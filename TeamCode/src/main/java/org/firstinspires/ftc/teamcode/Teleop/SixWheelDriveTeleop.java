@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
-import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
-import org.firstinspires.ftc.teamcode.vision.T265;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,9 +14,6 @@ public class SixWheelDriveTeleop extends OpMode {
     boolean slowMode;
     FileWriter writer;
     public void init(){
-        if (T265.slamra == null) {
-            T265.slamra = new T265Camera(new Transform2d(), T265.ODOMETRY_COVARIANCE, hardwareMap.appContext);
-        }
         hardware = new Hardware(hardwareMap,telemetry);
         slowMode = false;
         try {
@@ -30,9 +24,6 @@ public class SixWheelDriveTeleop extends OpMode {
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
-    }
-    public void start(){
-        T265.slamra.start();
     }
     public void loop(){
         double leftPower;
@@ -61,32 +52,7 @@ public class SixWheelDriveTeleop extends OpMode {
         hardware.sixWheelDrive.LB.setPower(leftPower);
         hardware.sixWheelDrive.RF.setPower(rightPower);
         hardware.sixWheelDrive.RB.setPower(rightPower);
-        hardware.sendT265OdoData= false;
         hardware.loop();
-        T265Camera.CameraUpdate up = T265.slamra.getLastReceivedCameraUpdate();
-        double[] t265position = T265.getCameraPosition(up);
-        try {
-            writer.write("desired X: " + t265position[0] + ", desired Y: " + t265position[1] + ", current X: " + hardware.getXAbsoluteCenter()  + ", current Y: " + hardware.getYAbsoluteCenter() +"\n");
-        }
-        catch(IOException e){
-            return;
-        }
-        if(up.confidence == null){
-            telemetry.addLine("no confidence level yet");
-        }
-        if(up.confidence == T265Camera.PoseConfidence.Failed){
-            telemetry.addLine("Pose Confidence Failed");
-        }
-        else if(up.confidence == T265Camera.PoseConfidence.Medium){
-            telemetry.addLine("Pose Confidence Medium");
-        }
-        else if(up.confidence == T265Camera.PoseConfidence.High){
-            telemetry.addLine("Pose Confidence High");
-        }
-        else{
-            telemetry.addLine("Pose Confidence Low");
-        }
-        telemetry.addLine("camera X: "+t265position[0]+", camera Y: "+t265position[1]);
         telemetry.addLine("left Power: " + leftPower + ", right Power: "+rightPower);
         telemetry.addLine("left position: " + hardware.hub1Motors[0].getCurrentPosition() + ", right position: " + hardware.hub1Motors[3].motor.getCurrentPosition() + ", lateral position: " + -hardware.hub1Motors[1].getCurrentPosition());
         telemetry.addLine("angle: "+hardware.angle + ", in degrees: "+ Math.toDegrees(hardware.angle) + ", from odo: "+ Math.toDegrees(hardware.angleOdo));
@@ -98,7 +64,6 @@ public class SixWheelDriveTeleop extends OpMode {
         telemetry.addLine("loops/sec: " + (hardware.loops / ((hardware.time.milliseconds()-hardware.startTime)/1000)));
     }
     public void stop(){
-        T265.slamra.stop();
         try {
             writer.close();
         } catch (IOException e) {

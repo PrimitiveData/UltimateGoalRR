@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Shooter;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Turret;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
-import org.firstinspires.ftc.teamcode.vision.T265;
 
 import java.util.List;
 
@@ -92,7 +91,6 @@ public class Hardware {
     public boolean currentlyForwardDirection = true;
     public double batteryVoltage;
     public static Telemetry telemetry;
-    public boolean sendT265OdoData;
     public double angle1 = 0;
     public double angle2 = 0;
     public Shooter shooter;
@@ -204,13 +202,6 @@ public class Hardware {
     }
     public void setBackwards(){
         currentlyForwardDirection = false;
-    }
-    public void sendT265Odometry(double localX, double localY, double deltaHeading, double deltaTime){
-        double[] T265VeloData = MathFunctions.transposeCoordinate(localX,localY,-T265.localXOffsetCameraToCenter,-T265.localYOffsetCameraToCenter,deltaHeading);
-        T265VeloData[0] = (T265VeloData[0] + T265.localXOffsetCameraToCenter)*0.0254/deltaTime;
-        T265VeloData[1] = (T265VeloData[1] + T265.localYOffsetCameraToCenter)*0.0254/deltaTime;
-        telemetry.addData("sentXVelo",-localX*0.0254/deltaTime);
-        T265.slamra.sendOdometry(-T265VeloData[0]*0.0254/deltaTime,-T265VeloData[1]*0.0254/deltaTime);
     }
     public void loop(){
 
@@ -354,9 +345,6 @@ public class Hardware {
         //double localYVelocity = (portVelo + (w*portOffset) + starboardVelo - (w * starboardOffset))/2.0;
 
          localYVelocity = localY*circumfrence/ticks_per_rotation/((currentTime - prevTime)/1000);
-         if(sendT265OdoData){
-             sendT265Odometry(localY*circumfrence/ticks_per_rotation,-localX*circumfrence/ticks_per_rotation,deltaAngle,deltaTime/1000);
-         }
         if(updatePID) {
             sixWheelDrive.updatePID(localYVelocity - w * trackWidth / 2, localYVelocity + w * trackWidth / 2);
         }

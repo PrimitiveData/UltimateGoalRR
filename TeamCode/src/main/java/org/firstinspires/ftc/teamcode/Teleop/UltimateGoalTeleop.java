@@ -110,7 +110,6 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.sixWheelDrive.LB.setPower(leftPower);
         hardware.sixWheelDrive.RF.setPower(rightPower);
         hardware.sixWheelDrive.RB.setPower(rightPower);
-        hardware.sendT265OdoData= false;
         hardware.loop();
         /*T265Camera.CameraUpdate up = T265.slamra.getLastReceivedCameraUpdate();
         double[] t265position = T265.getCameraPosition(up);

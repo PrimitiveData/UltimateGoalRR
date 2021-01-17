@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.MathFunctions;
-import org.firstinspires.ftc.teamcode.vision.T265;
 
 import java.util.List;
 
@@ -198,7 +197,6 @@ public class HardwareMecanum {
             previousAngleOdoReading = angle;
             prevLocalY = 0;
             firstLoop = false;
-            T265.slamra.start();
         }
         double currentTime = time.milliseconds();
         deltaTime = currentTime-prevTime;
