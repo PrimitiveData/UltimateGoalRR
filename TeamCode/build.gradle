@@ -20,4 +20,7 @@ repositories {
 
 dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+
+    implementation 'org.openftc:opencv-repackaged:4.1.0-B'
+    implementation 'com.android.support:support-annotations:28.0.0'
 }
