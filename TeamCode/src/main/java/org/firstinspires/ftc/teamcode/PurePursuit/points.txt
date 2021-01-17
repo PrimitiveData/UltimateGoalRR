@@ -1,0 +1,1 @@
+X:3 Y:3 Heading:3 TranslationPower:5.2 TurnPower:5.2
