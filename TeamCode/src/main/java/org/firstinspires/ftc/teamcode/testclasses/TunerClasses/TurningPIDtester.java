@@ -11,7 +11,6 @@ public class TurningPIDtester extends LinearOpMode {
     public void runOpMode() {
         Hardware hardware = new Hardware(hardwareMap, telemetry);
         waitForStart();
-        hardware.sendT265OdoData = false;
         TurretPID headingPID = new TurretPID(1.85,11,0.2, Math.toRadians(20), hardware.time);
         headingPID.setState(Math.toRadians(90));
         while(!isStopRequested()) {

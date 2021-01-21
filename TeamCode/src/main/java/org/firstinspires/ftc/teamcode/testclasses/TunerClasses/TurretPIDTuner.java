@@ -11,7 +11,6 @@ public class TurretPIDTuner extends LinearOpMode {
     public void runOpMode(){
         Hardware hardware = new Hardware(hardwareMap, telemetry);
         waitForStart();
-        hardware.sendT265OdoData = false;
         PIDwithBasePower turretPID = new PIDwithBasePower(0.87,0.7,0.3,0.15, Math.toRadians(0.75), Math.toRadians(20), hardware.time);
         turretPID.setState(Math.toRadians(-90));
         while(!isStopRequested()) {

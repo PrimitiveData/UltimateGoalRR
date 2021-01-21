@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testclasses;
+/*package org.firstinspires.ftc.teamcode.testclasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -37,4 +37,4 @@ public class magRotationUpdateTest extends LinearOpMode{
             return result;
         }
     }
-}
+}*/
