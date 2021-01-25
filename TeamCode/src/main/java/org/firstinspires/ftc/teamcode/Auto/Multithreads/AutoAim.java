@@ -6,14 +6,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
 public class AutoAim extends Thread {
-    Hardware hardware;
+    HardwareMecanum hardware;
 
     Telemetry telemetry;
     LinearOpMode parentOP;
     public boolean stopRequested;
-    public AutoAim(Hardware hardware, Telemetry telemetry, LinearOpMode parentOP){
+    public AutoAim(HardwareMecanum hardware, Telemetry telemetry, LinearOpMode parentOP){
         this.telemetry = telemetry;
         this.hardware = hardware;
         this.parentOP = parentOP;
@@ -21,7 +22,7 @@ public class AutoAim extends Thread {
     }
     public void run(){
         while(!parentOP.isStopRequested()&&!stopRequested) {
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(), hardware.getYAbsoluteCenter(), -4.72974566929, hardware.angle);
+            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(), hardware.getYAbsoluteCenter(), -4.72974566929, hardware.getAngle());
             telemetry.addLine("Turret Position: " + turretPosition[0] + ", " + turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.highGoalPosition[1], turretPosition[0] - FieldConstants.highGoalPosition[0]);
             double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1] - turretPosition[1], FieldConstants.highGoalPosition[0] - turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);

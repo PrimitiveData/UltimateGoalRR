@@ -5,13 +5,14 @@ import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.ContRotServo;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Turret {
     public static double ticks_per_radian=6258.22701028;
-    Hardware hardware;
+    HardwareMecanum hardware;
     ContRotServo[] turretServos;
     RegServo magRotationServo;
     public double startTurretPosition;
@@ -23,7 +24,7 @@ public class Turret {
     public double maxClockwise=180;
     public double turretAngleOffsetAdjustmentConstant=0;
     AutoShootInfo info;
-    public Turret(ContRotServo[] turretServos, RegServo magRotationServo, Motor encoder, Hardware hardware){
+    public Turret(ContRotServo[] turretServos, RegServo magRotationServo, Motor encoder, HardwareMecanum hardware){
         this.magRotationServo = magRotationServo;
         this.turretServos = turretServos;
         this.hardware = hardware;
@@ -54,7 +55,7 @@ public class Turret {
     }
     //sets the  angle of our turret to the global angle specified in the parameters
     public void setTurretAngle(double globalTurretAngle){//global turret angle is the angle with respect to the field, local is the angle with respect to the robot
-        double desiredLocalTurretAngle = MathFunctions.keepAngleWithin180Degrees(globalTurretAngle - hardware.angle);
+        double desiredLocalTurretAngle = MathFunctions.keepAngleWithin180Degrees(globalTurretAngle - hardware.getAngle());
         if(desiredLocalTurretAngle > 100){
             desiredLocalTurretAngle = 100;
         }
@@ -70,7 +71,7 @@ public class Turret {
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){
-        return MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),CENTER_TO_TURRET_INCHES,hardware.angle);
+        return MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),CENTER_TO_TURRET_INCHES,hardware.getAngle());
     }
     //sets the power of all the turret servos
     public void setAllTurretServoPowers(double power){

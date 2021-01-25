@@ -20,6 +20,11 @@ public class HardwareThreadInterface extends Thread {
         this.teleop = teleop;
         stopLooping = false;
     }
+    public HardwareThreadInterface(HardwareMecanum hardware, UltimateGoalTeleop teleop){
+        this.hardwareMecanum = hardware;
+        this.teleop = teleop;
+        stopLooping = false;
+    }
     public HardwareThreadInterface(HardwareMecanum hardware, LinearOpMode parentOP){
         this.hardwareMecanum = hardware;
         this.parentOP = parentOP;

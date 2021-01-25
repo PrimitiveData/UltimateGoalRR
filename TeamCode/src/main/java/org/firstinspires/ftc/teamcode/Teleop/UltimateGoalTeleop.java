@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.hardware.PID.TurretPID;
 
@@ -18,8 +21,7 @@ import java.io.IOException;
 
 @TeleOp(name = "aUltimateGoalTeleop",group="TeleOp")
 public class UltimateGoalTeleop extends OpMode {
-    double angleWhenIntakeIsOn = 0; // degrees
-    Hardware hardware;
+    HardwareMecanum hardware;
     boolean slowMode = false;
     boolean slowModeToggledPrevLoop = false;
     //toggles
@@ -56,11 +58,8 @@ public class UltimateGoalTeleop extends OpMode {
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new Hardware(hardwareMap,telemetry);
-        hardware.xPosTicks = Hardware.xPosTicksClassVariable;
-        hardware.yPosTicks = Hardware.yPosTicksClassVariable;
-        hardware.angle = startAngle;
-        hardware.canglePrev = startAngle;
+        hardware = new HardwareMecanum(hardwareMap,telemetry);
+        hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         slowMode = false;
         shooterVelo = -1600;
         magFlickerController = new MagFlickerController(hardware,this);
@@ -79,8 +78,6 @@ public class UltimateGoalTeleop extends OpMode {
         magThread.start();
     }
     public void loop(){
-        double leftPower;
-        double rightPower;
         if(gamepad1.left_trigger > 0) {
             if(!slowModeToggledPrevLoop) {
                 slowMode = !slowMode;
@@ -93,23 +90,23 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         if(!slowMode) {
-            double leftAbsValue = Math.abs(gamepad1.left_stick_y);
-            double rightAbsValue = Math.abs(gamepad1.right_stick_y);
-            leftPower = logistic(leftAbsValue, 1, 7.2) * -gamepad1.left_stick_y / leftAbsValue;
-            rightPower = logistic(rightAbsValue, 1, 7.2) * -gamepad1.right_stick_y / rightAbsValue;
+            hardware.drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x,
+                            -gamepad1.right_stick_x
+                    )
+            );
         }
         else{
-            leftPower = -gamepad1.left_stick_y*0.5;
-            rightPower = -gamepad1.right_stick_y*0.5;
+            hardware.drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -gamepad1.left_stick_y*0.3,
+                            -gamepad1.left_stick_x*0.3,
+                            -gamepad1.right_stick_x*0.3
+                    )
+            );
         }
-        if(gamepad1.b){
-            leftPower=0.3;
-            rightPower=-0.3;
-        }
-        hardware.sixWheelDrive.LF.setPower(leftPower);
-        hardware.sixWheelDrive.LB.setPower(leftPower);
-        hardware.sixWheelDrive.RF.setPower(rightPower);
-        hardware.sixWheelDrive.RB.setPower(rightPower);
         hardware.loop();
         /*T265Camera.CameraUpdate up = T265.slamra.getLastReceivedCameraUpdate();
         double[] t265position = T265.getCameraPosition(up);
@@ -208,7 +205,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.turret.setMagAngle(0.5);
         }
         else{
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.angle);
+            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
             telemetry.addLine("Turret Position: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
@@ -318,11 +315,11 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.turret.updatePID = true;
             hardware.turret.turretPID.setState(0);
             hardware.turret.updatePID = true;
-            double startingAngle = hardware.angle;
+            double startingAngle = hardware.getAngle();
             sleeep(1500);
-            double powershot1angle = Math.toDegrees(MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(2)+startingAngle));
-            double powershot2angle = Math.toDegrees(MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-5.5)+startingAngle));
-            double powershot3angle = Math.toDegrees(MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-10)+startingAngle));
+            double powershot1angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(2)+startingAngle);
+            double powershot2angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-5.5)+startingAngle);
+            double powershot3angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-10)+startingAngle);
             RobotLog.dd("TELEOPPOWERSHOT","startingAngle: "+startingAngle + ", powershot1Angle: "+powershot1angle+", powershot2Angle: "+powershot2angle+", powershot3Angle: "+powershot3angle);
             FileWriter writer = null;
             try {
@@ -336,15 +333,18 @@ public class UltimateGoalTeleop extends OpMode {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            turnToInterrupt(powershot1angle,1000,hardware);
+            hardware.drive.turnAsync(powershot1angle);
+            sleeep(1000);
             shootPowershot(hardware);
             sleeepInterrupt(200);
-            turnToInterrupt(powershot2angle, 1500,hardware);
+            hardware.drive.turnAsync(powershot2angle);
+            sleeep(1500);
             shootPowershot(hardware);
             hardware.mag.currentState = Mag.State.MID;
             hardware.mag.feedMidRing();
             sleeepInterrupt(200);
-            turnToInterrupt(powershot3angle,1750,hardware);
+            hardware.drive.turnAsync(powershot3angle);
+            sleeep(1750);
             hardware.mag.updateStateAndSetPosition();
             sleeepInterrupt(200);
             shootPowershot(hardware);
@@ -355,16 +355,10 @@ public class UltimateGoalTeleop extends OpMode {
         }
 
         if(gamepad1.dpad_up){
-            hardware.xPosTicks = -3.25 * Hardware.ticks_per_rotation/ Hardware.circumfrence;
-            hardware.yPosTicks = -3 * Hardware.ticks_per_rotation/ Hardware.circumfrence;
-            hardware.angle = 0;
-            hardware.canglePrev = 0;
+            hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
         }
         if(gamepad1.dpad_down){
-            hardware.xPosTicks = -3.25 * Hardware.ticks_per_rotation/ Hardware.circumfrence;
-            hardware.yPosTicks = 20.75 * Hardware.ticks_per_rotation/ Hardware.circumfrence;
-            hardware.angle = 0;
-            hardware.canglePrev = 0;
+            hardware.drive.setPoseEstimate(new Pose2d(-3.25,20.75,0));
         }
         if(gamepad1.dpad_right){
             hardware.shooter.setRampPosition(0);
@@ -389,8 +383,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         telemetry.addData("Wobbler grip",grip);
         telemetry.addData("Flap position",hardware.shooter.rampPostion);
-        telemetry.addLine("angle: "+hardware.angle + ", in degrees: "+ Math.toDegrees(hardware.angle) + ", from odo: "+ Math.toDegrees(hardware.angleOdo));
-        telemetry.addLine("angle 1: "+ Math.toDegrees(hardware.angle1) + ", angle 2: "+ Math.toDegrees(hardware.angle2));
+        telemetry.addLine("angle: "+hardware.getAngle() + ", in degrees: "+ Math.toDegrees(hardware.getAngle()));
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
         telemetry.addLine("left position: " + -hardware.hub1Motors[0].getCurrentPosition() + ", right position: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", lateral position: " + hardware.hub1Motors[1].getCurrentPosition());
         telemetry.addLine("shooter velo: "+shooterVelo);
@@ -442,11 +435,7 @@ public class UltimateGoalTeleop extends OpMode {
                 dPadRightToggledPrevLoop = false;
             }
         }
-        if(firstLoop){
-            hardware.angle = startAngle;
-            hardware.canglePrev = startAngle;
-            firstLoop=false;
-        }
+
     }
     public void stop(){
         //T265.slamra.stop();
@@ -458,36 +447,14 @@ public class UltimateGoalTeleop extends OpMode {
         }
     }
 
-    public void shootPowershot(Hardware hardware) {
+    public void shootPowershot(HardwareMecanum hardware) {
         hardware.mag.pushInRings();
         sleeepInterrupt(300);
         hardware.mag.setRingPusherResting();
         sleeepInterrupt(350);
         hardware.mag.updateStateAndSetPosition();
     }
-    public void turnTo(double targetAngleRadians, double duration, Hardware hardware) {
-        TurretPID headingPID = new TurretPID(1.2, 6, 0.12, Math.toRadians(20), hardware.time);
-        headingPID.setState(Math.toRadians(targetAngleRadians));
-        double startTime = hardware.time.milliseconds();
-        while (!teleopStopped && hardware.time.milliseconds() - startTime < duration) {
-            double output = headingPID.updateCurrentStateAndGetOutput(hardware.angle);
-            hardware.sixWheelDrive.turn(output);
-            hardware.loop();
-        }
-        hardware.sixWheelDrive.turn(0);
-    }
 
-    public void turnToInterrupt(double targetAngleRadians, double duration, Hardware hardware){
-        TurretPID headingPID = new TurretPID(1.2, 6, 0.12, Math.toRadians(20), hardware.time);
-        headingPID.setState(Math.toRadians(targetAngleRadians));
-        double startTime = hardware.time.milliseconds();
-        while (!teleopStopped && hardware.time.milliseconds() - startTime < duration && !gamepad2.b) {
-            double output = headingPID.updateCurrentStateAndGetOutput(hardware.angle);
-            hardware.sixWheelDrive.turn(output);
-            hardware.loop();
-        }
-        hardware.sixWheelDrive.turn(0);
-    }
 
     public void sleeepInterrupt(double milliseconds){
         double startTime = hardware.time.milliseconds();

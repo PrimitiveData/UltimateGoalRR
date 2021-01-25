@@ -5,13 +5,14 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.teamcode.Teleop.UltimateGoalTeleop;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
 public class MagFlickerController extends Thread {
-    public Hardware hardware;
+    public HardwareMecanum hardware;
     UltimateGoalTeleop parentOP;
     boolean shootRingRequested;
     boolean shootAllRingsRequested;
@@ -19,7 +20,7 @@ public class MagFlickerController extends Thread {
     int numButtonPresses;
     String TAG = "MagFlickerController";
     public Writer writer;
-    public MagFlickerController(Hardware hardware, UltimateGoalTeleop parentOP){
+    public MagFlickerController(HardwareMecanum hardware, UltimateGoalTeleop parentOP){
         this.hardware = hardware;
         this.parentOP = parentOP;
         shootRingRequested = false;

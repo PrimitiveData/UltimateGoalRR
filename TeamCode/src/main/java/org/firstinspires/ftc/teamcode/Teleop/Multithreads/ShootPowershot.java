@@ -5,17 +5,18 @@ import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.Teleop.UltimateGoalTeleop;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
 public class ShootPowershot extends Thread {
-    Hardware hardware;
+    HardwareMecanum hardware;
     UltimateGoalTeleop parentOP;
     Telemetry telemetry;
-    public ShootPowershot(Hardware hardware, UltimateGoalTeleop parentOP, Telemetry telemetry){
+    public ShootPowershot(HardwareMecanum hardware, UltimateGoalTeleop parentOP, Telemetry telemetry){
         this.hardware = hardware;
         this.parentOP = parentOP;
         this.telemetry = telemetry;
     }
-    public void shootPowershot(Hardware hardware) {
+    public void shootPowershot(HardwareMecanum hardware) {
         hardware.mag.pushInRings();
         sleeep(175);
         hardware.mag.setRingPusherResting();
