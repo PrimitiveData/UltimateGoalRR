@@ -15,6 +15,7 @@ public class ShooterTesterNew extends LinearOpMode {
         double deltaTime = 0;
         double deltaPosition = 0;
         double positionInitial = 0;
+        double currentPosition = 0;
         ElapsedTime time;
         time = new ElapsedTime();
         DcMotorEx shooter1 = hardwareMap.get(DcMotorEx.class, "shooterMotor1");
@@ -30,11 +31,12 @@ public class ShooterTesterNew extends LinearOpMode {
             shooterPower = gamepad1.right_stick_y;
             deltaTime = time.milliseconds() - timeInitial;
             deltaPosition = shooter1.getCurrentPosition() - positionInitial;
+            currentPosition = shooter1.getCurrentPosition();
             telemetry.addData("Shooter velo: ", deltaPosition/deltaTime*1000);
             telemetry.addData("Shooter encoder position: ", shooter1.getCurrentPosition());
             telemetry.update();
             timeInitial = time.milliseconds();
-            positionInitial = shooter1.getCurrentPosition();
+            positionInitial = currentPosition;
             sleep(100);
         }
     }
