@@ -18,10 +18,10 @@ public class ShooterTesterNew extends LinearOpMode {
         ElapsedTime time;
         time = new ElapsedTime();
         DcMotorEx shooter1 = hardwareMap.get(DcMotorEx.class, "shooterMotor1");
-        DcMotor shooter2 = hardwareMap.get(DcMotor.class, "shooterMotor2");
+        DcMotorEx shooter2 = hardwareMap.get(DcMotorEx.class, "shooterMotor2");
         shooter1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter1.setDirection(DcMotorEx.Direction.FORWARD);
+        shooter2.setDirection(DcMotorEx.Direction.FORWARD);
         waitForStart();
         double shooterPower = 0;
         while(!isStopRequested()){
@@ -30,7 +30,8 @@ public class ShooterTesterNew extends LinearOpMode {
             shooterPower = gamepad1.right_stick_y;
             deltaTime = time.milliseconds() - timeInitial;
             deltaPosition = shooter1.getCurrentPosition() - positionInitial;
-            telemetry.addData("Shooter Velo: ", deltaPosition/deltaTime);
+            telemetry.addData("Shooter velo: ", deltaPosition/deltaTime*1000);
+            telemetry.addData("Shooter encoder position: ", shooter1.getCurrentPosition());
             telemetry.update();
             timeInitial = time.milliseconds();
             positionInitial = shooter1.getCurrentPosition();
