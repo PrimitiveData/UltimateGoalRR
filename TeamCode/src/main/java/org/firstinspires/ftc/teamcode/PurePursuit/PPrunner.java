@@ -21,7 +21,7 @@ public class PPrunner {
     HardwareMecanum hardware;
     LinearOpMode parentOP;
     FileWriter writer;
-
+/*
     public PPrunner(String fileNameForPoints, HardwareMecanum hardware, LinearOpMode parentOP){
         this.parentOP = parentOP;
         this.hardware = hardware;
@@ -200,4 +200,5 @@ public class PPrunner {
         double turn = currentPoint.rotationPower* Range.clip(deltaHeadingToTurn,-1,1);
         hardware.mecanumDrive.setPowers(movementX+movementXErrorCorrection,movementY+movementYErrorCorrection,turn);
     }
+ */
 }

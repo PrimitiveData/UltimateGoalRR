@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Turret {
     public static double ticks_per_radian=6258.22701028;
-    HardwareMecanum hardware;
+    Hardware hardware;
     ContRotServo[] turretServos;
     RegServo magRotationServo;
     public double startTurretPosition;
@@ -24,13 +24,13 @@ public class Turret {
     public double maxClockwise=180;
     public double turretAngleOffsetAdjustmentConstant=0;
     AutoShootInfo info;
-    public Turret(ContRotServo[] turretServos, RegServo magRotationServo, Motor encoder, HardwareMecanum hardware){
+    public Turret(ContRotServo[] turretServos, RegServo magRotationServo, Motor encoder, Hardware hardware){
         this.magRotationServo = magRotationServo;
         this.turretServos = turretServos;
         this.hardware = hardware;
         this.encoder = encoder;
         encoder.readRequested = true;
-        startTurretPosition = localTurretAngleRadians();
+        //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
         turretPID = new PIDwithBasePower(1.4,4.15,0.45,0.085, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
         updatePID = false;
@@ -54,6 +54,7 @@ public class Turret {
         return turretAngleOffset+turretAngleOffsetAdjustmentConstant;
     }
     //sets the  angle of our turret to the global angle specified in the parameters
+    /*
     public void setTurretAngle(double globalTurretAngle){//global turret angle is the angle with respect to the field, local is the angle with respect to the robot
         double desiredLocalTurretAngle = MathFunctions.keepAngleWithin180Degrees(globalTurretAngle - hardware.getAngle());
         if(desiredLocalTurretAngle > 100){
@@ -92,4 +93,6 @@ public class Turret {
     public void setMagAngle(double position) {
         magRotationServo.setPosition(position);
     }
+
+     */
 }

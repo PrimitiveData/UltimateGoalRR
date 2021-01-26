@@ -25,6 +25,7 @@ public class MecanumDriveTeleop extends OpMode {
 
     }
     public void loop(){
+        /*
         hardware.mecanumDrive.setPowers(-gamepad1.left_stick_x,-gamepad1.left_stick_y,-gamepad1.right_stick_x);
         hardware.loop();
 
@@ -37,5 +38,6 @@ public class MecanumDriveTeleop extends OpMode {
         telemetry.addLine("XAltAlt: "+ hardware.xPosTicksAltAlt * Hardware.circumfrence / Hardware.ticks_per_rotation + ", YAltAlt: " + hardware.yPosTicksAltAlt * Hardware.circumfrence/ Hardware.ticks_per_rotation);
         telemetry.addLine("angularVeloTracker: "+hardware.integratedAngularVeloTracker);
         telemetry.addLine("loops/sec: " + (hardware.loops / ((hardware.time.milliseconds()-hardware.startTime)/1000)));
+         */
     }
 }

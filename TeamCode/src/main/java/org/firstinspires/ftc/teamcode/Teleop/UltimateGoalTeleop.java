@@ -144,11 +144,11 @@ public class UltimateGoalTeleop extends OpMode {
         if(manuelTurretControl){
             hardware.turret.updatePID = false;
             telemetry.addLine("manuel turret control on rn");
-            hardware.turret.setAllTurretServoPowers(gamepad2.left_stick_x);
+            //hardware.turret.setAllTurretServoPowers(gamepad2.left_stick_x);
         }
         else{
             hardware.turret.updatePID = true;
-            hardware.turret.pointTowardsHighGoal();
+            //hardware.turret.pointTowardsHighGoal();
         }
         telemetry.addData("turret Position",hardware.turret.encoder.getCurrentPosition());
         //intake control
@@ -202,7 +202,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(manuelRampControl){
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
-            hardware.turret.setMagAngle(0.5);
+            //hardware.turret.setMagAngle(0.5);
         }
         else{
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
@@ -214,7 +214,7 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
             }
             hardware.turret.updatePID = true;
-            hardware.turret.setTurretAngle(angleToGoal);
+            //hardware.turret.setTurretAngle(angleToGoal);
             shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
             /*if(gamepad2.dpad_down){
                 hardware.shooter.rampAngleAdjustmentConstant -= 0.001;
@@ -387,7 +387,7 @@ public class UltimateGoalTeleop extends OpMode {
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
         telemetry.addLine("left position: " + -hardware.hub1Motors[0].getCurrentPosition() + ", right position: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", lateral position: " + hardware.hub1Motors[1].getCurrentPosition());
         telemetry.addLine("shooter velo: "+shooterVelo);
-        telemetry.addLine("turret Angle: "+ Math.toDegrees(hardware.turret.localTurretAngleRadians())+", turret output power: "+gamepad2.left_stick_x);
+        //telemetry.addLine("turret Angle: "+ Math.toDegrees(hardware.turret.localTurretAngleRadians())+", turret output power: "+gamepad2.left_stick_x);
         telemetry.addLine("loops/sec: " + (hardware.loops / ((hardware.time.milliseconds()-hardware.startTime)/1000)));
         telemetry.update();
 //correcting autoaim
