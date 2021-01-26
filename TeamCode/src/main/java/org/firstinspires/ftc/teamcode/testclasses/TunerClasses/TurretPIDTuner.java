@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 
-@Autonomous(name = "TurretPIDTuner", group="Autonomous")
 public class TurretPIDTuner extends LinearOpMode {
     public void runOpMode(){
         Hardware hardware = new Hardware(hardwareMap, telemetry);

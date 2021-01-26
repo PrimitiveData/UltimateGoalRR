@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Shooter;
 
-@TeleOp(name = "motorRunner",group = "TeleOp")
 public class ShooterTester extends LinearOpMode {
     public void runOpMode(){
         DcMotor toTest = hardwareMap.get(DcMotor.class,"FFTuned");

@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 
-@TeleOp(name = "TurretTester", group = "TeleOp")
 public class TurretTester extends LinearOpMode {
     public void runOpMode(){
         Hardware hardware = new Hardware(hardwareMap,telemetry);

@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import java.io.FileWriter;
 import java.io.IOException;
 
-@TeleOp(name="fftuner", group="TeleOp")
 public class FeedForwardTuner extends LinearOpMode {
     Hardware hardware;
     String TAG = "feedfowardtuner";

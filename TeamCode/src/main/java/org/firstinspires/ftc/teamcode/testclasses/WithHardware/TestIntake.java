@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 
-@TeleOp(name = "IntakeTester", group = "TeleOp")
 public class TestIntake extends LinearOpMode {
     public void runOpMode(){
         Hardware hardware = new Hardware(hardwareMap,telemetry);

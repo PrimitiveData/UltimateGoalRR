@@ -37,9 +37,12 @@ public class HardwareMecanum {
     public ElapsedTime time;
     public int loops = 0;
     public boolean firstLoop = true;
-    public double startTime;
-    public double prevTime;
-    public double deltaTime;
+    public double startTimeHub1;
+    public double startTimeHub2;
+    public double prevTimeHub1;
+    public double prevTimeHub2;
+    public double deltaTimeHub1;
+    public double deltaTimeHub2;
     public static Telemetry telemetry;
     public Shooter shooter;
     public Turret turret;
@@ -76,8 +79,8 @@ public class HardwareMecanum {
         servos[5] = new RegServo(hardwareMap.get(Servo.class,"wobblerArm"));
         servos[6] = new RegServo(hardwareMap.get(Servo.class,"ringPusher"));
         servos[7] = new RegServo(hardwareMap.get(Servo.class, "magRotationServo"));
-        //shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
-        //turret = new Turret(new ContRotServo[]{CRservos[0],CRservos[1]}, servos[7], hub2Motors[0], this);
+        shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
+        turret = new Turret(new ContRotServo[]{CRservos[0],CRservos[1]}, servos[7], hub2Motors[0], this);
         intake = new Intake(hub2Motors[2],hub2Motors[3],servos[1]);
         mag = new Mag(servos[2],servos[6]);
         wobbler = new WobblerArm(servos[5],servos[4]);
@@ -102,6 +105,18 @@ public class HardwareMecanum {
                 motor.currentVelocity = motor.motor.getVelocity(AngleUnit.RADIANS);
             }
         }
+        if(firstLoop){
+            startTimeHub1 = time.milliseconds();
+            prevTimeHub1 = startTimeHub1;
+        }
+        double currentTimeHub1 = time.milliseconds();
+        deltaTimeHub1 = currentTimeHub1-prevTimeHub1;
+        prevTimeHub1 = currentTimeHub1;
+        drive.update();
+        currentPose = drive.getPoseEstimate();
+        poseStorage = currentPose;
+
+
         boolean hub2ReadNeeded = false;
         for(Motor motor: hub2Motors){
             if(motor != null && motor.readRequested)
@@ -118,36 +133,18 @@ public class HardwareMecanum {
             }
         }
         if(firstLoop){
-            startTime = time.milliseconds();
-            prevTime = startTime;
+            startTimeHub2 = time.milliseconds();
+            prevTimeHub2 = startTimeHub2;
             firstLoop = false;
         }
-        drive.update();
-        currentPose = drive.getPoseEstimate();
-        poseStorage = currentPose;
-        double currentTime = time.milliseconds();
-        deltaTime = currentTime-prevTime;
+        double currentTimeHub2 = time.milliseconds();
+        deltaTimeHub2 = currentTimeHub2-prevTimeHub2;
+        prevTimeHub2 = currentTimeHub2;
         if(shooter.updatePID) {
-            shooter.updateShooterPIDF(deltaTime / 1000);
+            shooter.updateShooterPIDF(deltaTimeHub2 / 1000);
         }
         if(turret.updatePID){
-            //turret.updateTurretPID();
-        }
-        for(Motor motor: hub1Motors){
-            if(motor!=null&&motor.setTargetPosRequested){
-                motor.motor.setTargetPosition(motor.targetPosition);
-                motor.setTargetPosRequested = false;
-            }
-        }
-        for(Motor motor: hub1Motors){
-            if(motor!=null&&motor.writePowerRequested){
-                motor.motor.setPower(motor.power);
-                motor.writePowerRequested = false;
-            }
-            if(motor!=null&&motor.writeVelocityRequested){
-                motor.motor.setVelocity(motor.velocity);
-                motor.writeVelocityRequested = false;
-            }
+            turret.updateTurretPID();
         }
         for(Motor motor: hub2Motors){
             if(motor!=null&&motor.setTargetPosRequested){
@@ -177,7 +174,6 @@ public class HardwareMecanum {
                 CRservo.writeRequested = false;
             }
         }
-        prevTime = currentTime;
     }
     public double getXAbsoluteCenter(){
         return currentPose.getX();

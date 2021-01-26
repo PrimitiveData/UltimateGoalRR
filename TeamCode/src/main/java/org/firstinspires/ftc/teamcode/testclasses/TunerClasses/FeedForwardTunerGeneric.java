@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.io.FileWriter;
 import java.io.IOException;
 
-@TeleOp(name="fftunergeneric", group="TeleOp")
 public class FeedForwardTunerGeneric extends LinearOpMode {
     final double ZERO_TO_MAX_TIME = 120000;//milliseconds
     public void runOpMode(){

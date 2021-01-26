@@ -15,7 +15,7 @@ public class Shooter {
     public Motor shooterMotor1;
     public Motor shooterMotor2;
     public ShooterPID shooterVeloPID;
-    Hardware hardware;
+    HardwareMecanum hardware;
     public RegServo shootAngleController;
     public boolean firstUpdateShooterPIDFLoop = true;
     private double prevShooterPos;
@@ -23,7 +23,7 @@ public class Shooter {
     public double rampPostion = 0;
     AutoShootInfo info;
     public double rampAngleAdjustmentConstant=0;
-    public Shooter(Motor shooterMotor1, Motor shooterMotor2, RegServo shootAngleController, Hardware hardware){
+    public Shooter(Motor shooterMotor1, Motor shooterMotor2, RegServo shootAngleController, HardwareMecanum hardware){
         this.shootAngleController = shootAngleController;
         this.shooterMotor1 = shooterMotor1;
         this.shooterMotor2 = shooterMotor2;

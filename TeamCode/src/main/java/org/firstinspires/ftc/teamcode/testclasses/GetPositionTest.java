@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 
-@TeleOp(name="GetPositionTest", group="TeleOp")
 public class GetPositionTest extends LinearOpMode {
     public void runOpMode(){
         Hardware hardware = new Hardware(hardwareMap,telemetry);
