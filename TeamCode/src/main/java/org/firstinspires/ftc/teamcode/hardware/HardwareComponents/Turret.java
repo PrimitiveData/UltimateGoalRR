@@ -13,20 +13,20 @@ import org.firstinspires.ftc.teamcode.hardware.RegServo;
 public class Turret {
     public static double ticks_per_radian=6258.22701028;
     HardwareMecanum hardware;
-    ContRotServo[] turretServos;
+    public Motor turretMotor;
     RegServo magRotationServo;
     public double startTurretPosition;
     public PIDwithBasePower turretPID;
     public Motor encoder;
-    public double CENTER_TO_TURRET_INCHES;
+    public double CENTER_TO_TURRET_INCHES; //needs to be updated
     public boolean updatePID;
-    public double maxCounterClockwise=180;
-    public double maxClockwise=180;
-    public double turretAngleOffsetAdjustmentConstant=0;
+    public double maxCounterClockwise = 280; //subject to change
+    public double maxClockwise = 280; //subject to change
+    public double turretAngleOffsetAdjustmentConstant = 0;
     AutoShootInfo info;
-    public Turret(ContRotServo[] turretServos, RegServo magRotationServo, Motor encoder, HardwareMecanum hardware){
+    public Turret(Motor turretMotor, RegServo magRotationServo, Motor encoder, HardwareMecanum hardware){
         this.magRotationServo = magRotationServo;
-        this.turretServos = turretServos;
+        this.turretMotor = turretMotor;
         this.hardware = hardware;
         this.encoder = encoder;
         encoder.readRequested = true;
@@ -68,17 +68,15 @@ public class Turret {
     //updates the turret's PID
     public void updateTurretPID(){
         double output = turretPID.updateCurrentStateAndGetOutput(localTurretAngleRadians());
-        setAllTurretServoPowers(output);
+        setTurretMotorPower(output);
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){
         return MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),CENTER_TO_TURRET_INCHES,hardware.getAngle());
     }
-    //sets the power of all the turret servos
-    public void setAllTurretServoPowers(double power){
-        for(ContRotServo crservo: turretServos){
-            crservo.setPower(power);
-        }
+    //sets the power of turret motor
+    public void setTurretMotorPower(double power){
+        turretMotor.setPower(power);
     }
     //points the robot directly towards the high goal
     public void pointTowardsHighGoal(){
