@@ -14,7 +14,7 @@ public class TurretTester extends LinearOpMode {
             telemetry.addData("output",output);
             telemetry.addData("turretPosition",-hardware.turret.encoder.getCurrentPosition());
             telemetry.update();
-            hardware.turret.setAllTurretServoPowers(gamepad1.left_stick_y);
+            hardware.turret.setTurretMotorPower(gamepad1.left_stick_y);
             hardware.loop();
         }
     }

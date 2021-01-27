@@ -86,8 +86,6 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.loop();
 
         hardware.mag.setRingPusherResting();
-        hardware.mag.currentState = Mag.State.TOP;
-        hardware.mag.magServo.servo.setPosition(0.32);
         waitForStart();
         hardware.intake.dropIntake();
         hardwareThreadInterface.start();
@@ -109,15 +107,6 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.shooter.rampAngleAdjustmentConstant = 0.06;
         autoAim1.start();
         hardware.drive.followTrajectoryAsync(goToShootPos);
-        hardware.mag.currentState = Mag.State.TOP;
-        hardware.mag.feedTopRing();
-        sleep(250);
-        shootPowershot(hardware);
-        hardware.shooter.rampAngleAdjustmentConstant = 0.0625;
-        sleep(200);
-        shootPowershot(hardware);
-        hardware.shooter.rampAngleAdjustmentConstant = 0.075;
-        sleep(200);
         shootPowershot(hardware);
         autoAim1.stopRequested = true;
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
@@ -172,8 +161,6 @@ public class UltimateGoalRedAuto extends AutoMethods {
             autoAim2.start();
             sleep(2000);
             hardware.intake.turnIntake(1);
-            hardware.mag.currentState = Mag.State.BOTTOM;
-            hardware.mag.feedBottomRing();
             sleep(500);
             shootPowershot(hardware);
             autoAim2.stopRequested = true;
@@ -200,18 +187,10 @@ public class UltimateGoalRedAuto extends AutoMethods {
             hardware.shooter.rampAngleAdjustmentConstant = -0.02;
             sleep(2650);
             hardware.intake.turnIntake(0);
-            hardware.mag.currentState = Mag.State.TOP;
-            hardware.mag.feedTopRing();
-            sleep(200);
-            shootPowershot(hardware);
-            hardware.shooter.rampAngleAdjustmentConstant = 0;
-            sleep(250);
-            shootPowershot(hardware);
-            sleep(250);
             shootPowershot(hardware);
             autoAim.stopRequested = true;
             hardware.turret.updatePID=false;
-            hardware.turret.setAllTurretServoPowers(0);
+            hardware.turret.setTurretMotorPower(0);
             hardware.drive.turnAsync(Math.toRadians(-3.25));
             sleep(1600);
         }

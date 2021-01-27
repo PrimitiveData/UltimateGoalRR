@@ -6,21 +6,17 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Intake {
-    Motor intakeMotor1;
-    Motor intakeMotor2;
+    Motor intakeMotor;
     RegServo intakeDropperGuard;
     double holdIntakeUp = 0.36;
     double releaseIntake = 0;
-    public Intake(Motor intakeMotor1, Motor intakeMotor2, RegServo intakeDropperGuard){
-        this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
-        this.intakeMotor1.motor.setDirection(DcMotorEx.Direction.FORWARD);
-        this.intakeMotor2.motor.setDirection(DcMotorEx.Direction.REVERSE);
+    public Intake(Motor intakeMotor, RegServo intakeDropperGuard){
+        this.intakeMotor = intakeMotor;
+        this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.intakeDropperGuard =intakeDropperGuard;
     }
     public void turnIntake(double power){
-        intakeMotor1.setPower(power);
-        intakeMotor2.setPower(power);
+        intakeMotor.setPower(power);
     }
     public void dropIntake(){
         intakeDropperGuard.setPosition(releaseIntake);

@@ -157,7 +157,7 @@ public class Hardware {
         servos[7] = new RegServo(hardwareMap.get(Servo.class, "magRotationServo"));
         //shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
         //turret = new Turret(new ContRotServo[]{CRservos[0],CRservos[1]}, servos[7], hub2Motors[0], this);
-        intake = new Intake(hub2Motors[2],hub2Motors[3],servos[1]);
+        intake = new Intake(hub2Motors[2],servos[1]);
         mag = new Mag(servos[2],servos[6]);
         wobbler = new WobblerArm(servos[5],servos[4]);
     }

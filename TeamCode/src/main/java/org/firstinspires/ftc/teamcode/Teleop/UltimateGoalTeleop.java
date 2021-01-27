@@ -144,7 +144,7 @@ public class UltimateGoalTeleop extends OpMode {
         if(manuelTurretControl){
             hardware.turret.updatePID = false;
             telemetry.addLine("manuel turret control on rn");
-            hardware.turret.setAllTurretServoPowers(gamepad2.left_stick_x);
+            hardware.turret.setTurretMotorPower(gamepad2.left_stick_x);
         }
         else{
             hardware.turret.updatePID = true;
@@ -176,7 +176,7 @@ public class UltimateGoalTeleop extends OpMode {
         //mag control
         if(gamepad1.right_bumper) {
             if(!magUpdateStateAndSetPositionPrevLoop) {
-                magFlickerController.updateMagStateAndSetPositionAndShootAllRings();
+                magFlickerController.shootAllRings();
             }
             magUpdateStateAndSetPositionPrevLoop = true;
         }
@@ -310,8 +310,6 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(0);
             hardware.shooter.updatePID = true;
             hardware.turret.updatePID = true;
-            hardware.mag.feedTopRing();
-            hardware.mag.currentState = Mag.State.TOP;
             hardware.turret.updatePID = true;
             hardware.turret.turretPID.setState(0);
             hardware.turret.updatePID = true;
@@ -320,34 +318,16 @@ public class UltimateGoalTeleop extends OpMode {
             double powershot1angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(2)+startingAngle);
             double powershot2angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-5.5)+startingAngle);
             double powershot3angle = MathFunctions.keepAngleWithinSetRange(startingAngle - Math.toRadians(180), startingAngle + Math.toRadians(180), Math.toRadians(-10)+startingAngle);
-            RobotLog.dd("TELEOPPOWERSHOT","startingAngle: "+startingAngle + ", powershot1Angle: "+powershot1angle+", powershot2Angle: "+powershot2angle+", powershot3Angle: "+powershot3angle);
-            FileWriter writer = null;
-            try {
-                writer = new FileWriter("//sdcard//FIRST//TeleopPowerShot.txt");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                writer.write("startingAngle: " + Math.toDegrees(startingAngle) + ", powershot1Angle: " + powershot1angle + ", powershot2Angle: " + powershot2angle + ", powershot3Angle: " + powershot3angle);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            hardware.mag.dropRings();
             hardware.drive.turnAsync(powershot1angle);
             sleeep(1000);
-            shootPowershot(hardware);
-            sleeepInterrupt(200);
+            shootRing(hardware);
             hardware.drive.turnAsync(powershot2angle);
             sleeep(1500);
-            shootPowershot(hardware);
-            hardware.mag.currentState = Mag.State.MID;
-            hardware.mag.feedMidRing();
-            sleeepInterrupt(200);
+            shootRing(hardware);
             hardware.drive.turnAsync(powershot3angle);
             sleeep(1750);
-            hardware.mag.updateStateAndSetPosition();
-            sleeepInterrupt(200);
-            shootPowershot(hardware);
+            shootRing(hardware);
             hardware.turret.updatePID = false;
             hardware.shooter.shooterVeloPID.setState(-1600);
             hardware.shooter.updatePID = false;
@@ -360,27 +340,15 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.dpad_down){
             hardware.drive.setPoseEstimate(new Pose2d(-3.25,20.75,0));
         }
-        if(gamepad1.dpad_right){
+        /*if(gamepad1.dpad_right){
             hardware.shooter.setRampPosition(0);
             hardware.mag.updateStateAndSetPosition();
             sleeep(500);
             hardware.mag.pushInRings();
             sleeep(250);
             hardware.mag.setRingPusherResting();
-        }
+        }*/
         telemetry.addData("shooter On",shooterOn);
-        if(hardware.mag.currentState == Mag.State.BOTTOM){
-            telemetry.addLine("Mag State: BOTTOM");
-        }
-        else if(hardware.mag.currentState == Mag.State.MID){
-            telemetry.addLine("Mag State: MID");
-        }
-        else if(hardware.mag.currentState == Mag.State.TOP){
-            telemetry.addLine("Mag State: TOP");
-        }
-        else{
-            telemetry.addLine("Mag State: COLLECT");
-        }
         telemetry.addData("Wobbler grip",grip);
         telemetry.addData("Flap position",hardware.shooter.rampPostion);
         telemetry.addLine("angle: "+hardware.getAngle() + ", in degrees: "+ Math.toDegrees(hardware.getAngle()));
@@ -446,12 +414,10 @@ public class UltimateGoalTeleop extends OpMode {
         }
     }
 
-    public void shootPowershot(HardwareMecanum hardware) {
+    public void shootRing(HardwareMecanum hardware) {
         hardware.mag.pushInRings();
-        sleeepInterrupt(300);
+        sleeep(250);
         hardware.mag.setRingPusherResting();
-        sleeepInterrupt(350);
-        hardware.mag.updateStateAndSetPosition();
     }
 
 

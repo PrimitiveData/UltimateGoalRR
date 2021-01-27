@@ -14,7 +14,6 @@ import java.io.Writer;
 public class MagFlickerController extends Thread {
     public HardwareMecanum hardware;
     UltimateGoalTeleop parentOP;
-    boolean shootRingRequested;
     boolean shootAllRingsRequested;
     boolean firstButtonPress = false;
     int numButtonPresses;
@@ -23,7 +22,6 @@ public class MagFlickerController extends Thread {
     public MagFlickerController(HardwareMecanum hardware, UltimateGoalTeleop parentOP){
         this.hardware = hardware;
         this.parentOP = parentOP;
-        shootRingRequested = false;
         shootAllRingsRequested = false;
         firstButtonPress = true;
         numButtonPresses = 0;
@@ -47,87 +45,20 @@ public class MagFlickerController extends Thread {
     public void run(){
         while(!parentOP.teleopStopped){
             if(shootAllRingsRequested){
-                hardware.mag.currentState = Mag.State.COLLECT;
-                parentOP.currentlyIncrementingMagDuringShooting = true;
+                hardware.mag.dropRings();
+                sleeep(500);//tune timeout
                 for(int i = 0; i < 3; i++){
-                    hardware.mag.updateStateAndSetPosition();
-                    sleeep(250);
                     hardware.mag.pushInRings();
-                    sleeep(100);
+                    sleeep(250);// tune time
                     hardware.mag.setRingPusherResting();
-                    sleeep(75);
-                    hardware.shooter.setRampPosition(hardware.shooter.rampPostion+=0.0125);
+                    sleeep(250);// tune time
                 }
-                parentOP.currentlyIncrementingMagDuringShooting = false;
-                shootAllRingsRequested=false;
-                hardware.mag.updateStateAndSetPosition();
-            }
-            if(shootRingRequested){
-                numButtonPresses++;
-                RobotLog.dd(TAG,numButtonPresses+" press checkpoint 1: " + hardware.mag.currentState.toString());
-                try {
-                    writer.write(numButtonPresses+" press checkpoint 1: " + hardware.mag.currentState.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                hardware.mag.updateStateAndSetPosition();
-                RobotLog.dd(TAG,numButtonPresses+" press checkpoint 2: " + hardware.mag.currentState.toString());
-                try {
-                    writer.write(numButtonPresses+" press checkpoint 2: " + hardware.mag.currentState.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(firstButtonPress){
-                    hardware.mag.currentState = Mag.State.TOP;
-                    firstButtonPress = false;
-                }
-                RobotLog.dd(TAG,numButtonPresses+" press checkpoint 3: " + hardware.mag.currentState.toString());
-                try {
-                    writer.write(numButtonPresses+" press checkpoint 3: " + hardware.mag.currentState.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(hardware.mag.currentState == Mag.State.COLLECT){
-                    hardware.mag.setRingPusherResting();
-                    RobotLog.dd(TAG,numButtonPresses+" press checkpoint 4: " + hardware.mag.currentState.toString());
-                    try {
-                        writer.write(numButtonPresses+" press checkpoint 4: " + hardware.mag.currentState.toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else{
-                    sleeep(225);
-                    hardware.shooter.shooterVeloPID.speedyRecoveryOn = false;
-                    hardware.mag.pushInRings();
-                    RobotLog.dd(TAG,numButtonPresses+" press checkpoint 5 time: " + hardware.time.milliseconds());
-                    try {
-                        writer.write(numButtonPresses+" press checkpoint 5 time: " + hardware.time.milliseconds());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    sleeep(175);
-                    hardware.shooter.shooterVeloPID.speedyRecoveryOn = true;
-                    hardware.mag.setRingPusherResting();
-                    RobotLog.dd(TAG,numButtonPresses+" press checkpoint 6 time: " + hardware.time.milliseconds());
-                    try {
-                        writer.write(numButtonPresses+" press checkpoint 6 time: " + hardware.time.milliseconds());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    sleeep(175);
-                    if(hardware.mag.currentState == Mag.State.BOTTOM){
-                        hardware.mag.updateStateAndSetPosition();
-                    }
-                }
-                shootRingRequested = false;
+                hardware.mag.collectRings();
+                shootAllRingsRequested = false;
             }
         }
     }
-    public void updateMagStateAndSetPosition(){
-        shootRingRequested = true;
-    }
-    public void updateMagStateAndSetPositionAndShootAllRings(){
+    public void shootAllRings(){
         shootAllRingsRequested = true;
     }
 }

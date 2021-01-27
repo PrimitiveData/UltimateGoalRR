@@ -66,12 +66,10 @@ public class HardwareMecanum {
         hub2Motors = new Motor[4];//initialize here
         servos = new RegServo[12];//initialize here
         CRservos = new ContRotServo[12];
-        CRservos[0] = new ContRotServo(hardwareMap.get(CRServo.class,"turretServo1"));
-        CRservos[1] = new ContRotServo(hardwareMap.get(CRServo.class,"turretServo2"));
         hub2Motors[0] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor1"));
         hub2Motors[1] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor2"));
-        hub2Motors[2] = new Motor(hardwareMap.get(DcMotorEx.class,"intakeMotor1"));
-        hub2Motors[3] = new Motor(hardwareMap.get(DcMotorEx.class,"intakeMotor2"));
+        hub2Motors[2] = new Motor(hardwareMap.get(DcMotorEx.class,"intakeMotor"));
+        hub2Motors[3] = new Motor(hardwareMap.get(DcMotorEx.class,"turretMotor"));
         servos[0] = new RegServo(hardwareMap.get(Servo.class,"shootAngleController"));
         servos[1] = new RegServo(hardwareMap.get(Servo.class,"intakeDropperGuard"));
         servos[2] = new RegServo(hardwareMap.get(Servo.class,"magServo"));
@@ -80,8 +78,8 @@ public class HardwareMecanum {
         servos[6] = new RegServo(hardwareMap.get(Servo.class,"ringPusher"));
         servos[7] = new RegServo(hardwareMap.get(Servo.class, "magRotationServo"));
         shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
-        turret = new Turret(new ContRotServo[]{CRservos[0],CRservos[1]}, servos[7], hub2Motors[0], this);
-        intake = new Intake(hub2Motors[2],hub2Motors[3],servos[1]);
+        turret = new Turret(hub2Motors[3], servos[7], hub2Motors[0], this);
+        intake = new Intake(hub2Motors[2],servos[1]);
         mag = new Mag(servos[2],servos[6]);
         wobbler = new WobblerArm(servos[5],servos[4]);
         drive = new SampleMecanumDrive(hardwareMap);

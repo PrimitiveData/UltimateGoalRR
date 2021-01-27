@@ -4,11 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 
 public class TurretPIDTuner extends LinearOpMode {
     public void runOpMode(){
-        Hardware hardware = new Hardware(hardwareMap, telemetry);
+        HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         waitForStart();
         PIDwithBasePower turretPID = new PIDwithBasePower(0.87,0.7,0.3,0.15, Math.toRadians(0.75), Math.toRadians(20), hardware.time);
         turretPID.setState(Math.toRadians(-90));
@@ -34,7 +35,7 @@ public class TurretPIDTuner extends LinearOpMode {
             telemetry.addData("output: ",output);
             telemetry.addData("currentIntegral: ",turretPID.integral);
             telemetry.update();
-            hardware.turret.setAllTurretServoPowers(output);
+            hardware.turret.setTurretMotorPower(output);
             hardware.loop();
         }
     }
