@@ -121,7 +121,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.turret.turretPID.setState(0);
         hardware.turret.updatePID = true;
         hardware.turret.turretPID.setState(0);
-        hardware.wobbler.goToAutoWobblerDropPosition();
+        hardware.wobbler.goToWobblerDropPosition();
         sleep(600);
         hardware.wobbler.releaseWobble();
         sleep(50);
@@ -208,7 +208,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             hardware.wobbler.goToWobblerDropPosition();
         }
         else{
-            hardware.wobbler.goToAutoWobblerDropPosition();
+            hardware.wobbler.goToWobblerDropPosition();
         }
         sleep(300);
         if(stack == 0){
