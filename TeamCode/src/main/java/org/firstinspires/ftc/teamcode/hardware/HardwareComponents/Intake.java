@@ -10,24 +10,32 @@ public class Intake {
     Motor intakeMotor;
     RegServo intakeDropperGuard;
     ContRotServo intakeServoStarboard;
-    ContRotServo getIntakeServoPort;
+    ContRotServo intakeServoPort;
     double holdIntakeUp = 0.36;
+    double bumperRaised = 0; //to be changed
     double releaseIntake = 0;
-    public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo getIntakeServoPort){
+    public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
         this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.intakeDropperGuard =intakeDropperGuard;
         this.intakeServoStarboard = intakeServoStarboard;
-        this.getIntakeServoPort = getIntakeServoPort;
+        this.intakeServoPort = intakeServoPort;
     }
     public void turnIntake(double power){
         intakeMotor.setPower(power);
         if(power != 0) {
-            intakeServoStarboard.setPower(1);
-            getIntakeServoPort.setPower(0);
+            intakeServoStarboard.setPower(-1);
+            intakeServoPort.setPower(1);
+        }
+        else{
+            intakeServoStarboard.setPower(0);
+            intakeServoStarboard.setPower(0);
         }
     }
     public void dropIntake(){
         intakeDropperGuard.setPosition(releaseIntake);
+    }
+    public void raiseBumper(){
+        intakeDropperGuard.setPosition(bumperRaised);
     }
 }
