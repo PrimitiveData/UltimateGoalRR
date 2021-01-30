@@ -15,21 +15,15 @@ public class Turret {
     HardwareMecanum hardware;
     public Motor turretMotor;
     RegServo magRotationServo;
-    public double startTurretPosition;
     public PIDwithBasePower turretPID;
-    public Motor encoder;
     public double CENTER_TO_TURRET_INCHES; //needs to be updated
     public boolean updatePID;
-    public double maxCounterClockwise = 280; //subject to change
-    public double maxClockwise = 280; //subject to change
     public double turretAngleOffsetAdjustmentConstant = 0;
     AutoShootInfo info;
-    public Turret(Motor turretMotor, RegServo magRotationServo, Motor encoder, HardwareMecanum hardware){
+    public Turret(Motor turretMotor, RegServo magRotationServo, HardwareMecanum hardware){
         this.magRotationServo = magRotationServo;
         this.turretMotor = turretMotor;
         this.hardware = hardware;
-        this.encoder = encoder;
-        encoder.readRequested = true;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
         turretPID = new PIDwithBasePower(1.4,4.15,0.45,0.085, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
@@ -88,7 +82,7 @@ public class Turret {
     }
     //gets the local position of the turret in radians
     public double localTurretAngleRadians(){
-        return -encoder.getCurrentPosition()/ticks_per_radian;
+        return turretMotor.getCurrentPosition()/ticks_per_radian;
     }
     public void setMagAngle(double position) {
         magRotationServo.setPosition(position);

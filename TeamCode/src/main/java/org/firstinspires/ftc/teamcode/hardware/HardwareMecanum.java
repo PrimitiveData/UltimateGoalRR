@@ -81,7 +81,7 @@ public class HardwareMecanum {
         CRservos[0] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerStarboard"));
         CRservos[1] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerPort"));
         shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
-        turret = new Turret(hub2Motors[3], servos[7], hub2Motors[0], this);
+        turret = new Turret(hub2Motors[3], servos[7], this);
         intake = new Intake(hub2Motors[2],servos[1],CRservos[0],CRservos[1]);
         mag = new Mag(servos[2],servos[6]);
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
