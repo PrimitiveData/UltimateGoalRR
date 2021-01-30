@@ -19,7 +19,7 @@ import java.io.Writer;
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
-@TeleOp(group = "drive", name = "LocalizationTest")
+@TeleOp(group = "drive", name = "AnalogGyroTuner")
 public class AnalogGyroTuner extends LinearOpMode {
     double timeToAccelerateToMax = 10000;//ms
     double timeToAccelerateToOppositeMaximum = 20000;//ms

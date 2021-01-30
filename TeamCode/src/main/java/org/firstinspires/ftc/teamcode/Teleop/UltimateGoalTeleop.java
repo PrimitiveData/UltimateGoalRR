@@ -150,7 +150,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.turret.updatePID = true;
             hardware.turret.pointTowardsHighGoal();
         }
-        telemetry.addData("turret Position",hardware.turret.encoder.getCurrentPosition());
+        telemetry.addData("turret Position",hardware.turret.turretMotor.getCurrentPosition());
         //intake control
         if(gamepad1.right_trigger>0) {
             if(!intakeOnToggledPrevLoop) {
