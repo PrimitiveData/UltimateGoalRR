@@ -66,10 +66,10 @@ public class HardwareMecanum {
         hub2Motors = new Motor[4];//initialize here
         servos = new RegServo[12];//initialize here
         CRservos = new ContRotServo[12];
-        hub2Motors[0] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor1"));
-        hub2Motors[1] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor2"));
-        hub2Motors[2] = new Motor(hardwareMap.get(DcMotorEx.class,"intakeMotor"));
-        hub2Motors[3] = new Motor(hardwareMap.get(DcMotorEx.class,"turretMotor"));
+        hub1Motors[0] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor1"));
+        hub1Motors[1] = new Motor(hardwareMap.get(DcMotorEx.class,"shooterMotor2"));
+        hub1Motors[2] = new Motor(hardwareMap.get(DcMotorEx.class,"intakeMotor"));
+        hub1Motors[3] = new Motor(hardwareMap.get(DcMotorEx.class,"turretMotor"));
         servos[0] = new RegServo(hardwareMap.get(Servo.class,"shootAngleController"));
         servos[1] = new RegServo(hardwareMap.get(Servo.class,"intakeDropperGuard"));
         servos[2] = new RegServo(hardwareMap.get(Servo.class,"magServo"));
@@ -78,9 +78,11 @@ public class HardwareMecanum {
         servos[6] = new RegServo(hardwareMap.get(Servo.class,"ringPusher"));
         servos[7] = new RegServo(hardwareMap.get(Servo.class, "magRotationServo"));
         servos[8] = new RegServo(hardwareMap.get(Servo.class,"wobblerArm2"));
+        CRservos[0] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerStarboard"));
+        CRservos[1] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerPort"));
         shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
         turret = new Turret(hub2Motors[3], servos[7], hub2Motors[0], this);
-        intake = new Intake(hub2Motors[2],servos[1]);
+        intake = new Intake(hub2Motors[2],servos[1],CRservos[0],CRservos[1]);
         mag = new Mag(servos[2],servos[6]);
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
         drive = new SampleMecanumDrive(hardwareMap);
@@ -89,7 +91,7 @@ public class HardwareMecanum {
 
     public void loop(){
         loops++;
-        boolean hub1ReadNeeded = true;
+        boolean hub1ReadNeeded = false;
         for(Motor motor: hub1Motors){
             if(motor != null && motor.readRequested){
                 hub1ReadNeeded = true;
@@ -111,19 +113,34 @@ public class HardwareMecanum {
         double currentTimeHub1 = time.milliseconds();
         deltaTimeHub1 = currentTimeHub1-prevTimeHub1;
         prevTimeHub1 = currentTimeHub1;
-        drive.update();
-        currentPose = drive.getPoseEstimate();
-        poseStorage = currentPose;
-
-
-        boolean hub2ReadNeeded = false;
-        for(Motor motor: hub2Motors){
-            if(motor != null && motor.readRequested)
-                hub2ReadNeeded = true;
+        if(shooter.updatePID) {
+            shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
         }
+        if(turret.updatePID){
+            turret.updateTurretPID();
+        }
+        for(Motor motor: hub1Motors){
+            if(motor!=null&&motor.setTargetPosRequested){
+                motor.motor.setTargetPosition(motor.targetPosition);
+                motor.setTargetPosRequested = false;
+            }
+        }
+        for(Motor motor: hub1Motors){
+            if(motor!=null&&motor.writePowerRequested){
+                motor.motor.setPower(motor.power);
+                motor.writePowerRequested = false;
+            }
+            if(motor!=null&&motor.writeVelocityRequested){
+                motor.motor.setVelocity(motor.velocity);
+                motor.writeVelocityRequested = false;
+            }
+        }
+
+        boolean hub2ReadNeeded = true;
         if(hub2ReadNeeded) {
             allHubs.get(1).clearBulkCache();
         }
+        drive.update();
         for(int i = 0; i <hub2Motors.length;i++){
             Motor motor = hub2Motors[i];
             if(motor != null && motor.readRequested){
@@ -139,28 +156,9 @@ public class HardwareMecanum {
         double currentTimeHub2 = time.milliseconds();
         deltaTimeHub2 = currentTimeHub2-prevTimeHub2;
         prevTimeHub2 = currentTimeHub2;
-        if(shooter.updatePID) {
-            shooter.updateShooterPIDF(deltaTimeHub2 / 1000);
-        }
-        if(turret.updatePID){
-            turret.updateTurretPID();
-        }
-        for(Motor motor: hub2Motors){
-            if(motor!=null&&motor.setTargetPosRequested){
-                motor.motor.setTargetPosition(motor.targetPosition);
-                motor.setTargetPosRequested = false;
-            }
-        }
-        for(Motor motor: hub2Motors){
-            if(motor!=null&&motor.writePowerRequested){
-                motor.motor.setPower(motor.power);
-                motor.writePowerRequested = false;
-            }
-            if(motor!=null&&motor.writeVelocityRequested){
-                motor.motor.setVelocity(motor.velocity);
-                motor.writeVelocityRequested = false;
-            }
-        }
+        currentPose = drive.getPoseEstimate();
+        poseStorage = currentPose;
+
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){
                 servo.servo.setPosition(servo.position);

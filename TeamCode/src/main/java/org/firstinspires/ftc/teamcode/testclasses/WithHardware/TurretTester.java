@@ -4,10 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
 public class TurretTester extends LinearOpMode {
     public void runOpMode(){
-        Hardware hardware = new Hardware(hardwareMap,telemetry);
+        HardwareMecanum hardware = new HardwareMecanum(hardwareMap,telemetry);
         waitForStart();
         while(!isStopRequested()) {
             double output = -gamepad1.left_stick_y;

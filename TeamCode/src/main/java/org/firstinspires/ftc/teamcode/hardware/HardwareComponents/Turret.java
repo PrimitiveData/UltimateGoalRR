@@ -57,10 +57,12 @@ public class Turret {
 
     public void setTurretAngle(double globalTurretAngle){//global turret angle is the angle with respect to the field, local is the angle with respect to the robot
         double desiredLocalTurretAngle = MathFunctions.keepAngleWithin180Degrees(globalTurretAngle - hardware.getAngle());
-        if(desiredLocalTurretAngle > 100){
-            desiredLocalTurretAngle = 100;
-        }
-        Hardware.telemetry.addData("desiredLocalTurretAngle", Math.toDegrees(desiredLocalTurretAngle));
+        turretPID.setState(desiredLocalTurretAngle);
+        double magAngle = (desiredLocalTurretAngle / Math.PI / 2) + 1/2;
+        setMagAngle(magAngle);
+    }
+    public void setLocalTurretAngle(double localTurretAngle){
+        double desiredLocalTurretAngle = localTurretAngle;
         turretPID.setState(desiredLocalTurretAngle);
         double magAngle = (desiredLocalTurretAngle / Math.PI / 2) + 1/2;
         setMagAngle(magAngle);

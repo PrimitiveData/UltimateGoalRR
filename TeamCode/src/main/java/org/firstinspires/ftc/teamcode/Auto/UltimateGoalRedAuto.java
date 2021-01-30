@@ -86,6 +86,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.loop();
 
         hardware.mag.setRingPusherResting();
+        hardware.mag.dropRings();
         waitForStart();
         hardware.intake.dropIntake();
         hardwareThreadInterface.start();
@@ -99,16 +100,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.shooter.setRampPosition(0);
         hardware.shooter.shooterVeloPID.setState(-1500);
         hardware.shooter.updatePID = true;
-        hardware.turret.turretPID.setState(Math.toRadians(-180));
         hardware.turret.updatePID = true;
-
-        AutoAim2 autoAim1 = new AutoAim2(hardware,telemetry,this);
-        hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(5);
-        hardware.shooter.rampAngleAdjustmentConstant = 0.06;
-        autoAim1.start();
+        double ps1TurretAngle=0;
+        double ps2TurretAngle=0;
+        double ps3TurretAngle=0;
+        hardware.turret.setLocalTurretAngle(ps1TurretAngle);
         hardware.drive.followTrajectoryAsync(goToShootPos);
-        shootPowershot(hardware);
-        autoAim1.stopRequested = true;
+        while(hardware.drive.isBusy()){
+            sleep(1);
+        }
+        shootIndividualRing(hardware);
+        hardware.turret.setLocalTurretAngle(ps2TurretAngle);
+        sleep(250);
+        shootIndividualRing(hardware);
+        hardware.turret.setLocalTurretAngle(ps3TurretAngle);
+        sleep(250);
+        shootIndividualRing(hardware);
+        hardware.mag.collectRings();
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
         hardware.shooter.rampAngleAdjustmentConstant = 0;
         hardware.turret.updatePID = true;
@@ -118,6 +126,9 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.turret.updatePID = true;
         hardware.turret.turretPID.setState(0);
         hardware.drive.followTrajectoryAsync(dropWobbler1);
+        while(hardware.drive.isBusy()){
+            sleep(1);
+        }
         hardware.turret.turretPID.setState(0);
         hardware.turret.updatePID = true;
         hardware.turret.turretPID.setState(0);
@@ -133,6 +144,9 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.wobbler.moveArmToGrabPos();
 
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
+        while(hardware.drive.isBusy()){
+            sleep(1);
+        }
         hardware.wobbler.gripWobble();
         sleep(250);
 

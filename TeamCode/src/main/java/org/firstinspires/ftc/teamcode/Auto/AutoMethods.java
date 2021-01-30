@@ -22,6 +22,11 @@ public abstract class AutoMethods extends LinearOpMode {
         }
         hardware.mag.collectRings();
     }
+    public void shootIndividualRing(HardwareMecanum hardware){
+        hardware.mag.pushInRings();
+        sleep(250);
+        hardware.mag.setRingPusherResting();
+    }
 
 
 }

@@ -13,7 +13,6 @@ public class Mag {
     public Mag(RegServo magServo, RegServo ringPusher){
         this.magServo = magServo;
         this.ringPusher = ringPusher;
-        collectRings();
         currentState = State.COLLECT;
     }
     public void collectRings(){
