@@ -1,6 +1,46 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
+
 public class MathFunctions {
+    public static double constrainAngleRange(double angle){
+        //takes radian difference in heading between global and local turret angle and constrains the local to a -pi, pi range
+        angle = angle % (Math.PI*2);
+        if(angle > Math.PI)
+            angle -= Math.PI;
+        if(angle < Math.PI)
+            angle += Math.PI;
+        return angle;
+    }
+    public static double correctedTargetWithinRange(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive){
+        //takes currentangle, targetangle, max, min, and picks the most effecient angle without exceeding the range
+        double correctedTarget;
+        double delta = targetLocalTurretAngle - maxNegative;
+        int deltaInt = (int) delta;
+
+        if(delta < 0)
+            deltaInt -= 1;
+        correctedTarget = targetLocalTurretAngle - (Math.PI * deltaInt);
+
+        double differenceAngle = Math.abs(currentTurretAngle - correctedTarget);
+        double nextCorrectedTarget;;
+        while (true){
+            nextCorrectedTarget = correctedTarget + Math.PI;
+            if(nextCorrectedTarget > maxPositive)
+                return correctedTarget;
+            double difference = Math.abs(currentTurretAngle - nextCorrectedTarget);
+            if(difference >= differenceAngle)
+                return correctedTarget;
+            correctedTarget = nextCorrectedTarget;
+            differenceAngle = difference;
+        }
+    }
+    public static double correctedTargetWithinRangeServoScale(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive){
+        double standardRangeOutput = correctedTargetWithinRange(currentTurretAngle, targetLocalTurretAngle, maxNegative, maxPositive);
+        double range = maxPositive - maxNegative;
+        double correctedOutput = (standardRangeOutput - maxNegative)/range;
+        return correctedOutput;
+    }
     public static double keepAngleWithin180Degrees(double angle){
         while(angle > Math.toRadians(180)){
             angle -= Math.toRadians(360);
