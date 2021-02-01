@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.ContRotServo;
@@ -11,14 +13,14 @@ import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Turret {
-    public static double ticks_per_radian=6258.22701028;
+    public static double ticks_per_radian=658.003123166;
     HardwareMecanum hardware;
     public Motor turretMotor;
     RegServo magRotationServo;
     public PIDwithBasePower turretPID;
     public double CENTER_TO_TURRET_INCHES; //needs to be updated
-    public double maxNegative = -270; //needs to be updated
-    public double maxPositive = 270; //needs to be updated
+    public double maxNegative = Math.toRadians(-270); //needs to be updated
+    public double maxPositive = Math.toRadians(270); //needs to be updated
     public boolean updatePID;
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
@@ -26,10 +28,11 @@ public class Turret {
     public Turret(Motor turretMotor, RegServo magRotationServo, HardwareMecanum hardware){
         this.magRotationServo = magRotationServo;
         this.turretMotor = turretMotor;
+        this.turretMotor.motor.setDirection(DcMotorEx.Direction.REVERSE);
         this.hardware = hardware;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
-        turretPID = new PIDwithBasePower(1.4,4.15,0.45,0.085, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
+        turretPID = new PIDwithBasePower(1.4,4.15,0.45,0, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
         updatePID = false;
         magShootingState = false;
         info = new AutoShootInfo();
