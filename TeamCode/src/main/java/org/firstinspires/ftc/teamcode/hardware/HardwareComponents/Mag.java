@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
+import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
@@ -13,9 +14,10 @@ public class Mag {
     double magDropRingPosition=0.39217;
     double magRotationCollectPosition = 0.48;
     public State currentState;
-    public Mag(RegServo magServo, RegServo ringPusher){
+    public Mag(RegServo magServo, RegServo ringPusher, HardwareMecanum hardware){
         this.magServo = magServo;
         this.ringPusher = ringPusher;
+        this.hardware = hardware;
         currentState = State.COLLECT;
     }
     public void collectRings(){
