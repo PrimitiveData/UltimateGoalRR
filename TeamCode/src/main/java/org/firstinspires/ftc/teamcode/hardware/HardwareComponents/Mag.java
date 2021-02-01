@@ -5,10 +5,10 @@ import org.firstinspires.ftc.teamcode.hardware.RegServo;
 public class Mag {
     public RegServo magServo;
     RegServo ringPusher;
-    double ringPusherResting; // must be tuned
-    double ringPusherPushedIn; // must be tuned
-    double magCollectRingPosition;
-    double magDropRingPosition;
+    double ringPusherResting=0.38589; // must be tuned
+    double ringPusherPushedIn=0.1425627; // must be tuned
+    double magCollectRingPosition=0.045;
+    double magDropRingPosition=0.39217;
     public State currentState;
     public Mag(RegServo magServo, RegServo ringPusher){
         this.magServo = magServo;
