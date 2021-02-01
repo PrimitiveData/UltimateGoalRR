@@ -9,18 +9,20 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 public class TurretTester extends LinearOpMode {
     public void runOpMode(){
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
+        hardware.turret.turretMotor.readRequested = true;
         waitForStart();
+
+        boolean turretTracking = false;
+        boolean magTracking = false;
+        double globalTurretAngle = 0;
+        boolean aToggle = false;
+        boolean bToggle = false;
         while(!isStopRequested()){
-            boolean turretTracking = false;
-            boolean magTracking = false;
-            double globalTurretAngle = 0;
-            boolean aToggle = false;
-            boolean bToggle = false;
 
             if(gamepad1.dpad_left)
-                globalTurretAngle += 20;
+                globalTurretAngle += Math.toRadians(0.4);
             if(gamepad1.dpad_right)
-                globalTurretAngle -= 20;
+                globalTurretAngle -= Math.toRadians(0.4);
 
             if(gamepad1.a) {
                 if(!aToggle)
@@ -52,13 +54,12 @@ public class TurretTester extends LinearOpMode {
             }
             if(magTracking) {
                 hardware.mag.dropRings();
-                hardware.turret.setTurretAngle(globalTurretAngle);
             }
             else
                 hardware.mag.collectRings();
 
-            telemetry.addData("Global Turret Angle: ", globalTurretAngle);
-            telemetry.addData("Turret Current Local Position: ", hardware.turret.localTurretAngleRadians());
+            telemetry.addData("Global Turret Angle: ", Math.toDegrees(globalTurretAngle));
+            telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             telemetry.addData("Robot Heading: ", hardware.getAngle());
             telemetry.addData("Turret Tracking: ", turretTracking);
             telemetry.addData("Mag Tracking: ", magTracking);

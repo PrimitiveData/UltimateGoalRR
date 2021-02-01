@@ -20,12 +20,12 @@ public class MathFunctions {
 
         if(delta < 0)
             deltaInt -= 1;
-        correctedTarget = targetLocalTurretAngle - (Math.PI * deltaInt);
+        correctedTarget = targetLocalTurretAngle - (2*Math.PI * deltaInt);
 
         double differenceAngle = Math.abs(currentTurretAngle - correctedTarget);
         double nextCorrectedTarget;;
         while (true){
-            nextCorrectedTarget = correctedTarget + Math.PI;
+            nextCorrectedTarget = correctedTarget + 2*Math.PI;
             if(nextCorrectedTarget > maxPositive)
                 return correctedTarget;
             double difference = Math.abs(currentTurretAngle - nextCorrectedTarget);

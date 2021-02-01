@@ -21,13 +21,13 @@ import java.io.Writer;
  */
 @TeleOp(group = "drive", name = "AnalogGyroTuner")
 public class AnalogGyroTuner extends LinearOpMode {
-    double timeToAccelerateToMax = 10000;//ms
-    double timeToAccelerateToOppositeMaximum = 20000;//ms
+    double timeToAccelerateToMax = 4000;//ms
+    double timeToAccelerateToOppositeMaximum = 80000;//ms
     @Override
     public void runOpMode() throws InterruptedException {
         FileWriter writer;
         try {
-            writer = new FileWriter("AnalogGyroTuning.txt");
+            writer = new FileWriter("/sdcard/FIRST/AnalogGyroTuning.txt");
         }
         catch(IOException e){
             return;
@@ -38,9 +38,12 @@ public class AnalogGyroTuner extends LinearOpMode {
 
         waitForStart();
         ElapsedTime time = new ElapsedTime();
+        drive.update();
+        double prevRateOutVoltage = drive.analogGyro.getRateOutVoltage();
         double startTime= time.milliseconds();
-        while (!isStopRequested()) {
-            double currentTime = time.milliseconds();
+        double currentTime = startTime;
+        while (!isStopRequested() && currentTime-startTime < timeToAccelerateToMax+timeToAccelerateToOppositeMaximum) {
+            currentTime = time.milliseconds();
             double turnPower;
             if(currentTime-startTime<timeToAccelerateToMax){
                 turnPower = -1;
@@ -55,23 +58,30 @@ public class AnalogGyroTuner extends LinearOpMode {
             }
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            turnPower
+                            0,0,turnPower
                     )
             );
 
             drive.update();
             if(currentTime-startTime<timeToAccelerateToOppositeMaximum+timeToAccelerateToMax && currentTime - startTime > timeToAccelerateToMax){
+                double rateOutVoltage = drive.analogGyro.getRateOutVoltage();
                 try {
-                    writer.write("AnalogGyroVelocity: " + drive.analogGyro.getAngularVelo() + ", ActualVelo: "+drive.getPoseVelocity().getHeading());
+                    writer.write("AnalogGyroVoltage: " + (rateOutVoltage+prevRateOutVoltage)/2 + ", ActualVelo: "+drive.getPoseVelocity().getHeading()+"\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                prevRateOutVoltage = rateOutVoltage;
             }
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", Math.toDegrees(poseEstimate.getHeading()));
             telemetry.update();
+        }
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

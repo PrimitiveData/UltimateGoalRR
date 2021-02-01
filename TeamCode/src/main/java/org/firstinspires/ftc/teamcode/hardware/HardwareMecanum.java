@@ -56,10 +56,15 @@ public class HardwareMecanum {
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         hw = this;
-        Hardware.telemetry = telemetry;
+        HardwareMecanum.telemetry = telemetry;
         allHubs = this.hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+        if(poseStorage == null){
+            currentPose = new Pose2d(0,0,0);
+        }else{
+            currentPose = poseStorage;
         }
         hub1Motors = new Motor[4];//initialize here
         time = new ElapsedTime();
@@ -80,10 +85,10 @@ public class HardwareMecanum {
         servos[8] = new RegServo(hardwareMap.get(Servo.class,"wobblerArm2"));
         CRservos[0] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerStarboard"));
         CRservos[1] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerPort"));
-        shooter = new Shooter(hub2Motors[0],hub2Motors[1],servos[0],this);
-        turret = new Turret(hub2Motors[3], servos[7], this);
-        intake = new Intake(hub2Motors[2],servos[1],CRservos[0],CRservos[1]);
-        mag = new Mag(servos[2],servos[6]);
+        shooter = new Shooter(hub1Motors[0],hub1Motors[1],servos[0],this);
+        turret = new Turret(hub1Motors[3], servos[7], this);
+        intake = new Intake(hub1Motors[2],servos[1],CRservos[0],CRservos[1]);
+        mag = new Mag(servos[2],servos[6],this);
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
