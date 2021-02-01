@@ -22,7 +22,7 @@ public class Mag {
     }
     public void collectRings(){
         hardware.turret.magShootingState = false;
-        hardware.turret.setMagAngle(magCollectRingPosition);
+        hardware.turret.setMagAngle(magRotationCollectPosition);
         currentState = State.COLLECT;
         magServo.setPosition(magCollectRingPosition);
     }
