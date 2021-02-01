@@ -35,10 +35,10 @@ public class MathFunctions {
             differenceAngle = difference;
         }
     }
-    public static double correctedTargetWithinRangeServoScale(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive){
+    public static double correctedTargetWithinRangeServoScale(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive, double turretMaxNegative, double turretMaxPositive){
         double standardRangeOutput = correctedTargetWithinRange(currentTurretAngle, targetLocalTurretAngle, maxNegative, maxPositive);
-        double range = maxPositive - maxNegative;
-        double correctedOutput = (standardRangeOutput - maxNegative)/range;
+        double range = turretMaxPositive - turretMaxNegative;
+        double correctedOutput = (standardRangeOutput - turretMaxNegative)/range;
         return correctedOutput;
     }
     public static double keepAngleWithin180Degrees(double angle){
