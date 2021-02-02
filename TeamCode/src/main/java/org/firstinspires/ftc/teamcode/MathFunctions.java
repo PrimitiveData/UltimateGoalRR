@@ -15,17 +15,17 @@ public class MathFunctions {
     public static double correctedTargetWithinRange(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive){
         //takes currentangle, targetangle, max, min, and picks the most effecient angle without exceeding the range
         double correctedTarget;
-        double delta = targetLocalTurretAngle - maxNegative;
+        double delta = (targetLocalTurretAngle - maxNegative)/(Math.PI * 2);
         int deltaInt = (int) delta;
 
         if(delta < 0)
             deltaInt -= 1;
-        correctedTarget = targetLocalTurretAngle - (Math.PI * deltaInt);
+        correctedTarget = targetLocalTurretAngle - (Math.PI * 2 * deltaInt);
 
         double differenceAngle = Math.abs(currentTurretAngle - correctedTarget);
-        double nextCorrectedTarget;;
+        double nextCorrectedTarget;
         while (true){
-            nextCorrectedTarget = correctedTarget + Math.PI;
+            nextCorrectedTarget = correctedTarget + (Math.PI * 2);
             if(nextCorrectedTarget > maxPositive)
                 return correctedTarget;
             double difference = Math.abs(currentTurretAngle - nextCorrectedTarget);
