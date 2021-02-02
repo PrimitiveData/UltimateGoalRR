@@ -31,6 +31,13 @@ public class Mag {
         currentState = State.DROP;
         magServo.setPosition(magDropRingPosition);
     }
+    public void toggleStates(){
+        if(currentState == State.DROP){
+            currentState = State.COLLECT;
+        }else if(currentState == State.COLLECT){
+            currentState = State.DROP;
+        }
+    }
     public enum State{
         DROP,
         COLLECT

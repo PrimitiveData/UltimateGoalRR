@@ -45,8 +45,10 @@ public class MagFlickerController extends Thread {
     public void run(){
         while(!parentOP.teleopStopped){
             if(shootAllRingsRequested){
-                hardware.mag.dropRings();
-                sleeep(500);//tune timeout
+                if(hardware.mag.currentState == Mag.State.COLLECT) {
+                    hardware.mag.dropRings();
+                    sleeep(500);//tune timeout
+                }
                 for(int i = 0; i < 3; i++){
                     hardware.mag.pushInRings();
                     sleeep(250);// tune time

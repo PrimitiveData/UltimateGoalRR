@@ -46,6 +46,9 @@ public class UltimateGoalTeleop extends OpMode {
     boolean dPadRightToggledPrevLoop = false;
     boolean dPadLeftToggledPrevLoop = false;
     boolean dPadDownToggledPrevLoop = false;
+
+    boolean toggleMagStatePrevLoop = false;
+
     MagFlickerController magFlickerController;
     boolean firstLoop;
     double startAngle;
@@ -246,13 +249,6 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.shooterMotor2.setPower(-0.5);
             hardware.shooter.shooterMotor1.setPower(-0.5);
         }
-        //Flicker
-        if(gamepad2.x){
-            hardware.mag.pushInRings();
-        }
-        if(gamepad2.y){
-            hardware.mag.setRingPusherResting();
-        }
         //wobbler
         if(gamepad2.left_bumper) {
             if(!gripOnToggledPrevLoop) {
@@ -336,6 +332,17 @@ public class UltimateGoalTeleop extends OpMode {
             sleeep(250);
             hardware.mag.setRingPusherResting();
         }*/
+        if(gamepad2.x) {
+            if(!toggleMagStatePrevLoop) {
+                hardware.mag.toggleStates();
+            }
+            toggleMagStatePrevLoop = true;
+        }
+        else{
+            if(toggleMagStatePrevLoop){
+                toggleMagStatePrevLoop = false;
+            }
+        }
         telemetry.addData("shooter On",shooterOn);
         telemetry.addData("Wobbler grip",grip);
         telemetry.addData("Flap position",hardware.shooter.rampPostion);
