@@ -90,43 +90,31 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         if(!slowMode) {
-            hardware.drive.setWeightedDrivePower(
-                    new Pose2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x,
-                            -gamepad1.right_stick_x
-                    )
-            );
+            double leftYAbs = Math.abs(gamepad1.left_stick_y);
+            double leftXAbs = Math.abs(gamepad1.left_stick_x);
+            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+
+            double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+            double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+            double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+
+            hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
         }
         else{
-            hardware.drive.setWeightedDrivePower(
-                    new Pose2d(
-                            -gamepad1.left_stick_y*0.3,
-                            -gamepad1.left_stick_x*0.3,
-                            -gamepad1.right_stick_x*0.3
-                    )
-            );
+            double leftYAbs = Math.abs(gamepad1.left_stick_y);
+            double leftXAbs = Math.abs(gamepad1.left_stick_x);
+            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+
+            double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+            double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+            double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+
+            hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
         }
         hardware.loop();
-        /*T265Camera.CameraUpdate up = T265.slamra.getLastReceivedCameraUpdate();
-        double[] t265position = T265.getCameraPosition(up);
-        if(up.confidence == null){
-            telemetry.addLine("no confidence level yet");
-        }
-        if(up.confidence == T265Camera.PoseConfidence.Failed){
-            telemetry.addLine("Pose Confidence Failed");
-        }
-        else if(up.confidence == T265Camera.PoseConfidence.Medium){
-            telemetry.addLine("Pose Confidence Medium");
-        }
-        else if(up.confidence == T265Camera.PoseConfidence.High){
-            telemetry.addLine("Pose Confidence High");
-        }
-        else{
-            telemetry.addLine("Pose Confidence Low");
-        }*/
+
         //intake dropper
-        if(gamepad1.y){
+        if(gamepad2.left_trigger > 0){
             hardware.intake.dropIntake();
         }
         //manuel turret control toggle & turret control
