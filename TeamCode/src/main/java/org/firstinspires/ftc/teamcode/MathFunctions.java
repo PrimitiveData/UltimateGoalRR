@@ -20,7 +20,7 @@ public class MathFunctions {
 
         if(delta < 0)
             deltaInt -= 1;
-        correctedTarget = targetLocalTurretAngle - (2*Math.PI * 2 * deltaInt);
+        correctedTarget = targetLocalTurretAngle - (Math.PI * 2 * deltaInt);
 
         double differenceAngle = Math.abs(currentTurretAngle - correctedTarget);
         double nextCorrectedTarget;
