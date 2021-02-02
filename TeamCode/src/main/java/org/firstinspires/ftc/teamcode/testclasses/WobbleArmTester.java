@@ -23,6 +23,10 @@ public class WobbleArmTester extends LinearOpMode {
                 hardware.wobbler.gripWobble();
             if(gamepad1.dpad_up)
                 hardware.wobbler.releaseWobble();
+            if(gamepad1.dpad_left){
+                hardware.wobbler.moveArmToGrabPos();
+            }
+            hardware.loop();
         }
     }
 }

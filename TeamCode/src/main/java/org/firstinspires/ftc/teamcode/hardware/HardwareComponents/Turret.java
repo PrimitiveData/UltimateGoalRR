@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.ContRotServo;
@@ -34,7 +35,7 @@ public class Turret {
         this.hardware = hardware;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
-        turretPID = new PIDwithBasePower(1.4,4.15,0.45,0, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
+        turretPID = new PIDwithBasePower(0.87,0.7,0,0.15, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
         updatePID = false;
         magShootingState = false;
         info = new AutoShootInfo();
@@ -61,6 +62,7 @@ public class Turret {
     public void setTurretAngle(double globalTurretAngle){
         //global turret angle is the angle with respect to the field, local is the angle with respect to the robot
         double desiredLocalTurretAngle = MathFunctions.correctedTargetWithinRange(localTurretAngleRadians(), globalTurretAngle - hardware.getAngle(), maxNegative, maxPositive);
+        HardwareMecanum.telemetry.addData("desiredLocalTurretAngleAfterBensAlgo",Math.toDegrees(desiredLocalTurretAngle));
         turretPID.setState(desiredLocalTurretAngle);
         if(magShootingState) {
             double range = maxPositive - maxNegative;
@@ -82,6 +84,7 @@ public class Turret {
     //updates the turret's PID
     public void updateTurretPID(){
         double output = turretPID.updateCurrentStateAndGetOutput(localTurretAngleRadians());
+        HardwareMecanum.telemetry.addData("TurretPIDoutput",output);
         setTurretMotorPower(output);
     }
     //gets the position of the turret on the field

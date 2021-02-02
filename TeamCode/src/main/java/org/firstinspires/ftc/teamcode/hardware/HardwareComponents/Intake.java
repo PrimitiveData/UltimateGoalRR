@@ -24,12 +24,12 @@ public class Intake {
     public void turnIntake(double power){
         intakeMotor.setPower(power);
         if(power != 0) {
-            intakeServoStarboard.setPower(-1);
-            intakeServoPort.setPower(1);
+            intakeServoStarboard.setPower(1);
+            intakeServoPort.setPower(-1);
         }
         else{
             intakeServoStarboard.setPower(0);
-            intakeServoStarboard.setPower(0);
+            intakeServoPort.setPower(0);
         }
     }
     public void dropIntake(){

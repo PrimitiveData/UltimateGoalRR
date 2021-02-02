@@ -6,16 +6,16 @@ public class WobblerArm {
     RegServo wobblerArm1;
     RegServo wobblerArm2;
     //wobbler arm positions
-    public double wobblerArm2PositionWhenWobblerArm1IsZero;
+    public double wobblerArm2PositionWhenWobblerArm1IsZero=0.9865;
     //ALL ARM POS VARIABLES ARE FOR WOBBLE ARM SERVO 1
-    public double armGrabWobblePos;
-    public double armRaiseWobble;
-    public double armStartingPos;
-    public double armRestingPos;
+    public double armGrabWobblePos=0.17523;
+    public double armRaiseWobble=0.676;
+    public double armStartingPos=0.80347;
+    public double armRestingPos=0.934;
     RegServo wobblerClaw;
-    public double clawReleasePos = 0.05;
-    public double clawGrip = 0.35;
-    public double clawRestingPos = 0.275;
+    public double clawReleasePos = 0.607;
+    public double clawGrip = 0.97;
+    public double clawRestingPos = 0.91874;
     public ArmState armState = ArmState.START;
     public WobblerArm(RegServo wobblerArm1, RegServo wobblerArm2, RegServo wobblerClaw){
         this.wobblerArm2 = wobblerArm2;
