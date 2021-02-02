@@ -64,6 +64,7 @@ public class UltimateGoalTeleop extends OpMode {
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
+        hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         slowMode = false;
         shooterVelo = -1600;
         magFlickerController = new MagFlickerController(hardware,this);

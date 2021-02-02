@@ -53,6 +53,9 @@ public class HardwareMecanum {
     public SampleMecanumDrive drive;
     public Pose2d currentPose;
     public static Pose2d poseStorage;
+    public static double cumulativeAngleStorage=0;
+    public double cumulativeAngle = 0;
+    private double prevAngle;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         hw = this;
@@ -66,6 +69,7 @@ public class HardwareMecanum {
         }else{
             currentPose = poseStorage;
         }
+        prevAngle = currentPose.getHeading();
         hub1Motors = new Motor[4];//initialize here
         time = new ElapsedTime();
         hub2Motors = new Motor[4];//initialize here
@@ -163,7 +167,8 @@ public class HardwareMecanum {
         prevTimeHub2 = currentTimeHub2;
         currentPose = drive.getPoseEstimate();
         poseStorage = currentPose;
-
+        cumulativeAngle = MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
+        prevAngle = currentPose.getHeading();
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){
                 servo.servo.setPosition(servo.position);
@@ -184,7 +189,7 @@ public class HardwareMecanum {
         return currentPose.getY();
     }
     public double getAngle(){
-        return currentPose.getHeading();
+        return cumulativeAngle;
     }
     public static HardwareMecanum getInstance(){
         return hw;
