@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -93,10 +94,17 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         if(!slowMode) {
+            /*
+            Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
+            double leftYAbs = Math.abs(input.getY());
+            double leftXAbs = Math.abs(input.getX());
+            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+            */
             double leftYAbs = Math.abs(gamepad1.left_stick_y);
             double leftXAbs = Math.abs(gamepad1.left_stick_x);
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
+            // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
             double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
             double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
             double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
@@ -104,10 +112,17 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
         }
         else{
+            /*
+            Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
+            double leftYAbs = Math.abs(input.getY());
+            double leftXAbs = Math.abs(input.getX());
+            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+            */
             double leftYAbs = Math.abs(gamepad1.left_stick_y);
             double leftXAbs = Math.abs(gamepad1.left_stick_x);
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
+            // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
             double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
             double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
             double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
