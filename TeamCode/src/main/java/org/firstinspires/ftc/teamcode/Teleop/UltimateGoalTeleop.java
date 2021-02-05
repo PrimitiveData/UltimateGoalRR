@@ -166,9 +166,6 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.drive.setWeightedDrivePower(driveDirection);
                 break;
         }
-
-        headingController.update(hardware.getAngle());
-        hardware.drive.getLocalizer().update();
         hardware.loop();
 
         //intake dropper
