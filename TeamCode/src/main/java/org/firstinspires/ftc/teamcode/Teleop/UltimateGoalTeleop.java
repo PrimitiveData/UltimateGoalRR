@@ -1,15 +1,19 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
@@ -54,6 +58,12 @@ public class UltimateGoalTeleop extends OpMode {
     boolean firstLoop;
     double startAngle;
     public boolean currentlyIncrementingMagDuringShooting;
+
+    enum Mode {DRIVER_CONTROL, ALIGN_TO_POINT}
+    private Mode driveMode;
+    private Vector2d targetPosition;
+    private PIDFController headingController;
+
     Thread magThread = new MagFlickerController(hardware, this);
     public void init(){
         msStuckDetectLoop = 15000;
@@ -65,6 +75,7 @@ public class UltimateGoalTeleop extends OpMode {
         hardware = new HardwareMecanum(hardwareMap,telemetry);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
+        hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slowMode = false;
         shooterVelo = -1600;
         magFlickerController = new MagFlickerController(hardware,this);
@@ -73,6 +84,9 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.wobbler.goToArmRestingPos();
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
+        driveMode = Mode.DRIVER_CONTROL;
+        targetPosition = new Vector2d(0, 0); //change to powershot location
+        headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
@@ -94,42 +108,67 @@ public class UltimateGoalTeleop extends OpMode {
                 slowModeToggledPrevLoop = false;
             }
         }
-        if(!slowMode) {
+        switch(driveMode){
+            case DRIVER_CONTROL:
+                if(gamepad1.b)
+                    driveMode = Mode.ALIGN_TO_POINT;
+                //driver control
+                if(!slowMode) {
             /*
             Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
             double leftYAbs = Math.abs(input.getY());
             double leftXAbs = Math.abs(input.getX());
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
             */
-            double leftYAbs = Math.abs(gamepad1.left_stick_y);
-            double leftXAbs = Math.abs(gamepad1.left_stick_x);
-            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+                    double leftYAbs = Math.abs(gamepad1.left_stick_y);
+                    double leftXAbs = Math.abs(gamepad1.left_stick_x);
+                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
-            // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-            double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-            double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-            double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+                    // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
+                    double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+                    double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+                    double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
 
-            hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
-        }
-        else{
+                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
+                }
+                else{
             /*
             Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
             double leftYAbs = Math.abs(input.getY());
             double leftXAbs = Math.abs(input.getX());
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
             */
-            double leftYAbs = Math.abs(gamepad1.left_stick_y);
-            double leftXAbs = Math.abs(gamepad1.left_stick_x);
-            double rightXAbs = Math.abs(gamepad1.right_stick_x);
+                    double leftYAbs = Math.abs(gamepad1.left_stick_y);
+                    double leftXAbs = Math.abs(gamepad1.left_stick_x);
+                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
-            // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-            double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-            double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-            double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+                    // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
+                    double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+                    double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+                    double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
 
-            hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
+                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
+                }
+                break;
+            case ALIGN_TO_POINT:
+                if(gamepad1.y)
+                    driveMode = Mode.DRIVER_CONTROL;
+                Vector2d fieldInput = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
+                Vector2d currentPosition = new Vector2d(hardware.getXAbsoluteCenter(), hardware.getYAbsoluteCenter());
+                Vector2d difference = targetPosition.minus(currentPosition);
+                double angle = difference.angle();
+                double angleFF = -fieldInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+                headingController.setTargetPosition(angle);
+                double headingInput = (headingController.update(hardware.getAngle())
+                        * DriveConstants.kV + angleFF)
+                        * DriveConstants.TRACK_WIDTH;
+                Pose2d driveDirection = new Pose2d(fieldInput, headingInput);
+                hardware.drive.setWeightedDrivePower(driveDirection);
+                break;
         }
+
+        headingController.update(hardware.getAngle());
+        hardware.drive.getLocalizer().update();
         hardware.loop();
 
         //intake dropper
@@ -303,6 +342,8 @@ public class UltimateGoalTeleop extends OpMode {
         }
         //end powershot
 
+
+        /*
         if(gamepad1.dpad_left){
             HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
             hardwareThreadInterface.start();
