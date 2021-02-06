@@ -1,15 +1,22 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+
+import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
+
 public class MecanumDrive {
     public Motor LF;
     public Motor LB;
     public Motor RF;
     public Motor RB;
+    HardwareMecanum hardware;
+    public PIDwithBasePower turretPID;
     public MecanumDrive (Motor LF, Motor LB, Motor RF, Motor RB){
         this.LF = LF;
         this.LB = LB;
         this.RF = RF;
         this.RB = RB;
+        turretPID = new PIDwithBasePower(0.87,0.7,0,0.15, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
     }
     public void setPowers(double movementX, double movementY, double turnMagnitude){
         double LFpower = movementY-turnMagnitude-movementX;

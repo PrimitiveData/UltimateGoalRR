@@ -56,6 +56,8 @@ public class HardwareMecanum {
     public static double cumulativeAngleStorage=0;
     public double cumulativeAngle = 0;
     private double prevAngle;
+    public boolean updateDrivePID = false;
+    public Pose2d targetPose = new Pose2d(0,0,0);
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         hw = this;
@@ -122,6 +124,7 @@ public class HardwareMecanum {
         double currentTimeHub1 = time.milliseconds();
         deltaTimeHub1 = currentTimeHub1-prevTimeHub1;
         prevTimeHub1 = currentTimeHub1;
+        if(updateDrivePID)
         if(shooter.updatePID) {
             shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
         }
@@ -150,6 +153,10 @@ public class HardwareMecanum {
             allHubs.get(1).clearBulkCache();
         }
         drive.update();
+        if(updateDrivePID) {
+            drive.updateDrivetrainPID(drive.getPoseEstimate(), targetPose);
+            drive.updateDrivetrainHeadingPID(drive.getPoseEstimate(), targetPose);
+        }
         for(int i = 0; i <hub2Motors.length;i++){
             Motor motor = hub2Motors[i];
             if(motor != null && motor.readRequested){

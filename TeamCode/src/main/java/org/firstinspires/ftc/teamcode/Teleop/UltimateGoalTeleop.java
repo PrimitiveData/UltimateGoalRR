@@ -61,7 +61,6 @@ public class UltimateGoalTeleop extends OpMode {
 
     enum Mode {DRIVER_CONTROL, ALIGN_TO_POINT}
     private Mode driveMode;
-    private Vector2d targetPosition;
     private PIDFController headingController;
 
     Thread magThread = new MagFlickerController(hardware, this);
@@ -85,7 +84,6 @@ public class UltimateGoalTeleop extends OpMode {
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
-        targetPosition = new Vector2d(0, 0); //change to powershot location
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
     }
     public double logistic(double input, double constantB, double constantC){
@@ -112,6 +110,7 @@ public class UltimateGoalTeleop extends OpMode {
             case DRIVER_CONTROL:
                 if(gamepad1.b)
                     driveMode = Mode.ALIGN_TO_POINT;
+                hardware.updateDrivePID = false;
                 //driver control
                 if(!slowMode) {
             /*
@@ -153,18 +152,7 @@ public class UltimateGoalTeleop extends OpMode {
             case ALIGN_TO_POINT:
                 if(gamepad1.y)
                     driveMode = Mode.DRIVER_CONTROL;
-                Vector2d fieldInput = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
-                Vector2d currentPosition = new Vector2d(hardware.getXAbsoluteCenter(), hardware.getYAbsoluteCenter());
-                Vector2d difference = targetPosition.minus(currentPosition);
-                double angle = difference.angle();
-                double angleFF = -fieldInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
-                headingController.setTargetPosition(angle);
-                double headingInput = (headingController.update(hardware.getAngle())
-                        * DriveConstants.kV + angleFF)
-                        * DriveConstants.TRACK_WIDTH;
-                Pose2d driveDirection = new Pose2d(fieldInput, headingInput);
-                hardware.drive.setWeightedDrivePower(driveDirection);
-                break;
+                hardware.updateDrivePID = true;
         }
         hardware.loop();
 

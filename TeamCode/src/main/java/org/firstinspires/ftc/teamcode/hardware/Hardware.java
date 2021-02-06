@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Intake;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Shooter;
@@ -71,7 +72,6 @@ public class Hardware {
     public RegServo[] servos;
     public ContRotServo[] CRservos;
     public MecanumDrive mecanumDrive;
-    public SixWheelDrive sixWheelDrive;
     public ElapsedTime time;
     public int loops = 0;
     public boolean firstLoop = true;
@@ -136,7 +136,7 @@ public class Hardware {
         hub1Motors[3].motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         hub1Motors[3].motor.setDirection(DcMotorEx.Direction.REVERSE);
         time = new ElapsedTime();
-        sixWheelDrive = new SixWheelDrive(hub1Motors[0],hub1Motors[1],hub1Motors[2],hub1Motors[3],time);
+        mecanumDrive = new MecanumDrive(hub1Motors[0],hub1Motors[1],hub1Motors[2],hub1Motors[3]);
         hub2Motors = new Motor[4];//initialize here
         servos = new RegServo[12];//initialize here
         CRservos = new ContRotServo[12];
@@ -345,9 +345,6 @@ public class Hardware {
         //double localYVelocity = (portVelo + (w*portOffset) + starboardVelo - (w * starboardOffset))/2.0;
 
          localYVelocity = localY*circumfrence/ticks_per_rotation/((currentTime - prevTime)/1000);
-        if(updatePID) {
-            sixWheelDrive.updatePID(localYVelocity - w * trackWidth / 2, localYVelocity + w * trackWidth / 2);
-        }
         if(shooter.updatePID) {
             shooter.updateShooterPIDF(deltaTime / 1000);
         }
@@ -398,7 +395,7 @@ public class Hardware {
                 CRservo.writeRequested = false;
             }
         }
-        RobotLog.dd("MOTORDEBUG", "Left: "+sixWheelDrive.LF.power+ ", Right: "+sixWheelDrive.RF.power);
+        //RobotLog.dd("MOTORDEBUG", "Left: "+sixWheelDrive.LF.power+ ", Right: "+sixWheelDrive.RF.power);
             xPosTicksClassVariable = xPosTicks;
             yPosTicksClassVariable = yPosTicks;
             angleClassVariable = angle;

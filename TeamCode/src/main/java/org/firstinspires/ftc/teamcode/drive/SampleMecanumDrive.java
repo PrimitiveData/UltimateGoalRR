@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -37,6 +38,8 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AnalogGyro;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
+import org.firstinspires.ftc.teamcode.hardware.PID.TurretPID;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 
@@ -102,8 +105,16 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private Pose2d lastPoseOnTurn;
     public AnalogGyro analogGyro;
+
+    HardwareMecanum hardware;
+
+    public TurretPID drivePID;
+    private PIDFController headingController;
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
+
+        drivePID = new TurretPID(0.0,0.0,0.0,0.0, hardware.time);
+        headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
 
         dashboard = FtcDashboard.getInstance();
         dashboard.setTelemetryTransmissionInterval(25);
@@ -172,6 +183,24 @@ public class SampleMecanumDrive extends MecanumDrive {
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
         analogGyro = new AnalogGyro(hardwareMap, new ElapsedTime());
+    }
+
+    public double updateDrivetrainPID(Pose2d currentPose, Pose2d targetPose){
+        double displacement = targetPose.vec().distTo(currentPose.vec());
+        double output = drivePID.updateCurrentStateAndGetOutput(displacement);
+        return output;
+    }
+    public double updateDrivetrainHeadingPID(Pose2d currentPose, Pose2d targetPose){
+        Vector2d fieldRelativeVector = currentPose.vec();
+        Vector2d difference = targetPose.vec().minus(currentPose.vec());
+        double theta = difference.angle();
+        double thetaFF = -fieldRelativeVector.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+        headingController.setInputBounds(-Math.PI, Math.PI);
+        headingController.setTargetPosition(theta);
+        double output = (headingController.update(currentPose.getHeading())
+                * DriveConstants.kV + thetaFF)
+                * DriveConstants.TRACK_WIDTH;
+        return output;
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
