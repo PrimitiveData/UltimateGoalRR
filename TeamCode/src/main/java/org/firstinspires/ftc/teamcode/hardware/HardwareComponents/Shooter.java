@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
@@ -28,7 +29,7 @@ public class Shooter {
         this.shooterMotor1 = shooterMotor1;
         this.shooterMotor2 = shooterMotor2;
         shooterMotor2.readRequested = true;
-        this.shooterMotor1.motor.setDirection(DcMotorEx.Direction.REVERSE);
+        this.shooterMotor1.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.shooterMotor2.motor.setDirection(DcMotorEx.Direction.REVERSE);
         this.hardware = hardware;
         shooterVeloPID = new ShooterPID(0.025,0.02,0,0.00522,1.62,0,75,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
