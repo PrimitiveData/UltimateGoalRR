@@ -108,12 +108,14 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     HardwareMecanum hardware;
 
+    public ElapsedTime time;
+
     public TurretPID drivePID;
     private PIDFController headingController;
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
-
-        drivePID = new TurretPID(0.0,0.0,0.0,0.0, hardware.time);
+        time = new ElapsedTime();
+        drivePID = new TurretPID(0.0,0.0,0.0,0.0, time);
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
 
         dashboard = FtcDashboard.getInstance();
