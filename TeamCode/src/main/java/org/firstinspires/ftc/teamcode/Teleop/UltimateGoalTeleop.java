@@ -78,9 +78,9 @@ public class UltimateGoalTeleop extends OpMode {
         slowMode = false;
         shooterVelo = -1600;
         magFlickerController = new MagFlickerController(hardware,this);
-        hardware.mag.setRingPusherResting();
-        hardware.wobbler.goToClawRestingPos();
-        hardware.wobbler.goToArmRestingPos();
+        //hardware.mag.setRingPusherResting();
+        //hardware.wobbler.goToClawRestingPos();
+        //hardware.wobbler.goToArmRestingPos();
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
