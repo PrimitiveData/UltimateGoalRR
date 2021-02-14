@@ -38,6 +38,7 @@ public class LocalizationTest extends LinearOpMode {
             if(gamepad1.left_trigger > 0)
                 hardware.intake.turnIntake(1);
 
+            hardware.loop();
             drive.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
