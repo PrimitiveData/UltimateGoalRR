@@ -18,7 +18,7 @@ public class ShooterPIDTuner extends LinearOpMode {
         waitForStart();
         while(!isStopRequested()) {
             if(gamepad1.y){
-                hardware.shooter.shooterVeloPID.setState(1600);
+                hardware.shooter.shooterVeloPID.setState(1500);
             }
             else if(gamepad1.x){
                 hardware.shooter.shooterVeloPID.setState(0);

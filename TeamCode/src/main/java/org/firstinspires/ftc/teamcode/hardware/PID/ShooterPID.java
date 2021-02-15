@@ -13,6 +13,7 @@ public class ShooterPID extends VelocityPID {
     }
     @Override
     public synchronized double updateCurrentStateAndGetOutput(double currentVelocity){
+        currentState = currentVelocity;
         double currentTime = time.milliseconds();
         if(firstGetOutputLoop){
             firstGetOutputLoop = false;
@@ -43,7 +44,10 @@ public class ShooterPID extends VelocityPID {
         /*if(currentVelocity > desiredState+75 && speedyRecoveryOn){
             return -1;
         }*/
-        if(desiredState > 0) {
+        if(desiredState == 0){
+            return 0;
+        }
+        else if(desiredState > 0) {
             return (error * kP + integral * kI + derivative * kD + kStatic + (desiredState * kV))/voltage;
         }
         else {

@@ -32,7 +32,7 @@ public class Shooter {
         this.shooterMotor1.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.shooterMotor2.motor.setDirection(DcMotorEx.Direction.REVERSE);
         this.hardware = hardware;
-        shooterVeloPID = new ShooterPID(0.025,0.02,0,0.00522,1.62,0,75,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
+        shooterVeloPID = new ShooterPID(0.07978,0.2797,0,0.005197539254,3.271255167,0,400,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
         shooterVeloPID.integralAntiWindupActive = true;
         updatePID = false;
         info = new AutoShootInfo();
@@ -45,11 +45,11 @@ public class Shooter {
         }
         double shooterPos = shooterMotor2.getCurrentPosition();
         double currentVelo = (shooterPos - prevShooterPos)/deltaTime;
-        Hardware.telemetry.addData("shooter velo",currentVelo);
-        Hardware.telemetry.addData("shooterPIDsetstate", shooterVeloPID.desiredState);
+        HardwareMecanum.telemetry.addData("shooter velo",currentVelo);
+        HardwareMecanum.telemetry.addData("shooterPIDsetstate", shooterVeloPID.desiredState);
         prevShooterPos = shooterPos;
         double outputPower = shooterVeloPID.updateCurrentStateAndGetOutput(currentVelo);
-        Hardware.telemetry.addData("outputVoltage",outputPower);
+        HardwareMecanum.telemetry.addData("outputVoltage",outputPower);
         shooterMotor1.setPower(outputPower);
         shooterMotor2.setPower(outputPower);
     }

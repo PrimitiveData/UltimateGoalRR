@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AnalogGyro;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.SanfordAnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.PID.TurretPID;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
@@ -65,8 +66,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0.5);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0.4);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -104,7 +105,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private VoltageSensor batteryVoltageSensor;
 
     private Pose2d lastPoseOnTurn;
-    public AnalogGyro analogGyro;
+    public SanfordAnalogGyro analogGyro;
 
     HardwareMecanum hardware;
 
@@ -184,7 +185,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
-        analogGyro = new AnalogGyro(hardwareMap, new ElapsedTime());
+        analogGyro = new SanfordAnalogGyro(hardwareMap, new ElapsedTime());
     }
 
     public double updateDrivetrainPID(Pose2d currentPose, Pose2d targetPose){
@@ -261,7 +262,6 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-        analogGyro.update();
         updatePoseEstimate();
 
         Pose2d currentPose = getPoseEstimate();
@@ -345,7 +345,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, currentPose);
 
-        dashboard.sendTelemetryPacket(packet);
+        //dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
