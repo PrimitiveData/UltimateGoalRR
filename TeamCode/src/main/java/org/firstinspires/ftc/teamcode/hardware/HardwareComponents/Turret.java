@@ -68,7 +68,7 @@ public class Turret {
             double range = maxPositive - maxNegative;
             double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,globalTurretAngle - hardware.getAngle(), maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
-            setMagAngle(magAngle);
+            setMagAngle(magAngle - hardware.mag.magRotationOffset);
         }
     }
     public void setLocalTurretAngle(double localTurretAngle){
@@ -78,7 +78,7 @@ public class Turret {
             double range = maxPositive - maxNegative;
             double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,localTurretAngle, maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
-            setMagAngle(magAngle);
+            setMagAngle(magAngle - hardware.mag.magRotationOffset);
         }
     }
     //updates the turret's PID

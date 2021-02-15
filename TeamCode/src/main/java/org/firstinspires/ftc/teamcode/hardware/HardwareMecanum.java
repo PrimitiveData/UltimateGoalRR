@@ -174,7 +174,7 @@ public class HardwareMecanum {
         prevTimeHub2 = currentTimeHub2;
         currentPose = drive.getPoseEstimate();
         poseStorage = currentPose;
-        cumulativeAngle = MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
+        cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
         prevAngle = currentPose.getHeading();
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){
