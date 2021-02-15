@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.hardware.PID.ShooterPID;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Shooter {
-    public final static double START_TICKS_RAMP = 1;
-    public final static double END_TICKS_RAMP = 0.9238;
+    public final static double START_TICKS_RAMP = 0.35;
+    public final static double END_TICKS_RAMP = 0.17;
     public Motor shooterMotor1;
     public Motor shooterMotor2;
     public ShooterPID shooterVeloPID;
@@ -21,7 +21,7 @@ public class Shooter {
     public boolean firstUpdateShooterPIDFLoop = true;
     private double prevShooterPos;
     public boolean updatePID;
-    public double rampPostion = 0;
+    public double rampPostion = 1;
     AutoShootInfo info;
     public double rampAngleAdjustmentConstant=0;
     public Shooter(Motor shooterMotor1, Motor shooterMotor2, RegServo shootAngleController, HardwareMecanum hardware){
