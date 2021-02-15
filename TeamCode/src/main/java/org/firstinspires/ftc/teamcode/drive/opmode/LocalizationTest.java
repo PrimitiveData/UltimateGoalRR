@@ -22,6 +22,9 @@ public class LocalizationTest extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap,telemetry);
 
+        boolean intake = false;
+        boolean intakePrevLoop = false;
+
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
@@ -34,9 +37,21 @@ public class LocalizationTest extends LinearOpMode {
                             -gamepad1.right_stick_x
                     )
             );
-
-            if(gamepad1.left_trigger > 0)
+            if(gamepad1.left_trigger > 0) {
+                if(!intakePrevLoop) {
+                    intake = !intake;
+                }
+                intakePrevLoop = true;
+            } 
+            else{
+                if(intakePrevLoop){
+                    intakePrevLoop = false;
+                }
+            }
+            if(intake)
                 hardware.intake.turnIntake(1);
+            else
+                hardware.intake.turnIntake(0);
 
             hardware.loop();
             drive.update();

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.testclasses.TunerClasses;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,7 +12,10 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 @TeleOp(group = "TeleOp", name = "TurretPIDTuner")
 public class TurretPIDTuner extends LinearOpMode {
+
     public void runOpMode(){
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        TelemetryPacket packet = new TelemetryPacket();
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         hardware.turret.turretMotor.readRequested=true;
         waitForStart();
@@ -36,6 +42,11 @@ public class TurretPIDTuner extends LinearOpMode {
             double output = hardware.turret.turretPID.updateCurrentStateAndGetOutput(hardware.turret.localTurretAngleRadians());
             telemetry.addData("output: ",output);
             telemetry.addData("currentIntegral: ",hardware.turret.turretPID.integral);
+            telemetry.addData("targetHeading: ", hardware.turret.turretPID.desiredState);
+            telemetry.addData("currentHeading: ", hardware.turret.turretPID.currentState);
+            packet.put("targetHeading: ", hardware.turret.turretPID.desiredState);
+            packet.put("currentHeading: ", hardware.turret.turretPID.currentState);
+            dashboard.sendTelemetryPacket(packet);
             telemetry.update();
             hardware.loop();
         }

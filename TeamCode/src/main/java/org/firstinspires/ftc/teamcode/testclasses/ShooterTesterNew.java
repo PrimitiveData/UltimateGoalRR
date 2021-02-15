@@ -27,7 +27,7 @@ public class ShooterTesterNew extends LinearOpMode {
         waitForStart();
         double shooterPower = 0;
         while(!isStopRequested()){
-            shooter1.setPower(shooterPower);
+            shooter1.setPower(-shooterPower);
             shooter2.setPower(shooterPower);
             shooterPower = gamepad1.right_stick_y;
             deltaTime = time.milliseconds() - timeInitial;

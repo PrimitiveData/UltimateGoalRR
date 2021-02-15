@@ -124,11 +124,11 @@ public class UltimateGoalTeleop extends OpMode {
                     double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
                     // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-                    double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-                    double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-                    double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
+                    //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+                    //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+                    //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+                    hardware.drive.setWeightedDrivePower(new Pose2d(leftYAbs, leftXAbs, rightXAbs));
+                    //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
                 }
                 else{
             /*
@@ -142,11 +142,11 @@ public class UltimateGoalTeleop extends OpMode {
                     double rightXAbs = Math.abs(gamepad1.right_stick_x);
 
                     // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-                    double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-                    double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-                    double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
+                    //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
+                    //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
+                    //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
+                    hardware.drive.setWeightedDrivePower(new Pose2d(leftYAbs * 0.3, leftXAbs * 0.3, rightXAbs * 0.3));
+                    //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
                 }
                 break;
             case ALIGN_TO_POINT:
@@ -286,8 +286,8 @@ public class UltimateGoalTeleop extends OpMode {
         }
         else{
             hardware.shooter.updatePID = false;
-            hardware.shooter.shooterMotor2.setPower(-0.5);
-            hardware.shooter.shooterMotor1.setPower(-0.5);
+            //hardware.shooter.shooterMotor2.setPower(-0.5);
+            //hardware.shooter.shooterMotor1.setPower(-0.5);
         }
         //wobbler
         if(gamepad2.left_bumper) {

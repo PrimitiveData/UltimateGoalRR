@@ -10,9 +10,9 @@ public class Mag {
     HardwareMecanum hardware;
     double ringPusherResting=0.38589; // must be tuned
     double ringPusherPushedIn=0.1425627; // must be tuned
-    double magCollectRingPosition=0.045;
-    double magDropRingPosition=0.39217;
-    double magRotationCollectPosition = 0.48;
+    double magCollectRingPosition=0.1706;
+    double magDropRingPosition=0.619;
+    double magRotationCollectPosition = 0.488;
     public State currentState;
     public Mag(RegServo magServo, RegServo ringPusher, HardwareMecanum hardware){
         this.magServo = magServo;

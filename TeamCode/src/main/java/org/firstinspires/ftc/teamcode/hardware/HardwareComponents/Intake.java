@@ -23,7 +23,6 @@ public class Intake {
     }
     public void turnIntake(double power){
         intakeMotor.setPower(power);
-        /*
         if(power != 0) {
             intakeServoStarboard.setPower(1);
             intakeServoPort.setPower(-1);
@@ -32,7 +31,6 @@ public class Intake {
             intakeServoStarboard.setPower(0);
             intakeServoPort.setPower(0);
         }
-        */
     }
     public void dropIntake(){
         intakeDropperGuard.setPosition(releaseIntake);

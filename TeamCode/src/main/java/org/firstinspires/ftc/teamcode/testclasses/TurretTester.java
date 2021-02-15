@@ -59,6 +59,7 @@ public class TurretTester extends LinearOpMode {
                 hardware.mag.collectRings();
 
             telemetry.addData("Global Turret Angle: ", Math.toDegrees(globalTurretAngle));
+            telemetry.addData("Hardware Angle: ", hardware.getAngle());
             telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             telemetry.addData("Robot Heading: ", hardware.getAngle());
             telemetry.addData("Turret Tracking: ", turretTracking);

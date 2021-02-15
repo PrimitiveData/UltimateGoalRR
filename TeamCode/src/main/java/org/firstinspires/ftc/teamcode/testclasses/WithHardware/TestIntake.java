@@ -63,7 +63,7 @@ public class TestIntake extends LinearOpMode {
 
                 hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
             }
-
+            hardware.drive.update();
             double output = 1;
             telemetry.addData("output",output);
             telemetry.update();
