@@ -1,20 +1,22 @@
 package org.firstinspires.ftc.teamcode.testclasses.TunerClasses;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.FileWriter;
 import java.io.IOException;
-
+@Autonomous(name = "FFtunerGeneric", group = "Autonomous")
 public class FeedForwardTunerGeneric extends LinearOpMode {
     final double ZERO_TO_MAX_TIME = 120000;//milliseconds
     public void runOpMode(){
         DcMotor toTest = hardwareMap.get(DcMotor.class,"FFTuned");
         DcMotor toTest2 = hardwareMap.get(DcMotor.class,"FFTuned2");
-        toTest.setDirection(DcMotor.Direction.FORWARD);
+        toTest.setDirection(DcMotor.Direction.REVERSE);
         toTest2.setDirection(DcMotor.Direction.FORWARD);
         waitForStart();
         FileWriter writer;

@@ -124,7 +124,6 @@ public class HardwareMecanum {
         double currentTimeHub1 = time.milliseconds();
         deltaTimeHub1 = currentTimeHub1-prevTimeHub1;
         prevTimeHub1 = currentTimeHub1;
-        if(updateDrivePID)
         if(shooter.updatePID) {
             shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
         }

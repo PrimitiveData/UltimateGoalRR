@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -119,7 +120,7 @@ public class VelocityPIDDrivetrain extends GenericPID {
     }
     public static double getBatteryVoltage() {
         double result = Double.POSITIVE_INFINITY;
-        for (VoltageSensor sensor : Hardware.getInstance().hardwareMap.voltageSensor) {
+        for (VoltageSensor sensor : HardwareMecanum.getInstance().hardwareMap.voltageSensor) {
             double voltage = sensor.getVoltage();
             if (voltage > 0) {
                 result = Math.min(result, voltage);

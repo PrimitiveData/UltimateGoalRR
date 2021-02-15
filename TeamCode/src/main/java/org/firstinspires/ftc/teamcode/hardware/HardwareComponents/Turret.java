@@ -35,7 +35,7 @@ public class Turret {
         this.hardware = hardware;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
-        turretPID = new PIDwithBasePower(0.87,0.7,0,0.15, Math.toRadians(0.5), Math.toRadians(20), hardware.time);
+        turretPID = new PIDwithBasePower(3.4498,8,0,0, Math.toRadians(0), Math.toRadians(20), hardware.time);
         updatePID = false;
         magShootingState = false;
         info = new AutoShootInfo();

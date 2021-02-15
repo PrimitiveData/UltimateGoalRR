@@ -2,24 +2,17 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.AutoAim;
-import org.firstinspires.ftc.teamcode.Auto.Multithreads.AutoAim2;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.CloseTheCamera;
-import org.firstinspires.ftc.teamcode.Auto.Multithreads.MoveArmDownAfterDropping1stWobbler;
-import org.firstinspires.ftc.teamcode.Ramsete.PathEngine;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCamera;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraRotation;
-import org.firstinspires.ftc.teamcode.hardware.Hardware;
-import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
-import org.firstinspires.ftc.teamcode.hardware.SixWheelDrive;
 import org.firstinspires.ftc.teamcode.vision.UltimateGoalReturnPositionPipeline;
 
 @Autonomous(name = "RedAuto", group = "Autonomous")
