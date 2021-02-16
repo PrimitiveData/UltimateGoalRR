@@ -35,11 +35,12 @@ public class MathFunctions {
             differenceAngle = difference;
         }
     }
-    public static double correctedTargetWithinRangeServoScale(double currentTurretAngle, double targetLocalTurretAngle, double maxNegative, double maxPositive, double turretMaxNegative, double turretMaxPositive){
-        double standardRangeOutput = correctedTargetWithinRange(currentTurretAngle, targetLocalTurretAngle, maxNegative, maxPositive);
-        double range = maxPositive - maxNegative;
-        double correctedOutput = (standardRangeOutput - maxNegative)/range;
-        return correctedOutput;
+    public static double correctedTargetServoScale(double currentMagAngle, double targetAngle, double maxNegative, double maxPositive){
+        double uncorrectedTarget = correctedTargetWithinRange(currentMagAngle, targetAngle, maxNegative, maxPositive); //returns target value between maxNegative and maxPositive
+        double adjustRangeto0Min = uncorrectedTarget - maxNegative; //adjusts output into 0 to (maxNegative + maxPositive)
+        double range = maxPositive - maxNegative; //total range
+        double convertToServoRange = adjustRangeto0Min/range; //divides radian measure by range to get value between 0 and 1 for servo
+        return convertToServoRange;
     }
     public static double keepAngleWithin180Degrees(double angle){
         while(angle > Math.toRadians(180)){
