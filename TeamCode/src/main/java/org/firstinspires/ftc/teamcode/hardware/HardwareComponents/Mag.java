@@ -12,7 +12,7 @@ public class Mag {
     double ringPusherPushedIn=0.6684;
     double magCollectRingPosition=0.1706;
     double magDropRingPosition=0.619;
-    double magRotationCollectPosition = 0.488;
+    double magRotationCollectPosition = 0.172;
     public State currentState;
     public Mag(RegServo magServo, RegServo ringPusher, HardwareMecanum hardware){
         this.magServo = magServo;
