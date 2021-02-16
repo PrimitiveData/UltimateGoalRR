@@ -36,17 +36,15 @@ public class ShooterRegression extends LinearOpMode {
             hardware.shooter.setRampPosition(rampPos);
 
             if(gamepad1.x){
-                if(hardware.mag.currentState == Mag.State.COLLECT) {
-                    hardware.mag.dropRings();
-                    sleep(500);//tune timeout
-                }
-                for(int i = 0; i < 3; i++){
-                    hardware.mag.pushInRings();
-                    sleep(100);// tune time
-                    hardware.mag.setRingPusherResting();
-                    sleep(100);// tune time
-                }
-                hardware.mag.collectRings();
+                hardware.mag.dropRings();
+            }
+
+            if(gamepad1.right_bumper){
+                hardware.mag.pushInRings();
+            }
+
+            if(gamepad1.right_trigger > 0){
+                hardware.mag.setRingPusherResting();
             }
 
             if(gamepad1.left_bumper) {
