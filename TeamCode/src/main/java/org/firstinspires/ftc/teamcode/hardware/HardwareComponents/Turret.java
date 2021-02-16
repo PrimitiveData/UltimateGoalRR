@@ -22,8 +22,8 @@ public class Turret {
     public double CENTER_TO_TURRET_INCHES; //needs to be updated
     public double maxNegative = Math.toRadians(-190);
     public double maxPositive = Math.toRadians(400);
-    public double maxNegativeServo = Math.toRadians(-280);
-    public double maxPositiveServo = Math.toRadians(280);
+    public double maxNegativeServo = Math.toRadians(-280 - 180);
+    public double maxPositiveServo = Math.toRadians(280 + 180);
     public boolean updatePID;
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
@@ -67,8 +67,9 @@ public class Turret {
         HardwareMecanum.telemetry.addData("Mag Tracking State: ", magShootingState);
         if(magShootingState) {
             double range = maxPositiveServo - maxNegativeServo;
-            double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
+            double magCurrentAngle = (magRotationServo.position * range) + maxNegativeServo;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,globalTurretAngle - hardware.getAngle(), maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
+            HardwareMecanum.telemetry.addData("Mag Output: ", Math.toDegrees((magAngle * range) + maxNegativeServo));
             setMagAngle(magAngle);
         }
     }
@@ -78,8 +79,9 @@ public class Turret {
         HardwareMecanum.telemetry.addData("Mag Tracking State: ", magShootingState);
         if(magShootingState) {
             double range = maxPositiveServo - maxNegativeServo;
-            double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
+            double magCurrentAngle = (magRotationServo.position * range) + maxNegativeServo;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,localTurretAngle, maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
+            HardwareMecanum.telemetry.addData("Mag Output: ", Math.toDegrees((magAngle * range) + maxNegativeServo));
             setMagAngle(magAngle);
         }
     }
