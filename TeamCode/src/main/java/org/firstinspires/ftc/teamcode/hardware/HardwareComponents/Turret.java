@@ -22,8 +22,8 @@ public class Turret {
     public double CENTER_TO_TURRET_INCHES; //needs to be updated
     public double maxNegative = Math.toRadians(-225);
     public double maxPositive = Math.toRadians(315);
-    public double maxNegativeServo = Math.toRadians(-225);
-    public double maxPositiveServo = Math.toRadians(315);
+    public double maxNegativeServo = Math.toRadians(-280);
+    public double maxPositiveServo = Math.toRadians(260);
     public boolean updatePID;
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;

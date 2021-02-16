@@ -27,10 +27,10 @@ import java.io.IOException;
 @TeleOp(name = "aUltimateGoalTeleop",group="TeleOp")
 public class UltimateGoalTeleop extends OpMode {
     HardwareMecanum hardware;
-    boolean slowMode = false;
-    boolean slowModeToggledPrevLoop = false;
     //toggles
     boolean magUpdateStateAndSetPositionPrevLoop = false;
+    boolean bumperPrevLoop = false;
+    int magTrigger = 0;
     boolean manuelRampControl = true;
     boolean manuelRampControlTogglePrevLoop = false;
     boolean shooterOn = false;
@@ -73,7 +73,6 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        slowMode = false;
         shooterVelo = 1600;
         magFlickerController = new MagFlickerController(hardware,this);
         //hardware.mag.setRingPusherResting();
@@ -95,48 +94,18 @@ public class UltimateGoalTeleop extends OpMode {
         magThread.start();
     }
     public void loop(){
-        if(gamepad1.left_trigger > 0) {
-            if(!slowModeToggledPrevLoop) {
-                slowMode = !slowMode;
-            }
-            slowModeToggledPrevLoop = true;
-        }
-        else{
-            if(slowModeToggledPrevLoop){
-                slowModeToggledPrevLoop = false;
-            }
-        }
         switch(driveMode){
             case DRIVER_CONTROL:
                 if(gamepad1.b)
                     driveMode = Mode.ALIGN_TO_POINT;
                 hardware.updateDrivePID = false;
-                //driver control
-                if(!slowMode) {
-            /*
-            Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
-            double leftYAbs = Math.abs(input.getY());
-            double leftXAbs = Math.abs(input.getX());
-            double rightXAbs = Math.abs(gamepad1.right_stick_x);
-            */
-                    double leftYAbs = gamepad1.left_stick_y;
-                    double leftXAbs = gamepad1.left_stick_x;
-                    double rightXAbs = gamepad1.right_stick_x;
-
-                    // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-                    //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-                    //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-                    //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs, -leftXAbs, -rightXAbs));
-                    //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
-                }
-                else{
-            /*
-            Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
-            double leftYAbs = Math.abs(input.getY());
-            double leftXAbs = Math.abs(input.getX());
-            double rightXAbs = Math.abs(gamepad1.right_stick_x);
-            */
+                //driver contro
+                    /*
+                    Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
+                    double leftYAbs = Math.abs(input.getY());
+                    double leftXAbs = Math.abs(input.getX());
+                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
+                    */
                     double leftYAbs = gamepad1.left_stick_y;
                     double leftXAbs = gamepad1.left_stick_x;
                     double rightXAbs = gamepad1.right_stick_x;
@@ -147,7 +116,6 @@ public class UltimateGoalTeleop extends OpMode {
                     //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
                     hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs * 0.3, -leftXAbs * 0.3, -rightXAbs * 0.3));
                     //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
-                }
                 break;
             case ALIGN_TO_POINT:
                 if(gamepad1.y)
@@ -185,12 +153,27 @@ public class UltimateGoalTeleop extends OpMode {
         else{
             hardware.intake.turnIntake(0);
         }
-        //mag control
-        if(gamepad1.right_bumper) {
-            if(!magUpdateStateAndSetPositionPrevLoop) {
-                magFlickerController.shootAllRings();
+        //bumper control
+        if(gamepad1.right_bumper){
+            if(!bumperPrevLoop) {
+                hardware.intake.raiseBumper();
             }
-            magUpdateStateAndSetPositionPrevLoop = true;
+        }
+        else{
+            if(bumperPrevLoop){
+                hardware.intake.dropIntake();
+            }
+        }
+        if(gamepad1.left_trigger > 0) {
+            if(!magUpdateStateAndSetPositionPrevLoop) {
+                magTrigger++;
+                if(magTrigger == 2)
+                    magFlickerController.shootAllRings();
+                else
+                    hardware.mag.dropRings();
+            }
+            if(magTrigger == 2)
+                magUpdateStateAndSetPositionPrevLoop = true;
         }
         else{
             if(magUpdateStateAndSetPositionPrevLoop){
