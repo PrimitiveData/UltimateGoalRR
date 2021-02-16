@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop.Multithreads;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.Teleop.UltimateGoalTeleop;
@@ -14,6 +15,7 @@ import java.io.Writer;
 public class MagFlickerController extends Thread {
     public HardwareMecanum hardware;
     UltimateGoalTeleop parentOP;
+    ElapsedTime time;
     boolean shootAllRingsRequested;
     boolean firstButtonPress = false;
     int numButtonPresses;
@@ -25,6 +27,7 @@ public class MagFlickerController extends Thread {
         shootAllRingsRequested = false;
         firstButtonPress = true;
         numButtonPresses = 0;
+        time = new ElapsedTime();
         try {
             writer = new FileWriter("//sdcard//FIRST//MagFlickerControllerData.txt");
         }
@@ -58,6 +61,12 @@ public class MagFlickerController extends Thread {
                 hardware.mag.collectRings();
                 shootAllRingsRequested = false;
             }
+        }
+        if(hardware.mag.currentState == Mag.State.COLLECT){
+            if(time.milliseconds() % 1000 < 500)
+                hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 0.019);
+            else if(time.milliseconds() % 1000 >= 500)
+                hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition - 0.019);
         }
     }
     public void shootAllRings(){
