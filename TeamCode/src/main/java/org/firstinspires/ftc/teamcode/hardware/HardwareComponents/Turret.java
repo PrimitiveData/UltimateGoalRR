@@ -66,10 +66,10 @@ public class Turret {
         turretPID.setState(desiredLocalTurretAngle);
         HardwareMecanum.telemetry.addData("Mag Tracking State: ", magShootingState);
         if(magShootingState) {
-            double range = maxPositive - maxNegative;
+            double range = maxPositiveServo - maxNegativeServo;
             double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,globalTurretAngle - hardware.getAngle(), maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
-            setMagAngle(magAngle - hardware.mag.magRotationOffset);
+            setMagAngle(magAngle);
         }
     }
     public void setLocalTurretAngle(double localTurretAngle){
@@ -77,10 +77,10 @@ public class Turret {
         turretPID.setState(desiredLocalTurretAngle);
         HardwareMecanum.telemetry.addData("Mag Tracking State: ", magShootingState);
         if(magShootingState) {
-            double range = maxPositive - maxNegative;
+            double range = maxPositiveServo - maxNegativeServo;
             double magCurrentAngle = (magRotationServo.position * range) + maxNegative;
             double magAngle = MathFunctions.correctedTargetWithinRangeServoScale(magCurrentAngle,localTurretAngle, maxNegativeServo, maxPositiveServo, maxNegative, maxPositive);
-            setMagAngle(magAngle - hardware.mag.magRotationOffset);
+            setMagAngle(magAngle);
         }
     }
     //updates the turret's PID

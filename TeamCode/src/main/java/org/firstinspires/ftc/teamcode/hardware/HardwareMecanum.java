@@ -52,7 +52,7 @@ public class HardwareMecanum {
     public List<LynxModule> allHubs;
     public SampleMecanumDrive drive;
     public Pose2d currentPose;
-    public static Pose2d poseStorage;
+    public static Pose2d poseStorage = new Pose2d();
     public static double cumulativeAngleStorage=0;
     public double cumulativeAngle = 0;
     private double prevAngle;
@@ -128,6 +128,7 @@ public class HardwareMecanum {
             shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
         }
         if(turret.updatePID){
+            telemetry.addLine("turretPIDOn");
             turret.updateTurretPID();
         }
         for(Motor motor: hub1Motors){

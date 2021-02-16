@@ -30,8 +30,6 @@ public class UltimateGoalTeleop extends OpMode {
     boolean slowMode = false;
     boolean slowModeToggledPrevLoop = false;
     //toggles
-    public boolean manuelTurretControl = true;
-    boolean manuelTurretControlToggledPrevLoop = false;
     boolean magUpdateStateAndSetPositionPrevLoop = false;
     boolean manuelRampControl = true;
     boolean manuelRampControlTogglePrevLoop = false;
@@ -76,7 +74,7 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slowMode = false;
-        shooterVelo = -1600;
+        shooterVelo = 1600;
         magFlickerController = new MagFlickerController(hardware,this);
         //hardware.mag.setRingPusherResting();
         //hardware.wobbler.goToClawRestingPos();
@@ -85,6 +83,8 @@ public class UltimateGoalTeleop extends OpMode {
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
+        hardware.turret.turretMotor.readRequested = true;
+        hardware.shooter.shooterMotor1.readRequested = true;
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
@@ -119,15 +119,15 @@ public class UltimateGoalTeleop extends OpMode {
             double leftXAbs = Math.abs(input.getX());
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
             */
-                    double leftYAbs = Math.abs(gamepad1.left_stick_y);
-                    double leftXAbs = Math.abs(gamepad1.left_stick_x);
-                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
+                    double leftYAbs = gamepad1.left_stick_y;
+                    double leftXAbs = gamepad1.left_stick_x;
+                    double rightXAbs = gamepad1.right_stick_x;
 
                     // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
                     //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
                     //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
                     //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(leftYAbs, leftXAbs, rightXAbs));
+                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs, -leftXAbs, -rightXAbs));
                     //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted, -leftXWeighted, -rightXWeighted));
                 }
                 else{
@@ -137,15 +137,15 @@ public class UltimateGoalTeleop extends OpMode {
             double leftXAbs = Math.abs(input.getX());
             double rightXAbs = Math.abs(gamepad1.right_stick_x);
             */
-                    double leftYAbs = Math.abs(gamepad1.left_stick_y);
-                    double leftXAbs = Math.abs(gamepad1.left_stick_x);
-                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
+                    double leftYAbs = gamepad1.left_stick_y;
+                    double leftXAbs = gamepad1.left_stick_x;
+                    double rightXAbs = gamepad1.right_stick_x;
 
                     // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
                     //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
                     //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
                     //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(leftYAbs * 0.3, leftXAbs * 0.3, rightXAbs * 0.3));
+                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs * 0.3, -leftXAbs * 0.3, -rightXAbs * 0.3));
                     //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
                 }
                 break;
@@ -161,26 +161,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.intake.dropIntake();
         }
         //manuel turret control toggle & turret control
-        if(gamepad2.a) {
-            if(!manuelTurretControlToggledPrevLoop) {
-                manuelTurretControl = !manuelTurretControl;
-            }
-            manuelTurretControlToggledPrevLoop = true;
-        }
-        else{
-            if(manuelTurretControlToggledPrevLoop){
-                manuelTurretControlToggledPrevLoop = false;
-            }
-        }
-        if(manuelTurretControl){
-            hardware.turret.updatePID = false;
-            telemetry.addLine("manuel turret control on rn");
-            hardware.turret.setTurretMotorPower(gamepad2.left_stick_x);
-        }
-        else{
-            hardware.turret.updatePID = true;
-            hardware.turret.pointTowardsHighGoal();
-        }
+
         telemetry.addData("turret Position",hardware.turret.turretMotor.getCurrentPosition());
         //intake control
         if(gamepad1.right_trigger>0) {
@@ -237,7 +218,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         else{
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
-            telemetry.addLine("Turret Position: "+turretPosition[0]+", "+turretPosition[1]);
+            telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
             telemetry.addData("angleToGoal", Math.toDegrees(angleToGoal));
@@ -278,16 +259,16 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(shooterOn){
             hardware.shooter.updatePID = true;
+            hardware.shooter.shooterVeloPID.setState(1600);
             /*double voltage = VelocityPIDDrivetrain.getBatteryVoltage();
             double maxVolts = -10.5;
             hardware.shooter.shooterMotor2.setPower(maxVolts/voltage);
             hardware.shooter.shooterMotor1.setPower(maxVolts/voltage);*/
-            hardware.shooter.shooterVeloPID.setState(shooterVelo);
         }
         else{
             hardware.shooter.updatePID = false;
-            //hardware.shooter.shooterMotor2.setPower(-0.5);
-            //hardware.shooter.shooterMotor1.setPower(-0.5);
+            hardware.shooter.shooterMotor2.setPower(0.5);
+            hardware.shooter.shooterMotor1.setPower(0.5);
         }
         //wobbler
         if(gamepad2.left_bumper) {

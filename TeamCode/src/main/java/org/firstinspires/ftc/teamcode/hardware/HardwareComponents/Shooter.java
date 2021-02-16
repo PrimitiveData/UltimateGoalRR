@@ -49,7 +49,7 @@ public class Shooter {
         HardwareMecanum.telemetry.addData("shooterPIDsetstate", shooterVeloPID.desiredState);
         prevShooterPos = shooterPos;
         double outputPower = shooterVeloPID.updateCurrentStateAndGetOutput(currentVelo);
-        HardwareMecanum.telemetry.addData("outputVoltage",outputPower);
+        HardwareMecanum.telemetry.addData("shooterOutputVoltage",outputPower);
         shooterMotor1.setPower(outputPower);
         shooterMotor2.setPower(outputPower);
     }

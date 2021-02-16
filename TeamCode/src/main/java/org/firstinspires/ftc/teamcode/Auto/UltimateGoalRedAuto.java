@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.AutoAim;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.CloseTheCamera;
+import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCamera;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraRotation;
@@ -15,12 +17,14 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.vision.UltimateGoalReturnPositionPipeline;
 
+import java.util.Vector;
+
 @Autonomous(name = "RedAuto", group = "Autonomous")
 public class UltimateGoalRedAuto extends AutoMethods {
     int stack = 2;
     OpenCvCamera webcam;
     public void runOpMode(){
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         webcam.openCameraDevice();
         UltimateGoalReturnPositionPipeline pipeline = new UltimateGoalReturnPositionPipeline();
@@ -32,9 +36,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         stack = pipeline.stack;
         telemetry.addData("stack",stack);
         telemetry.update();
+         */
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
-        Trajectory goToShootPos = null;
+        Trajectory goToShootPos = hardware.drive.trajectoryBuilder(new Pose2d())
+                .lineToConstantHeading(new Vector2d(-20,0))
+                .build();
+
         Trajectory dropWobbler1 = null;
         if(stack==0) {
                    }
@@ -76,27 +84,19 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         hardware.wobbler.goToWobbleStartingPos();
         hardware.wobbler.gripWobble();
-        hardware.loop();
-
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
+        hardware.loop();
         waitForStart();
         hardware.intake.dropIntake();
         hardwareThreadInterface.start();
-        CloseTheCamera closeCamera = new CloseTheCamera(webcam);
-        closeCamera.start();
-        RobotLog.dd("CAMERACLOSED","camera closed successfully");
-        //hardware.turret.turretPID.leewayDistance = Math.toRadians(0.3);
-        hardware.turret.turretPID.kD = 0.35;
-        hardware.turret.turretPID.kP = 1.15;
-        hardware.turret.turretPID.kI = 3.85;
-        hardware.shooter.setRampPosition(0);
-        hardware.shooter.shooterVeloPID.setState(-1500);
-        hardware.shooter.updatePID = true;
+        //CloseTheCamera closeCamera = new CloseTheCamera(webcam);
+        //closeCamera.start();
+        hardware.shooter.updatePID = false;
         hardware.turret.updatePID = true;
-        double ps1TurretAngle=0;
-        double ps2TurretAngle=0;
-        double ps3TurretAngle=0;
+        double ps1TurretAngle=-Math.toRadians(180);
+        double ps2TurretAngle=-Math.toRadians(180);
+        double ps3TurretAngle=-Math.toRadians(180);
         hardware.turret.setLocalTurretAngle(ps1TurretAngle);
         hardware.drive.followTrajectoryAsync(goToShootPos);
         while(hardware.drive.isBusy()){
@@ -110,6 +110,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         sleep(250);
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
+        /*
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
         hardware.shooter.rampAngleAdjustmentConstant = 0;
         hardware.turret.updatePID = true;
@@ -248,7 +249,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             telemetry.addLine("X: " + hardware.getXAbsoluteCenter() + "Y: " + hardware.getYAbsoluteCenter());
             telemetry.update();
         }
-
+*/
 
 
     }

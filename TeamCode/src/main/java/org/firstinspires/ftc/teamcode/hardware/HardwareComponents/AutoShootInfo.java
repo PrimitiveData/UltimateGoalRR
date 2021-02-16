@@ -76,26 +76,26 @@ public class AutoShootInfo {
         turretAngleOffsets.add(-5.6);
         turretAngleOffsets.add(-5.4);
 
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1600.0);
-        shooterSpeeds.add(-1450.0);
-        shooterSpeeds.add(-1450.0);
-        shooterSpeeds.add(-1450.0);
-        shooterSpeeds.add(-1450.0);
-        shooterSpeeds.add(-1450.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1600.0);
+        shooterSpeeds.add(1450.0);
+        shooterSpeeds.add(1450.0);
+        shooterSpeeds.add(1450.0);
+        shooterSpeeds.add(1450.0);
+        shooterSpeeds.add(1450.0);
 
 
         for(int i = 0; i < distances.size(); i++){
