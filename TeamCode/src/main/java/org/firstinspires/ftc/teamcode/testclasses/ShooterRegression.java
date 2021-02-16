@@ -25,9 +25,9 @@ public class ShooterRegression extends LinearOpMode {
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
-                globalTurretAngle += Math.toRadians(0.1);
+                globalTurretAngle += Math.toRadians(0.01);
             if(gamepad1.dpad_right)
-                globalTurretAngle -= Math.toRadians(0.1);
+                globalTurretAngle -= Math.toRadians(0.01);
 
             if(gamepad1.dpad_up)
                 rampPos += 0.001;
@@ -42,9 +42,9 @@ public class ShooterRegression extends LinearOpMode {
                 }
                 for(int i = 0; i < 3; i++){
                     hardware.mag.pushInRings();
-                    sleep(100);// tune time
+                    sleep(400);// tune time
                     hardware.mag.setRingPusherResting();
-                    sleep(100);// tune time
+                    sleep(400);// tune time
                 }
                 hardware.mag.collectRings();
             }
