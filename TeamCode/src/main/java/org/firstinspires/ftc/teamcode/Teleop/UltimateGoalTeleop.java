@@ -84,7 +84,6 @@ public class UltimateGoalTeleop extends OpMode {
         driveMode = Mode.DRIVER_CONTROL;
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
         hardware.turret.turretMotor.readRequested = true;
-        hardware.shooter.shooterMotor1.readRequested = true;
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
@@ -259,7 +258,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(shooterOn){
             hardware.shooter.updatePID = true;
-            hardware.shooter.shooterVeloPID.setState(1600);
+            hardware.shooter.shooterVeloPID.setState(1500);
             /*double voltage = VelocityPIDDrivetrain.getBatteryVoltage();
             double maxVolts = -10.5;
             hardware.shooter.shooterMotor2.setPower(maxVolts/voltage);
@@ -267,8 +266,8 @@ public class UltimateGoalTeleop extends OpMode {
         }
         else{
             hardware.shooter.updatePID = false;
-            hardware.shooter.shooterMotor2.setPower(0.5);
-            hardware.shooter.shooterMotor1.setPower(0.5);
+            hardware.shooter.shooterMotor2.setPower(0);
+            hardware.shooter.shooterMotor1.setPower(0);
         }
         //wobbler
         if(gamepad2.left_bumper) {
