@@ -39,6 +39,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
          */
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
+        hardware.turret.turretMotor.readRequested = true;
         Trajectory goToShootPos = hardware.drive.trajectoryBuilder(new Pose2d())
                 .lineToConstantHeading(new Vector2d(-20,0))
                 .build();
@@ -81,23 +82,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         }
 
-
+        hardware.intake.dropIntake();
         hardware.wobbler.goToWobbleStartingPos();
         hardware.wobbler.gripWobble();
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
         hardware.loop();
         waitForStart();
-        hardware.intake.dropIntake();
         hardwareThreadInterface.start();
         //CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         //closeCamera.start();
-        hardware.shooter.updatePID = false;
+        hardware.shooter.updatePID = true;
         hardware.turret.updatePID = true;
         double ps1TurretAngle=-Math.toRadians(180);
         double ps2TurretAngle=-Math.toRadians(180);
         double ps3TurretAngle=-Math.toRadians(180);
         hardware.turret.setLocalTurretAngle(ps1TurretAngle);
+        hardware.shooter.shooterVeloPID.setState(1500);
         hardware.drive.followTrajectoryAsync(goToShootPos);
         while(hardware.drive.isBusy()){
             sleep(1);

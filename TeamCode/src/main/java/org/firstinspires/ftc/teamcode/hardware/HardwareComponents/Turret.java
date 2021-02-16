@@ -70,9 +70,6 @@ public class Turret {
             double magAngle = MathFunctions.correctedTargetServoScale(magRotationServo.position, trackingTarget, maxNegativeServo, maxPositiveServo);
             setMagAngle(magAngle);
         }
-        else{
-            setMagAngle(hardware.mag.magRotationCollectPosition);
-        }
     }
     public void setLocalTurretAngle(double localTurretAngle){
         double desiredLocalTurretAngle = localTurretAngle;
@@ -81,8 +78,6 @@ public class Turret {
         if(magShootingState) {
             double magAngle = MathFunctions.correctedTargetServoScale(magRotationServo.position, desiredLocalTurretAngle, maxNegativeServo, maxPositiveServo);
             setMagAngle(magAngle);
-        }else{
-            setMagAngle(hardware.mag.magRotationCollectPosition);
         }
     }
     //updates the turret's PID

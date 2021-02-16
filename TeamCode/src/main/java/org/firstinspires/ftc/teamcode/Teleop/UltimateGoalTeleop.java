@@ -204,7 +204,6 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(manuelRampControl){
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
-            hardware.turret.setMagAngle(0.5);
         }
         else{
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
