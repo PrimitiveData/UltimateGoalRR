@@ -75,9 +75,9 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1600;
         magFlickerController = new MagFlickerController(hardware,this);
-        //hardware.mag.setRingPusherResting();
-        //hardware.wobbler.goToClawRestingPos();
-        //hardware.wobbler.goToArmRestingPos();
+        hardware.mag.setRingPusherResting();
+        hardware.wobbler.goToClawRestingPos();
+        hardware.wobbler.goToArmRestingPos();
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
@@ -113,7 +113,7 @@ public class UltimateGoalTeleop extends OpMode {
                     //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
                     //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
                     //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs * 0.3, -leftXAbs * 0.3, -rightXAbs * 0.3));
+                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs, -leftXAbs, -rightXAbs));
                     //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
                 break;
             case ALIGN_TO_POINT:
@@ -157,11 +157,13 @@ public class UltimateGoalTeleop extends OpMode {
             if(!bumperPrevLoop) {
                 hardware.intake.raiseBumper();
             }
+            bumperPrevLoop = true;
         }
         else{
             if(bumperPrevLoop){
                 hardware.intake.dropIntake();
             }
+            bumperPrevLoop = false;
         }
         if(gamepad1.left_trigger > 0) {
             if(!magUpdateStateAndSetPositionPrevLoop) {
