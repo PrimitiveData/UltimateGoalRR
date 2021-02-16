@@ -29,6 +29,7 @@ public class UltimateGoalTeleop extends OpMode {
     HardwareMecanum hardware;
     //toggles
     boolean magUpdateStateAndSetPositionPrevLoop = false;
+    boolean bumperDown;
     boolean bumperPrevLoop = false;
     int magTrigger = 0;
     boolean manuelRampControl = true;
@@ -61,7 +62,6 @@ public class UltimateGoalTeleop extends OpMode {
     private Mode driveMode;
     private PIDFController headingController;
 
-    Thread magThread = new MagFlickerController(hardware, this);
     public void init(){
         msStuckDetectLoop = 15000;
         /*if (T265.slamra == null) {
@@ -83,6 +83,7 @@ public class UltimateGoalTeleop extends OpMode {
         driveMode = Mode.DRIVER_CONTROL;
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
         hardware.turret.turretMotor.readRequested = true;
+        bumperDown = false;
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
@@ -90,7 +91,7 @@ public class UltimateGoalTeleop extends OpMode {
     public void start(){
         //T265.slamra.start();
         magFlickerController.start();
-        magThread.start();
+        hardware.mag.collectRings();
     }
     public void loop(){
         switch(driveMode){
@@ -155,26 +156,31 @@ public class UltimateGoalTeleop extends OpMode {
         //bumper control
         if(gamepad1.right_bumper){
             if(!bumperPrevLoop) {
-                hardware.intake.raiseBumper();
+                bumperDown = !bumperDown;
             }
             bumperPrevLoop = true;
         }
         else{
             if(bumperPrevLoop){
-                hardware.intake.dropIntake();
+                bumperPrevLoop = false;
             }
-            bumperPrevLoop = false;
+        }
+        if(bumperDown){
+            hardware.intake.dropIntake();
+        }else{
+            hardware.intake.raiseBumper();
         }
         if(gamepad1.left_trigger > 0) {
             if(!magUpdateStateAndSetPositionPrevLoop) {
                 magTrigger++;
-                if(magTrigger == 2)
+                if(magTrigger == 2) {
                     magFlickerController.shootAllRings();
+                    magTrigger = 0;
+                }
                 else
                     hardware.mag.dropRings();
             }
-            if(magTrigger == 2)
-                magUpdateStateAndSetPositionPrevLoop = true;
+            magUpdateStateAndSetPositionPrevLoop = true;
         }
         else{
             if(magUpdateStateAndSetPositionPrevLoop){

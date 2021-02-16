@@ -51,9 +51,9 @@ public class MagFlickerController extends Thread {
                 }
                 for(int i = 0; i < 3; i++){
                     hardware.mag.pushInRings();
-                    sleeep(250);// tune time
+                    sleeep(100);// tune time
                     hardware.mag.setRingPusherResting();
-                    sleeep(250);// tune time
+                    sleeep(100);// tune time
                 }
                 hardware.mag.collectRings();
                 shootAllRingsRequested = false;
