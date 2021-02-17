@@ -103,7 +103,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         }else{
             collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
-                    .lineToLinearHeading(new Pose2d(-10,36,Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-10,36,Math.toRadians(-179)))
                     .build();
         }
 
