@@ -4,10 +4,12 @@ import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -153,10 +155,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.intake.dropIntake();
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
-        sleep(800);
+        while(Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
+            sleep(10);
+        ElapsedTime powershotTimer = new ElapsedTime();
+        while(true) {
+            if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
+                powershotTimer.reset();
+            if (powershotTimer.milliseconds() >= 100)
+                break;
+        }
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
-        sleep(800);
+        while(true) {
+            if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
+                powershotTimer.reset();
+            if (powershotTimer.milliseconds() >= 100)
+                break;
+        }
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
         hardware.intake.turnIntake(1);
@@ -173,7 +188,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
         }
-        sleep(2000);
+        for(int i = 0; i < 4; i++){
+            hardware.drive.setWeightedDrivePower(new Pose2d(-1, 0, 0));
+            sleep(250);
+            hardware.drive.setWeightedDrivePower(new Pose2d(1, 0, 0));
+            sleep(250);
+        }
+        hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));
         hardware.intake.turnIntake(0);
         if(hardware.mag.currentState == Mag.State.COLLECT) {
             hardware.mag.dropRings();
@@ -192,7 +213,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
             while (hardware.drive.isBusy()&&!isStopRequested()){
                 sleep(1);
             }
-            sleep(1500);
+            for(int i = 0; i < 3; i++){
+                hardware.drive.setWeightedDrivePower(new Pose2d(-1, 0, 0));
+                sleep(250);
+                hardware.drive.setWeightedDrivePower(new Pose2d(1, 0, 0));
+                sleep(250);
+            }
+            hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));
             hardware.intake.turnIntake(0);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
