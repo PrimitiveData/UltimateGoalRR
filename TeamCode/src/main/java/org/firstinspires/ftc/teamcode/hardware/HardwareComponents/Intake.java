@@ -11,10 +11,10 @@ public class Intake {
     RegServo intakeDropperGuard;
     ContRotServo intakeServoStarboard;
     ContRotServo intakeServoPort;
-    double holdIntakeUp = 0.36;
+    double holdIntakeUp = 0.21;
     double bumperInit = 0.1438;
-    double bumperRaised = 0.418;
-    double releaseIntake = 0.513;
+    double bumperRaised = 0.44;
+    double releaseIntake = 0.58;
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
         this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);

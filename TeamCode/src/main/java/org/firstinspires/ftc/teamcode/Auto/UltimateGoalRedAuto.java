@@ -103,7 +103,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         }else{
             collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
-                    .lineToLinearHeading(new Pose2d(-29,36.6,Math.toRadians(-179)))
+                    .lineToLinearHeading(new Pose2d(-32.5,41.1,Math.toRadians(-179)))
                     .build();
         }
 
@@ -222,11 +222,17 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
-            if(hardware.getAngle() + 180 < 45)
+            if(hardware.getAngle() < -Math.toRadians(135)) {
                 hardware.wobbler.moveArmToGrabPos();
+                hardware.wobbler.releaseWobble();
+            }
             else if (hardware.wobbler.wobblerArm1.position != hardware.wobbler.armRestingPos)
                 hardware.wobbler.goToArmRestingPos();
         }
+        sleep(250);
+        hardware.wobbler.gripWobble();
+        sleep(500);
+        hardware.wobbler.raiseWobble();
         /*
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
         hardware.shooter.rampAngleAdjustmentConstant = 0;
