@@ -16,7 +16,7 @@ public abstract class AutoMethods extends LinearOpMode {
         sleep(500);//tune timeout
         for(int i = 0; i < 3; i++){
             hardware.mag.pushInRings();
-            sleep(250);// tune time
+            sleep(300);// tune time
             hardware.mag.setRingPusherResting();
             sleep(250);// tune time
         }
