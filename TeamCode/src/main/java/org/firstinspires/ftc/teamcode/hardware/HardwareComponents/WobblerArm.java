@@ -8,10 +8,11 @@ public class WobblerArm {
     //wobbler arm positions
     public double wobblerArm2PositionWhenWobblerArm1IsZero=1.09772;
     //ALL ARM POS VARIABLES ARE FOR WOBBLE ARM SERVO 1
-    public double armGrabWobblePos=0.23;
-    public double armRaiseWobble=0.59476;
-    public double armStartingPos=0.792913;
+    public double armGrabWobblePos=0.21;
+    public double armRaiseWobble=0.7;
+    public double armStartingPos=0.84;
     public double armRestingPos=1;
+    public double armDropPos = 0.61;
     RegServo wobblerClaw;
     public double clawReleasePos = 0.607;
     public double clawGrip = 0.97;
@@ -44,8 +45,8 @@ public class WobblerArm {
         wobblerArm2.setPosition(wobblerArm2PositionWhenWobblerArm1IsZero - armStartingPos);
     }
     public void goToWobblerDropPosition(){
-        wobblerArm1.setPosition((armRaiseWobble+armGrabWobblePos)/2);
-        wobblerArm2.setPosition(wobblerArm2PositionWhenWobblerArm1IsZero-(armRaiseWobble+armGrabWobblePos)/2);
+        wobblerArm1.setPosition(armDropPos);
+        wobblerArm2.setPosition(wobblerArm2PositionWhenWobblerArm1IsZero-armDropPos);
     }
     public void goToArmRestingPos(){
         wobblerArm1.setPosition(armRestingPos);

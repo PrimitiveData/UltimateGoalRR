@@ -10,14 +10,16 @@ public class WobbleArmTester extends LinearOpMode {
     public void runOpMode(){
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         waitForStart();
+        double currentWobblePosition = 0.5;
         while(!isStopRequested()){
             if(gamepad1.a)
                 hardware.wobbler.gripWobble();
             if(gamepad1.b)
                 hardware.wobbler.releaseWobble();
-            hardware.wobbler.wobblerArm1.setPosition(-gamepad1.left_stick_y);
-            hardware.wobbler.wobblerArm2.setPosition(hardware.wobbler.wobblerArm2PositionWhenWobblerArm1IsZero + gamepad1.left_stick_y);
-            hardware.telemetry.addData("Wobble Arm Pos: ", hardware.wobbler.wobblerArm1.position);
+            currentWobblePosition += gamepad1.left_stick_y*0.001;
+            hardware.wobbler.wobblerArm1.setPosition(currentWobblePosition);
+            hardware.wobbler.wobblerArm2.setPosition(hardware.wobbler.wobblerArm2PositionWhenWobblerArm1IsZero -currentWobblePosition);
+            hardware.telemetry.addData("Wobble Arm Pos: ", currentWobblePosition);
             hardware.loop();
             telemetry.update();
         }
