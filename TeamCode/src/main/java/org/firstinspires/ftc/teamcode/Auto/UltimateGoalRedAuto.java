@@ -222,6 +222,10 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
+            if(hardware.getAngle() + 180 < 45)
+                hardware.wobbler.moveArmToGrabPos();
+            else if (hardware.wobbler.wobblerArm1.position != hardware.wobbler.armRestingPos)
+                hardware.wobbler.goToArmRestingPos();
         }
         /*
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
