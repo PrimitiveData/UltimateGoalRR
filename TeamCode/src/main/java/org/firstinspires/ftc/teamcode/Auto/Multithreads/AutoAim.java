@@ -22,15 +22,16 @@ public class AutoAim extends Thread {
     }
     public void run(){
         while(!parentOP.isStopRequested()&&!stopRequested) {
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(), hardware.getYAbsoluteCenter(), -4.72974566929, hardware.getAngle());
-            telemetry.addLine("Turret Position: " + turretPosition[0] + ", " + turretPosition[1]);
-            double distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.highGoalPosition[1], turretPosition[0] - FieldConstants.highGoalPosition[0]);
-            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1] - turretPosition[1], FieldConstants.highGoalPosition[0] - turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
-            angleToGoal+=-0.1;
+            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
+            telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
+            double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
+            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
             telemetry.addData("angleToGoal", Math.toDegrees(angleToGoal));
             hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
-            //hardware.turret.setTurretAngle(angleToGoal);
-            telemetry.update();
+            hardware.turret.updatePID = true;
+            hardware.turret.setTurretAngle(angleToGoal);
+            double shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
+            hardware.shooter.shooterVeloPID.setState(shooterVelo);
         }
     }
 }

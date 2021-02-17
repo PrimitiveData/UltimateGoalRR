@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCamera;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraRotation;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.vision.UltimateGoalReturnPositionPipeline;
@@ -55,14 +56,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 .lineToConstantHeading(new Vector2d(-60,0))
                 .build();
 
+        Trajectory pickUpRingsPrelude = hardware.drive.trajectoryBuilder(goToShootPos.end())
+                .lineToConstantHeading(new Vector2d(goToShootPos.end().getX(), goToShootPos.end().getY()+20))
+                .build();
+
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
                 new MecanumVelocityConstraint(12, TRACK_WIDTH)
         ));
-        double distanceToPickUp= 28;
-        double headingToPickUp = Math.toRadians(40);
-        Trajectory pickUpRings = hardware.drive.trajectoryBuilder(new Pose2d(goToShootPos.end().getX(), goToShootPos.end().getY(),Math.toRadians(45)))
-                .lineToConstantHeading(new Vector2d(-60+distanceToPickUp*Math.cos(headingToPickUp),distanceToPickUp*Math.sin(headingToPickUp)))
+        double distanceToPickUp= 8;
+        double headingToPickUp = Math.toRadians(0);
+        Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())
+                .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
+                .build();
+
+        double distanceToPickUp2 = 24;
+        Trajectory pickUpRings2 = hardware.drive.trajectoryBuilder(pickUpRings.end())
+                .lineToConstantHeading(new Vector2d(pickUpRings.end().getX()+distanceToPickUp2*Math.cos(headingToPickUp),pickUpRings.end().getY() + distanceToPickUp2*Math.sin(headingToPickUp)))
                 .build();
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
@@ -72,11 +82,15 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         Trajectory dropWobbler1 = null;
         if(stack==0) {
-                   }
-        else if(stack == 1){
-                    }
-        else{
 
+        }
+        else if(stack == 1){
+
+        }
+        else{
+            dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings2.end())
+                    .lineToConstantHeading(new Vector2d(-102,32))
+                    .build();
         }
         Trajectory collect2ndWobbler = null;
         if(stack==0) {
@@ -144,7 +158,12 @@ public class UltimateGoalRedAuto extends AutoMethods {
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
         hardware.intake.turnIntake(1);
-        hardware.drive.turnAsync(headingToPickUp);
+
+        double prevMaxPositiveTurret = hardware.turret.maxPositive;
+        hardware.turret.maxPositive = Math.toRadians(0);
+        AutoAim autoAim = new AutoAim(hardware,telemetry,this);
+        autoAim.start();
+        hardware.drive.followTrajectoryAsync(pickUpRingsPrelude);
         while(hardware.drive.isBusy()){
             sleep(1);
         }
@@ -152,10 +171,52 @@ public class UltimateGoalRedAuto extends AutoMethods {
         while(hardware.drive.isBusy()){
             sleep(1);
         }
-        hardware.intake.turnIntake(0);
-        sleep(1000);
-        hardware.intake.turnIntake(1);
         sleep(2000);
+        hardware.intake.turnIntake(0);
+        if(hardware.mag.currentState == Mag.State.COLLECT) {
+            hardware.mag.dropRings();
+            sleep(500);//tune timeout
+        }
+        for(int i = 0; i < 3; i++){
+            hardware.mag.pushInRings();
+            sleep(250);// tune time
+            hardware.mag.setRingPusherResting();
+            sleep(150);// tune time
+        }
+        hardware.mag.collectRings();
+        hardware.intake.turnIntake(1);
+        if(stack == 2){
+            hardware.drive.followTrajectoryAsync(pickUpRings2);
+            while (hardware.drive.isBusy()){
+                sleep(1);
+            }
+            sleep(1500);
+            hardware.intake.turnIntake(0);
+            if(hardware.mag.currentState == Mag.State.COLLECT) {
+                hardware.mag.dropRings();
+                sleep(500);//tune timeout
+            }
+            for(int i = 0; i < 3; i++){
+                hardware.mag.pushInRings();
+                sleep(250);// tune time
+                hardware.mag.setRingPusherResting();
+                sleep(150);// tune time
+            }
+        }
+        autoAim.stopRequested = true;
+        hardware.turret.maxPositive = prevMaxPositiveTurret;
+        hardware.wobbler.goToWobblerDropPosition();
+        hardware.drive.followTrajectoryAsync(dropWobbler1);
+        while(hardware.drive.isBusy()){
+            sleep(1);
+            hardware.turret.setLocalTurretAngle(0);
+            hardware.shooter.updatePID = false;
+            hardware.shooter.shooterMotor1.setPower(0);
+            hardware.shooter.shooterMotor2.setPower(0);
+        }
+        hardware.wobbler.releaseWobble();
+        sleep(500);
+        hardware.wobbler.goToClawRestingPos();
         /*
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
         hardware.shooter.rampAngleAdjustmentConstant = 0;
