@@ -12,21 +12,14 @@ public class WobbleArmTester extends LinearOpMode {
         waitForStart();
         while(!isStopRequested()){
             if(gamepad1.a)
-                hardware.wobbler.goToArmRestingPos();
-            if(gamepad1.b)
-                hardware.wobbler.goToClawRestingPos();
-            if(gamepad1.x)
-                hardware.wobbler.goToWobblerDropPosition();
-            if(gamepad1.y)
-                hardware.wobbler.goToWobbleStartingPos();
-            if(gamepad1.dpad_down)
                 hardware.wobbler.gripWobble();
-            if(gamepad1.dpad_up)
+            if(gamepad1.b)
                 hardware.wobbler.releaseWobble();
-            if(gamepad1.dpad_left){
-                hardware.wobbler.moveArmToGrabPos();
-            }
+            hardware.wobbler.wobblerArm1.setPosition(-gamepad1.left_stick_y);
+            hardware.wobbler.wobblerArm2.setPosition(hardware.wobbler.wobblerArm2PositionWhenWobblerArm1IsZero + gamepad1.left_stick_y);
+            hardware.telemetry.addData("Wobble Arm Pos: ", hardware.wobbler.wobblerArm1.position);
             hardware.loop();
+            telemetry.update();
         }
     }
 }

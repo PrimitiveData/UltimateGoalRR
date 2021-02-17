@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class WobblerArm {
-    RegServo wobblerArm1;
-    RegServo wobblerArm2;
+    public RegServo wobblerArm1;
+    public RegServo wobblerArm2;
     //wobbler arm positions
     public double wobblerArm2PositionWhenWobblerArm1IsZero=1.09772;
     //ALL ARM POS VARIABLES ARE FOR WOBBLE ARM SERVO 1
