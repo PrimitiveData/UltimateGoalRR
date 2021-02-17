@@ -92,7 +92,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private MotionProfile turnProfile;
     private double turnStart;
 
-    private TrajectoryVelocityConstraint velConstraint;
+    public TrajectoryVelocityConstraint velConstraint;
     private TrajectoryAccelerationConstraint accelConstraint;
     private TrajectoryFollower follower;
 
@@ -105,7 +105,6 @@ public class SampleMecanumDrive extends MecanumDrive {
     private VoltageSensor batteryVoltageSensor;
 
     private Pose2d lastPoseOnTurn;
-    public SanfordAnalogGyro analogGyro;
 
     HardwareMecanum hardware;
 
@@ -185,7 +184,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
-        analogGyro = new SanfordAnalogGyro(hardwareMap, new ElapsedTime());
     }
 
     public double updateDrivetrainPID(Pose2d currentPose, Pose2d targetPose){
@@ -263,7 +261,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void update() {
         updatePoseEstimate();
-
         Pose2d currentPose = getPoseEstimate();
         Pose2d lastError = getLastError();
 
@@ -345,7 +342,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, currentPose);
 
-        //dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
@@ -429,6 +426,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return analogGyro.getAngle();
+        return imu.getAngularOrientation().firstAngle;
     }
 }

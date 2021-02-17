@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -10,6 +14,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.AutoAim;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.CloseTheCamera;
 import org.firstinspires.ftc.teamcode.Ramsete.Pose;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCamera;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraRotation;
@@ -17,7 +23,12 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.vision.UltimateGoalReturnPositionPipeline;
 
+import java.util.Arrays;
 import java.util.Vector;
+
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 
 @Autonomous(name = "RedAuto", group = "Autonomous")
 public class UltimateGoalRedAuto extends AutoMethods {
@@ -41,8 +52,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
         hardware.turret.turretMotor.readRequested = true;
         Trajectory goToShootPos = hardware.drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(-20,0))
+                .lineToConstantHeading(new Vector2d(-60,0))
                 .build();
+
+        hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
+                new AngularVelocityConstraint(MAX_ANG_VEL),
+                new MecanumVelocityConstraint(12, TRACK_WIDTH)
+        ));
+        double distanceToPickUp= 28;
+        double headingToPickUp = Math.toRadians(40);
+        Trajectory pickUpRings = hardware.drive.trajectoryBuilder(new Pose2d(goToShootPos.end().getX(), goToShootPos.end().getY(),Math.toRadians(45)))
+                .lineToConstantHeading(new Vector2d(-60+distanceToPickUp*Math.cos(headingToPickUp),distanceToPickUp*Math.sin(headingToPickUp)))
+                .build();
+
+        hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
+                new AngularVelocityConstraint(MAX_ANG_VEL),
+                new MecanumVelocityConstraint(MAX_VEL, TRACK_WIDTH)
+        ));
 
         Trajectory dropWobbler1 = null;
         if(stack==0) {
@@ -82,35 +108,54 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         }
 
-        hardware.intake.dropIntake();
         hardware.wobbler.goToWobbleStartingPos();
         hardware.wobbler.gripWobble();
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
         hardware.loop();
         waitForStart();
+        hardware.shooter.setRampPosition(0);
+        hardware.intake.dropIntake();
         hardwareThreadInterface.start();
         //CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         //closeCamera.start();
         hardware.shooter.updatePID = true;
         hardware.turret.updatePID = true;
-        double ps1TurretAngle=-Math.toRadians(180);
-        double ps2TurretAngle=-Math.toRadians(180);
+        double ps1TurretAngle=-Math.toRadians(176);
         double ps3TurretAngle=-Math.toRadians(180);
-        hardware.turret.setLocalTurretAngle(ps1TurretAngle);
+        double ps2TurretAngle=-Math.toRadians(184.5);
+        hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         hardware.shooter.shooterVeloPID.setState(1500);
+        double goToShootPosStartTime = hardware.time.milliseconds();
         hardware.drive.followTrajectoryAsync(goToShootPos);
+        while(hardware.drive.isBusy()){
+            if(hardware.time.milliseconds() - goToShootPosStartTime > 450 && hardware.time.milliseconds() - goToShootPosStartTime < 550){
+                hardware.intake.raiseBumper();
+            }
+            sleep(1);
+        }
+        hardware.intake.dropIntake();
+        shootIndividualRing(hardware);
+        hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
+        sleep(800);
+        shootIndividualRing(hardware);
+        hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
+        sleep(800);
+        shootIndividualRing(hardware);
+        hardware.mag.collectRings();
+        hardware.intake.turnIntake(1);
+        hardware.drive.turnAsync(headingToPickUp);
         while(hardware.drive.isBusy()){
             sleep(1);
         }
-        shootIndividualRing(hardware);
-        hardware.turret.setLocalTurretAngle(ps2TurretAngle);
-        sleep(250);
-        shootIndividualRing(hardware);
-        hardware.turret.setLocalTurretAngle(ps3TurretAngle);
-        sleep(250);
-        shootIndividualRing(hardware);
-        hardware.mag.collectRings();
+        hardware.drive.followTrajectoryAsync(pickUpRings);
+        while(hardware.drive.isBusy()){
+            sleep(1);
+        }
+        hardware.intake.turnIntake(0);
+        sleep(1000);
+        hardware.intake.turnIntake(1);
+        sleep(2000);
         /*
         hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
         hardware.shooter.rampAngleAdjustmentConstant = 0;

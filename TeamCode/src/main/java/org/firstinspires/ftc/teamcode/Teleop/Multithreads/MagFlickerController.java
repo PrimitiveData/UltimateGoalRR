@@ -54,7 +54,7 @@ public class MagFlickerController extends Thread {
                 }
                 for(int i = 0; i < 3; i++){
                     hardware.mag.pushInRings();
-                    sleeep(100);// tune time
+                    sleeep(200);// tune time
                     hardware.mag.setRingPusherResting();
                     sleeep(100);// tune time
                 }
@@ -62,12 +62,12 @@ public class MagFlickerController extends Thread {
                 shootAllRingsRequested = false;
             }
         }
-        if(hardware.mag.currentState == Mag.State.COLLECT){
+        /*if(hardware.mag.currentState == Mag.State.COLLECT){
             if(time.milliseconds() % 1000 < 500)
                 hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 0.019);
             else if(time.milliseconds() % 1000 >= 500)
                 hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition - 0.019);
-        }
+        }*/
     }
     public void shootAllRings(){
         shootAllRingsRequested = true;
