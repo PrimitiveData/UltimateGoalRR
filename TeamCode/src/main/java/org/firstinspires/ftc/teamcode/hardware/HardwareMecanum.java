@@ -128,7 +128,6 @@ public class HardwareMecanum {
             shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
         }
         if(turret.updatePID){
-            telemetry.addLine("turretPIDOn");
             turret.updateTurretPID();
         }
         for(Motor motor: hub1Motors){

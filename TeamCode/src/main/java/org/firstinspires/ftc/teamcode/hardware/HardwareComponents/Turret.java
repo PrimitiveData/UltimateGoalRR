@@ -63,7 +63,6 @@ public class Turret {
         //global turret angle is the angle with respect to the field, local is the angle with respect to the robot
         double trackingTarget = globalTurretAngle - hardware.getAngle();
         double desiredLocalTurretAngle = MathFunctions.correctedTargetWithinRange(localTurretAngleRadians(), trackingTarget, maxNegative, maxPositive);
-        HardwareMecanum.telemetry.addData("desiredLocalTurretAngleAfterBensAlgo",Math.toDegrees(desiredLocalTurretAngle));
         turretPID.setState(desiredLocalTurretAngle);
         if(magShootingState) {
             double magAngle = MathFunctions.correctedTargetServoScale(magRotationServo.position, trackingTarget, maxNegativeServo, maxPositiveServo);
@@ -89,7 +88,6 @@ public class Turret {
     //updates the turret's PID
     public void updateTurretPID(){
         double output = turretPID.updateCurrentStateAndGetOutput(localTurretAngleRadians());
-        HardwareMecanum.telemetry.addData("TurretPIDoutput",output);
         setTurretMotorPower(output);
     }
     //gets the position of the turret on the field

@@ -43,8 +43,6 @@ public class MecanumDrive {
         RB.setPower(RBpower);
     }
     public void setPowersTeleop(double movementX, double movementY, double turnMagnitude){
-        HardwareMecanum.telemetry.addData("movementY: ",movementY);
-        HardwareMecanum.telemetry.update();
         double LFpower = movementY-turnMagnitude-movementX;
         double LBpower = movementY-turnMagnitude+movementX;
         double RFpower = movementY+turnMagnitude+movementX;

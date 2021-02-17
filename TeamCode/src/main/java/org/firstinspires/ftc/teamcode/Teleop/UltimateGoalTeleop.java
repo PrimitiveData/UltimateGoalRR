@@ -355,14 +355,12 @@ public class UltimateGoalTeleop extends OpMode {
                 toggleMagStatePrevLoop = false;
             }
         }
-        telemetry.addData("shooter On",shooterOn);
-        telemetry.addData("Wobbler grip",grip);
-        telemetry.addData("Flap position",hardware.shooter.rampPostion);
-        telemetry.addLine("angle: "+hardware.getAngle() + ", in degrees: "+ Math.toDegrees(hardware.getAngle()));
+        telemetry.addData("Shooter Velocity: ",shooterVelo);
+        telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
+        telemetry.addData("Shooter On: ",shooterOn);
+        telemetry.addLine("Robot Angle: " + Math.toDegrees(hardware.getAngle()));
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
-        telemetry.addLine("left position: " + -hardware.hub1Motors[0].getCurrentPosition() + ", right position: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", lateral position: " + hardware.hub1Motors[1].getCurrentPosition());
-        telemetry.addLine("shooter velo: "+shooterVelo);
-        //telemetry.addLine("turret Angle: "+ Math.toDegrees(hardware.turret.localTurretAngleRadians())+", turret output power: "+gamepad2.left_stick_x);
+        telemetry.addLine("Left Odo Pos: " + -hardware.hub1Motors[0].getCurrentPosition() + ", Right Odo Pos: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", Lateral Odo Pos: " + hardware.hub1Motors[1].getCurrentPosition());
         telemetry.update();
 //correcting autoaim
         if(gamepad2.dpad_up) {

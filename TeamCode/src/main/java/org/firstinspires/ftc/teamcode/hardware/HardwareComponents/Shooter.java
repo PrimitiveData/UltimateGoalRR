@@ -52,11 +52,9 @@ new ShooterPID(0.07978,0.2797,0,0.005197539254,3.271255167,0,Double.POSITIVE_INF
         }
         double shooterPos = shooterMotor2.getCurrentPosition();
         double currentVelo = (shooterPos - prevShooterPos)/deltaTime;
-        HardwareMecanum.telemetry.addData("shooter velo",currentVelo);
-        HardwareMecanum.telemetry.addData("shooterPIDsetstate", shooterVeloPID.desiredState);
         prevShooterPos = shooterPos;
         double outputPower = shooterVeloPID.updateCurrentStateAndGetOutput(currentVelo);
-        HardwareMecanum.telemetry.addData("shooterOutputVoltage",outputPower);
+        //HardwareMecanum.telemetry.addData("shooterOutputVoltage",outputPower);
         packet.put("shooterVelo",currentVelo);
         packet.put("shooterPIDsetState",shooterVeloPID.desiredState);
         //dashboard.sendTelemetryPacket(packet);
