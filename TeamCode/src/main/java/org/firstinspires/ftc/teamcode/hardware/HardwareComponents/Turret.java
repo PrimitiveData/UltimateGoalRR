@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -28,6 +30,9 @@ public class Turret {
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
     AutoShootInfo info;
+
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    TelemetryPacket packet = new TelemetryPacket();
     public Turret(Motor turretMotor, RegServo magRotationServo, HardwareMecanum hardware){
         this.magRotationServo = magRotationServo;
         this.turretMotor = turretMotor;
@@ -89,6 +94,8 @@ public class Turret {
     public void updateTurretPID(){
         double output = turretPID.updateCurrentStateAndGetOutput(localTurretAngleRadians());
         setTurretMotorPower(output);
+        packet.put("Turret Desired State: ", hardware.turret.turretPID.desiredState);
+        packet.put("Turret Current State: ", hardware.turret.turretPID.currentState);
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){
