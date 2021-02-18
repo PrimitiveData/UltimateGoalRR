@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -62,6 +64,9 @@ public class UltimateGoalTeleop extends OpMode {
     private Mode driveMode;
     private PIDFController headingController;
 
+    TelemetryPacket packet = new TelemetryPacket();
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+
     public void init(){
         msStuckDetectLoop = 15000;
         /*if (T265.slamra == null) {
@@ -73,7 +78,7 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterVelo = 1600;
+        shooterVelo = 1500;
         magFlickerController = new MagFlickerController(hardware,this);
         hardware.mag.setRingPusherResting();
         hardware.wobbler.goToClawRestingPos();
@@ -361,6 +366,10 @@ public class UltimateGoalTeleop extends OpMode {
         telemetry.addLine("Robot Angle: " + Math.toDegrees(hardware.getAngle()));
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
         telemetry.addLine("Left Odo Pos: " + -hardware.hub1Motors[0].getCurrentPosition() + ", Right Odo Pos: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", Lateral Odo Pos: " + hardware.hub1Motors[1].getCurrentPosition());
+        packet.put("targetVelocity: ", hardware.shooter.shooterVeloPID.desiredState);
+        packet.put("currentVelocity: ", hardware.shooter.shooterVeloPID.currentState);
+        packet.put("Velocity Difference: ", hardware.shooter.shooterVeloPID.desiredState - hardware.shooter.shooterVeloPID.currentState);
+        dashboard.sendTelemetryPacket(packet);
         telemetry.update();
 //correcting autoaim
         if(gamepad2.dpad_up) {
