@@ -8,15 +8,13 @@ import org.firstinspires.ftc.teamcode.MathFunctions;
 
 public class SanfordAnalogGyro {
     HardwareMap hardwareMap;
-    ElapsedTime time;
     AnalogInput out;
     double corectionCoeff = -360/358.0*7200/7319.98;
     boolean firstUpdateLoop;
     double prevAngle;
     double cumulativeAngle;
-    public SanfordAnalogGyro(HardwareMap hardwareMap, ElapsedTime time){
+    public SanfordAnalogGyro(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
-        this.time = time;
         out = hardwareMap.get(AnalogInput.class,"SanfordAnalogGyroOutput");
         firstUpdateLoop = true;
         cumulativeAngle = 0;

@@ -26,7 +26,7 @@ public class TestAnalogGyro extends OpMode {
         imu.initialize(parameters);
         imu2 = hardwareMap.get(BNO055IMU.class, "imu2");
         imu2.initialize(parameters);
-        analogGyro = new SanfordAnalogGyro(hardwareMap,new ElapsedTime());
+        analogGyro = new SanfordAnalogGyro(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }

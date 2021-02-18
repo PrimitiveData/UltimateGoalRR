@@ -112,9 +112,12 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public TurretPID drivePID;
     private PIDFController headingController;
+    public SanfordAnalogGyro analogGyro;
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
         time = new ElapsedTime();
+
+        analogGyro = new SanfordAnalogGyro(hardwareMap);
         drivePID = new TurretPID(0.0,0.0,0.0,0.0, time);
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
 
@@ -260,6 +263,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
+        analogGyro.update();
         updatePoseEstimate();
         Pose2d currentPose = getPoseEstimate();
         Pose2d lastError = getLastError();
