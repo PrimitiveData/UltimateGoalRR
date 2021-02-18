@@ -20,7 +20,6 @@ public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        HardwareMecanum hardware = new HardwareMecanum(hardwareMap,telemetry);
 
         boolean intake = false;
         boolean intakePrevLoop = false;
@@ -48,18 +47,13 @@ public class LocalizationTest extends LinearOpMode {
                     intakePrevLoop = false;
                 }
             }
-            if(intake)
-                hardware.intake.turnIntake(1);
-            else
-                hardware.intake.turnIntake(0);
-
-            hardware.loop();
             drive.update();
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", Math.toDegrees(poseEstimate.getHeading()));
+            telemetry.addData("RawExternalHeading",Math.toDegrees(drive.getRawExternalHeading()));
             telemetry.update();
         }
     }

@@ -186,7 +186,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
-        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
+        setLocalizer(new ThreeWheelTrackingLocalizerAnalogGyro(hardwareMap,this));
     }
 
     public double updateDrivetrainPID(Pose2d currentPose, Pose2d targetPose){
@@ -346,7 +346,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, currentPose);
 
-        //dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
@@ -430,6 +430,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return analogGyro.getAngleCorrected();
     }
 }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.testclasses;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -7,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.SanfordAnalogGyro;
@@ -29,6 +32,7 @@ public class TestAnalogGyro extends OpMode {
         analogGyro = new SanfordAnalogGyro(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
     public void loop(){
         drive.setWeightedDrivePower(new Pose2d(0,0,gamepad1.left_stick_x));
@@ -36,6 +40,7 @@ public class TestAnalogGyro extends OpMode {
         telemetry.addData("analogGyroPosition",Math.toDegrees(analogGyro.getAngleRaw()));
         telemetry.addData("odoHeading",Math.toDegrees(drive.getPoseEstimate().getHeading()));
         telemetry.addData("cumulativeAngle",Math.toDegrees(drive.getRawExternalHeading()));
+        telemetry.addData("sanfordAndOdoAvg",drive.getPoseEstimate().getHeading() + MathFunctions.keepAngleWithin180Degrees(drive.getRawExternalHeading()-drive.getPoseEstimate().getHeading())/2);
         telemetry.addLine("cntrl hub heading: "+Math.toDegrees(imu.getAngularOrientation().firstAngle) + ", expansion hub heading: "+Math.toDegrees(imu2.getAngularOrientation().firstAngle));
         telemetry.addLine("X: "+drive.getPoseEstimate().getX()+", Y: "+drive.getPoseEstimate().getY());
         telemetry.update();

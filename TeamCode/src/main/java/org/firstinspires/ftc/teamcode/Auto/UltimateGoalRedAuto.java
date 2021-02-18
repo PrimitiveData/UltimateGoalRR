@@ -59,20 +59,20 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 .build();
 
         Trajectory pickUpRingsPrelude = hardware.drive.trajectoryBuilder(goToShootPos.end())
-                .lineToConstantHeading(new Vector2d(goToShootPos.end().getX(), goToShootPos.end().getY()+20))
+                .lineToConstantHeading(new Vector2d(goToShootPos.end().getX(), goToShootPos.end().getY()+18.5))
                 .build();
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
                 new MecanumVelocityConstraint(12, TRACK_WIDTH)
         ));
-        double distanceToPickUp= 12;
+        double distanceToPickUp= 16;
         double headingToPickUp = Math.toRadians(0);
         Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())
                 .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
                 .build();
 
-        double distanceToPickUp2 = 28;
+        double distanceToPickUp2 = 18;
         Trajectory pickUpRings2 = hardware.drive.trajectoryBuilder(pickUpRings.end())
                 .lineToConstantHeading(new Vector2d(pickUpRings.end().getX()+distanceToPickUp2*Math.cos(headingToPickUp),pickUpRings.end().getY() + distanceToPickUp2*Math.sin(headingToPickUp)))
                 .build();
@@ -162,17 +162,19 @@ public class UltimateGoalRedAuto extends AutoMethods {
         while(true) {
             if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 100)
+            if (powershotTimer.milliseconds() >= 250)
                 break;
         }
+        sleep(100);
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
         while(true) {
             if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 100)
+            if (powershotTimer.milliseconds() >= 250)
                 break;
         }
+        sleep(100);
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
         hardware.intake.turnIntake(1);
@@ -189,13 +191,14 @@ public class UltimateGoalRedAuto extends AutoMethods {
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
         }
-        for(int i = 0; i < 4; i++){
+        /*for(int i = 0; i < 4; i++){
             hardware.drive.setWeightedDrivePower(new Pose2d(-1, 0, 0));
             sleep(250);
             hardware.drive.setWeightedDrivePower(new Pose2d(1, 0, 0));
             sleep(250);
         }
-        hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));
+        hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
+        sleep(1500);
         hardware.intake.turnIntake(0);
         if(hardware.mag.currentState == Mag.State.COLLECT) {
             hardware.mag.dropRings();
@@ -208,19 +211,21 @@ public class UltimateGoalRedAuto extends AutoMethods {
             sleep(150);// tune time
         }
         hardware.mag.collectRings();
+        sleep(250);
         hardware.intake.turnIntake(1);
         if(stack == 2){
             hardware.drive.followTrajectoryAsync(pickUpRings2);
             while (hardware.drive.isBusy()&&!isStopRequested()){
                 sleep(1);
             }
-            for(int i = 0; i < 3; i++){
-                hardware.drive.setWeightedDrivePower(new Pose2d(-1, 0, 0));
+            /*for(int i = 0; i < 3; i++){
+                hardware.drive.setWeightedDrivePower(new Pose2d(-0.4, 0, 0));
                 sleep(250);
-                hardware.drive.setWeightedDrivePower(new Pose2d(1, 0, 0));
+                hardware.drive.setWeightedDrivePower(new Pose2d(0.4, 0, 0));
                 sleep(250);
             }
-            hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));
+            hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
+            sleep(1750);
             hardware.intake.turnIntake(0);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();

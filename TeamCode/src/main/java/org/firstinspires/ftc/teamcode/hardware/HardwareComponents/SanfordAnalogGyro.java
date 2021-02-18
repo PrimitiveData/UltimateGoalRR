@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.MathFunctions;
 public class SanfordAnalogGyro {
     HardwareMap hardwareMap;
     AnalogInput out;
-    double corectionCoeff = -360/358.0*7200/7319.98;
+    double corectionCoeff = -360/358.0*7200/7319.98 * 1.002087682672234 * 360/360.3990130404954;
     boolean firstUpdateLoop;
     double prevAngle;
     double cumulativeAngle;
@@ -20,7 +20,7 @@ public class SanfordAnalogGyro {
         cumulativeAngle = 0;
     }
     public double getAngleRaw(){
-        return out.getVoltage() / 3.3 *360/354* 2*Math.PI;
+        return out.getVoltage() / 3.3 *360/354* 360/360.22187981510024*2*Math.PI;
     }
     public void update(){
         if(firstUpdateLoop){
