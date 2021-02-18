@@ -155,18 +155,14 @@ public class UltimateGoalRedAuto extends AutoMethods {
             sleep(1);
         }
         hardware.intake.dropIntake();
-        hardware.drive.turnAsync(0);
-        while(hardware.drive.isBusy() && !isStopRequested()){
-            sleep(1);
-        }
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
         while(Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
             sleep(1);
         ElapsedTime powershotTimer = new ElapsedTime();
         double prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        /*while(true) {
-            if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
+        /*while(!isStopRequested()) {
+            if (Math.abs(hardware.turret.localTurretAngleRadians() - prevTurretAngle) > Math.toRadians(0.125))
                 powershotTimer.reset();
             if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
                 break;
@@ -176,8 +172,8 @@ public class UltimateGoalRedAuto extends AutoMethods {
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        /*while(true) {
-            if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
+        /*while(!isStopRequested()) {
+            if (Math.abs(hardware.turret.localTurretAngleRadians() - prevTurretAngle) > Math.toRadians(0.125))
                 powershotTimer.reset();
             if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps1TurretAngle) > Math.toRadians(0.5))
                 break;
