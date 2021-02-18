@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.AutoAim;
 import org.firstinspires.ftc.teamcode.Auto.Multithreads.CloseTheCamera;
+import org.firstinspires.ftc.teamcode.Auto.Multithreads.WiggleTheMag;
 import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -91,7 +92,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         else{
             dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings2.end())
-                    .lineToConstantHeading(new Vector2d(-112,36))
+                    .lineToConstantHeading(new Vector2d(-111,36))
                     .build();
         }
         Trajectory collect2ndWobbler = null;
@@ -105,8 +106,8 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         }else{
             collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
-                    .splineToSplineHeading(new Pose2d(-80, 25,Math.toRadians(-90)),0)
-                    .splineToSplineHeading(new Pose2d(-28.5,43.1,Math.toRadians(-155)),25)
+                    .splineToSplineHeading(new Pose2d(-80, 16,Math.toRadians(-180)),0)
+                    .splineToSplineHeading(new Pose2d(-30,30,Math.toRadians(-155)),25)
                     .build();
         }
 
@@ -140,7 +141,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         //closeCamera.start();
         hardware.shooter.updatePID = true;
         hardware.turret.updatePID = true;
-        double ps1TurretAngle=-Math.toRadians(176);
+        double ps1TurretAngle=-Math.toRadians(174);
         double ps3TurretAngle=-Math.toRadians(180);
         double ps2TurretAngle=-Math.toRadians(184.5);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
@@ -154,28 +155,34 @@ public class UltimateGoalRedAuto extends AutoMethods {
             sleep(1);
         }
         hardware.intake.dropIntake();
+        hardware.drive.turnAsync(0);
+        while(hardware.drive.isBusy() && !isStopRequested()){
+            sleep(1);
+        }
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
         while(Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
             sleep(1);
         ElapsedTime powershotTimer = new ElapsedTime();
         double prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        while(true) {
+        /*while(true) {
             if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
                 powershotTimer.reset();
             if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
                 break;
             prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        }
+        }*/
+        sleep(800);
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        while(true) {
+        /*while(true) {
             if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
                 powershotTimer.reset();
             if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps1TurretAngle) > Math.toRadians(0.5))
                 break;
-        }
+        }*/
+        sleep(800);
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
         hardware.intake.turnIntake(1);
@@ -184,6 +191,8 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.turret.maxPositive = Math.toRadians(0);
         AutoAim autoAim = new AutoAim(hardware,telemetry,this);
         autoAim.start();
+        WiggleTheMag wiggleTheMag = new WiggleTheMag(hardware,this);
+        wiggleTheMag.start();
         hardware.drive.followTrajectoryAsync(pickUpRingsPrelude);
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
@@ -240,6 +249,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             }
         }
         autoAim.stopRequested = true;
+        wiggleTheMag.stopRequested = true;
         hardware.turret.maxPositive = prevMaxPositiveTurret;
         hardware.wobbler.goToWobblerDropPosition();
         hardware.drive.followTrajectoryAsync(dropWobbler1);
@@ -256,13 +266,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
-            if(hardware.getAngle() < -Math.toRadians(135)) {
+            if(hardware.getAngle() < -Math.toRadians(100)) {
                 hardware.wobbler.moveArmToGrabPos();
             }
             else if (hardware.wobbler.wobblerArm1.position != hardware.wobbler.armRestingPos)
                 hardware.wobbler.goToArmRestingPos();
 
-            if(hardware.getAngle() < -Math.toRadians(160)){
+            if(hardware.getAngle() < -Math.toRadians(120)){
                 hardware.wobbler.releaseWobble();
             }
         }
