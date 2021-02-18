@@ -143,7 +143,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         double ps1TurretAngle=-Math.toRadians(176);
         double ps3TurretAngle=-Math.toRadians(180);
         double ps2TurretAngle=-Math.toRadians(184.5);
-        hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
+        hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
         hardware.shooter.shooterVeloPID.setState(1500);
         double goToShootPosStartTime = hardware.time.milliseconds();
         hardware.drive.followTrajectoryAsync(goToShootPos);
@@ -155,26 +155,27 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         hardware.intake.dropIntake();
         shootIndividualRing(hardware);
-        hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
-        while(Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
-            sleep(10);
-        ElapsedTime powershotTimer = new ElapsedTime();
-        while(true) {
-            if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
-                powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 250)
-                break;
-        }
-        sleep(100);
-        shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
+        while(Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
+            sleep(1);
+        ElapsedTime powershotTimer = new ElapsedTime();
+        double prevTurretAngle = hardware.turret.localTurretAngleRadians();
         while(true) {
-            if (Math.abs(hardware.turret.localTurretAngleRadians() - ps2TurretAngle) > Math.toRadians(0.5))
+            if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 250)
+            if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
+                break;
+            prevTurretAngle = hardware.turret.localTurretAngleRadians();
+        }
+        shootIndividualRing(hardware);
+        hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
+        prevTurretAngle = hardware.turret.localTurretAngleRadians();
+        while(true) {
+            if (hardware.turret.localTurretAngleRadians() != prevTurretAngle)
+                powershotTimer.reset();
+            if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps1TurretAngle) > Math.toRadians(0.5))
                 break;
         }
-        sleep(100);
         shootIndividualRing(hardware);
         hardware.mag.collectRings();
         hardware.intake.turnIntake(1);
