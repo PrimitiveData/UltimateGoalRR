@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -58,6 +60,7 @@ public class HardwareMecanum {
     private double prevAngle;
     public boolean updateDrivePID = false;
     public Pose2d targetPose = new Pose2d(0,0,0);
+    public TelemetryPacket packet;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
         hw = this;
@@ -98,6 +101,7 @@ public class HardwareMecanum {
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        packet = new TelemetryPacket();
     }
 
     public void loop(){
@@ -166,6 +170,7 @@ public class HardwareMecanum {
         if(firstLoop){
             startTimeHub2 = time.milliseconds();
             prevTimeHub2 = startTimeHub2;
+            prevAngle = currentPose.getHeading();
             firstLoop = false;
         }
         double currentTimeHub2 = time.milliseconds();
@@ -175,6 +180,9 @@ public class HardwareMecanum {
         poseStorage = currentPose;
         cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
         prevAngle = currentPose.getHeading();
+        packet.put("cumulativeAngle",MathFunctions.keepAngleWithin180Degrees(cumulativeAngle));
+        packet.put("RRheading",MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading()));
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){
                 servo.servo.setPosition(servo.position);

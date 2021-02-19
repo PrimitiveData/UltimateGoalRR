@@ -97,13 +97,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         Trajectory dropWobbler1 = null;
         if(stack==0) {
             dropWobbler1 = hardware.drive.trajectoryBuilder(goToShootPos.end())
-                    .splineToLinearHeading(new Pose2d(-63,36,-Math.toRadians(90)),Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-88,24,-Math.toRadians(90)),Math.toRadians(90))
                     .build();
 
         }
         else if(stack == 1){
             dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings.end())
-                    .lineToConstantHeading(new Vector2d(-87,15))
+                    .lineToConstantHeading(new Vector2d(-84,14))
                     .build();
         }
         else{
@@ -114,12 +114,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         Trajectory collect2ndWobbler = null;
         if(stack==0) {
             collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
-                    .lineToLinearHeading(new Pose2d(-28,39,-Math.toRadians(-179)))
+                    .splineToSplineHeading(new Pose2d(-65,24,Math.toRadians(-179)),0)
+                    .splineToSplineHeading(new Pose2d(-30,39,Math.toRadians(-179)),0)
                     .build();
         }
         else if(stack == 1){
             collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d(dropWobbler1.end().getX(),dropWobbler1.end().getY(),-Math.toRadians(179)))
-                    .lineToConstantHeading(new Vector2d(-28,39))
+                    .lineToConstantHeading(new Vector2d(-30,39))
                     .build();
         }else{
             collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d(dropWobbler1.end().getX(),dropWobbler1.end().getY(),-Math.toRadians(179)))
@@ -130,11 +131,11 @@ public class UltimateGoalRedAuto extends AutoMethods {
         Trajectory dropWobbler2 = null;
         if(stack==0) {
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
-                    .splineToLinearHeading(new Pose2d(-56,36,0),Math.toRadians(135))
+                    .splineToLinearHeading(new Pose2d(-82,24,-Math.toRadians(90)),Math.toRadians(135))
                     .build();
         }else if(stack==1){
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
-                    .splineToLinearHeading(new Pose2d(-80,12,0),Math.toRadians(135))
+                    .splineToLinearHeading(new Pose2d(-77,12,0),Math.toRadians(135))
                     .build();
         }else{
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
@@ -145,7 +146,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         Trajectory park = null;
         if(stack==0) {
             park = hardware.drive.trajectoryBuilder(dropWobbler2.end())
-                    .lineToConstantHeading(new Vector2d(-69,28))
+                    .lineToConstantHeading(new Vector2d(-69,20))
                     .build();
         }
         else if(stack == 1){
@@ -213,7 +214,6 @@ public class UltimateGoalRedAuto extends AutoMethods {
             prevTurretAngle = currentTurretAngle;
         }
         shootIndividualRing(hardware);
-
         AutoAim autoAim = null;
         double prevMaxPositiveTurret = hardware.turret.maxPositive;
         WiggleTheMag wiggleTheMag = null;
@@ -307,7 +307,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             autoAim.stopRequested = true;
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
-        hardware.wobbler.goToWobblerDropPosition();
+        hardware.wobbler.goToWobblerDropPosition2();
         hardware.drive.followTrajectoryAsync(dropWobbler1);
         while(hardware.drive.isBusy()&&!isStopRequested()){
             sleep(1);
@@ -325,10 +325,20 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 sleep(1);
             }
         }
-        hardware.wobbler.moveArmToGrabPos();
+        if(stack == 1 || stack == 2) {
+            hardware.wobbler.moveArmToGrabPos();
+        }
+        else if (stack == 0){
+            hardware.wobbler.raiseWobble();
+        }
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
         double collect2ndWobblerStartTime = hardware.time.milliseconds();
         while(hardware.drive.isBusy()&&!isStopRequested()){
+            if(stack == 0){
+                if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 500){
+                    hardware.wobbler.moveArmToGrabPos();
+                }
+            }
             if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 1000){
                 hardware.wobbler.releaseWobble();
             }
