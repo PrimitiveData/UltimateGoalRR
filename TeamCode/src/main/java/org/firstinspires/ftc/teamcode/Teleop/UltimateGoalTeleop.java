@@ -221,7 +221,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
             hardware.turret.updatePID = true;
             hardware.turret.setTurretAngle(angleToGoal);
-            shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
+            //shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
             /*if(gamepad2.dpad_down){
                 hardware.shooter.rampAngleAdjustmentConstant -= 0.001;
             }
@@ -253,7 +253,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(shooterOn){
             hardware.shooter.updatePID = true;
-            hardware.shooter.shooterVeloPID.setState(1500);
+            hardware.shooter.shooterVeloPID.setState(shooterVelo);
             /*double voltage = VelocityPIDDrivetrain.getBatteryVoltage();
             double maxVolts = -10.5;
             hardware.shooter.shooterMotor2.setPower(maxVolts/voltage);
@@ -369,7 +369,7 @@ public class UltimateGoalTeleop extends OpMode {
         packet.put("targetVelocity: ", hardware.shooter.shooterVeloPID.desiredState);
         packet.put("currentVelocity: ", hardware.shooter.shooterVeloPID.currentState);
         packet.put("Velocity Difference: ", hardware.shooter.shooterVeloPID.desiredState - hardware.shooter.shooterVeloPID.currentState);
-        dashboard.sendTelemetryPacket(packet);
+        //dashboard.sendTelemetryPacket(packet);
         telemetry.update();
 //correcting autoaim
         if(gamepad2.dpad_up) {

@@ -37,7 +37,7 @@ public class Shooter {
         this.shooterMotor2.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.hardware = hardware;
         shooterVeloPID = //new ShooterPID(0,0,0,0.005197539254,3.271255167,0,400,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
-new ShooterPID(0.07978,0.2797,0,0.005197539254,3.271255167,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
+new ShooterPID(0,0.7,0,0.005197539254,3.271255167,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
         shooterVeloPID.integralAntiWindupActive = true;
         updatePID = false;
         info = new AutoShootInfo();
@@ -57,7 +57,9 @@ new ShooterPID(0.07978,0.2797,0,0.005197539254,3.271255167,0,Double.POSITIVE_INF
         //HardwareMecanum.telemetry.addData("shooterOutputVoltage",outputPower);
         packet.put("shooterVelo",currentVelo);
         packet.put("shooterPIDsetState",shooterVeloPID.desiredState);
-        //dashboard.sendTelemetryPacket(packet);
+        packet.put("OutputPower",outputPower);
+        packet.put("Integral",shooterVeloPID.integral);
+        dashboard.sendTelemetryPacket(packet);
         shooterMotor1.setPower(outputPower);
         shooterMotor2.setPower(outputPower);
     }
