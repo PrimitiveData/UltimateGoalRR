@@ -13,102 +13,70 @@ public class AutoShootInfo {
         this.rampAngles = new ArrayList<Double>();
         this.turretAngleOffsets = new ArrayList<Double>();
         this.shooterSpeeds = new ArrayList<Double>();
-        distances.add(0.0);
-        distances.add(52.0);
-        distances.add(56.0);
+
+        distances.add(0.0);//lower bounder
+        distances.add(54.0);
         distances.add(60.0);
-        distances.add(64.0);
-        distances.add(68.0);
+        distances.add(66.0);
         distances.add(72.0);
-        distances.add(76.0);
-        distances.add(80.0);
+        distances.add(78.0);
         distances.add(84.0);
-        distances.add(88.0);
-        distances.add(92.0);
+        distances.add(90.0);
         distances.add(96.0);
-        distances.add(100.0);
-        distances.add(104.0);
+        distances.add(102.0);
         distances.add(108.0);
-        distances.add(112.0);
-        distances.add(116.0);
-        distances.add(120.0);
-        distances.add(124.0);
+        distances.add(114.0);
+        distances.add(160.0);//upper bounder
 
-        rampAngles.add(0.68);
-        rampAngles.add(0.68);
-        rampAngles.add(0.64);
-        rampAngles.add(0.6);
-        rampAngles.add(0.58);
-        rampAngles.add(0.56);
-        rampAngles.add(0.53);
-        rampAngles.add(0.5);
-        rampAngles.add(0.47);
-        rampAngles.add(0.45);
-        rampAngles.add(0.42);
-        rampAngles.add(0.39);
-        rampAngles.add(0.35);
-        rampAngles.add(0.31);
-        rampAngles.add(0.29);
-        rampAngles.add(0.28);
-        rampAngles.add(0.28);
-        rampAngles.add(0.28);
-        rampAngles.add(0.28);
-        rampAngles.add(0.28);
+        rampAngles.add(0.621);//lower bounder
+        rampAngles.add(0.621);
+        rampAngles.add(0.55);
+        rampAngles.add(0.49);
+        rampAngles.add(0.2);
+        rampAngles.add(0.2);
+        rampAngles.add(0.2);
+        rampAngles.add(0.367);
+        rampAngles.add(0.258);
+        rampAngles.add(0.258);
+        rampAngles.add(0.2);
+        rampAngles.add(0.387);
+        rampAngles.add(0.387);//upper bounder
 
-        turretAngleOffsets.add(-8.8);
-        turretAngleOffsets.add(-8.8);
-        turretAngleOffsets.add(-8.6);
-        turretAngleOffsets.add(-7.8);
-        turretAngleOffsets.add(-7.6);
-        turretAngleOffsets.add(-7.4);
-        turretAngleOffsets.add(-7.2);
-        turretAngleOffsets.add(-7.1);
-        turretAngleOffsets.add(-6.6);
-        turretAngleOffsets.add(-6.1);
-        turretAngleOffsets.add(-5.7);
-        turretAngleOffsets.add(-5.6);
-        turretAngleOffsets.add(-5.4);
-        turretAngleOffsets.add(-5.3);
-        turretAngleOffsets.add(-5.2);
-        turretAngleOffsets.add(-5.0);
-        turretAngleOffsets.add(-4.8);
-        turretAngleOffsets.add(-4.7);
-        turretAngleOffsets.add(-5.6);
-        turretAngleOffsets.add(-5.4);
+        turretAngleOffsets.add(-4.702);//lower bounder
+        turretAngleOffsets.add(-4.702);
+        turretAngleOffsets.add(-3.3959);
+        turretAngleOffsets.add(-2.35103);
+        turretAngleOffsets.add(-2.525182);
+        turretAngleOffsets.add(-3.31347);
+        turretAngleOffsets.add(-3.1347);
+        turretAngleOffsets.add(-5.13744);
+        turretAngleOffsets.add(-5.65989);
+        turretAngleOffsets.add(-2.699);
+        turretAngleOffsets.add(-4.615);
+        turretAngleOffsets.add(-3.5701);
+        turretAngleOffsets.add(-3.5701); //upper bounder
 
+        shooterSpeeds.add(1575.0);//lower bounder
+        shooterSpeeds.add(1575.0);
+        shooterSpeeds.add(1575.0);
+        shooterSpeeds.add(1575.0);
         shooterSpeeds.add(1500.0);
         shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1500.0);
-        shooterSpeeds.add(1450.0);
-        shooterSpeeds.add(1450.0);
-        shooterSpeeds.add(1450.0);
-        shooterSpeeds.add(1450.0);
-        shooterSpeeds.add(1450.0);
+        shooterSpeeds.add(1425.0);
+        shooterSpeeds.add(1400.0);
+        shooterSpeeds.add(1400.0);
+        shooterSpeeds.add(1400.0);
+        shooterSpeeds.add(1400.0);
+        shooterSpeeds.add(1400.0);
+        shooterSpeeds.add(1400.0);//upper bounder
 
 
         for(int i = 0; i < distances.size(); i++){
-            distances.set(i, distances.get(i) + 13.543);
+            distances.set(i, distances.get(i) + 13.039);
         }
-
         for(int i = 0; i < turretAngleOffsets.size(); i++){
-            turretAngleOffsets.set(i, Math.toRadians(turretAngleOffsets.get(i) - 0.5));
-
+            turretAngleOffsets.set(i,Math.toRadians(turretAngleOffsets.get(i)));
         }
-        for(int i = 0; i < rampAngles.size(); i++){
-            rampAngles.set(i, rampAngles.get(i));
 
-        }
     }
 }

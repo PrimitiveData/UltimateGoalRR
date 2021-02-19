@@ -21,7 +21,6 @@ public class Shooter {
     HardwareMecanum hardware;
     public RegServo shootAngleController;
     public boolean firstUpdateShooterPIDFLoop = true;
-    private double prevShooterPos;
     public boolean updatePID;
     public double rampPostion = 1;
     AutoShootInfo info;
@@ -37,7 +36,7 @@ public class Shooter {
         this.shooterMotor2.motor.setDirection(DcMotorEx.Direction.FORWARD);
         this.hardware = hardware;
         shooterVeloPID = //new ShooterPID(0,0,0,0.005197539254,3.271255167,0,400,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
-new ShooterPID(0,0.7,0,0.005197539254,3.271255167,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
+new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
         shooterVeloPID.integralAntiWindupActive = true;
         updatePID = false;
         info = new AutoShootInfo();
@@ -45,14 +44,11 @@ new ShooterPID(0,0.7,0,0.005197539254,3.271255167,0,Double.POSITIVE_INFINITY,har
         packet = new TelemetryPacket();
     }
     //updates the shooter's PID
-    public void updateShooterPIDF(double deltaTime){
+    public void updateShooterPIDF(){
         if(firstUpdateShooterPIDFLoop){
-            prevShooterPos = shooterMotor2.getCurrentPosition();
             firstUpdateShooterPIDFLoop = false;
         }
-        double shooterPos = shooterMotor2.getCurrentPosition();
-        double currentVelo = (shooterPos - prevShooterPos)/deltaTime;
-        prevShooterPos = shooterPos;
+        double currentVelo = shooterMotor2.getVelocity();
         double outputPower = shooterVeloPID.updateCurrentStateAndGetOutput(currentVelo);
         //HardwareMecanum.telemetry.addData("shooterOutputVoltage",outputPower);
         packet.put("shooterVelo",currentVelo);

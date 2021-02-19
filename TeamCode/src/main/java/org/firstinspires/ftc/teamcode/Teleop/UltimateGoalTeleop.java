@@ -211,7 +211,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
         else{
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
+            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
@@ -221,7 +221,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
             hardware.turret.updatePID = true;
             hardware.turret.setTurretAngle(angleToGoal);
-            //shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
+            shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
             /*if(gamepad2.dpad_down){
                 hardware.shooter.rampAngleAdjustmentConstant -= 0.001;
             }
@@ -263,6 +263,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.updatePID = false;
             hardware.shooter.shooterMotor2.setPower(0);
             hardware.shooter.shooterMotor1.setPower(0);
+            hardware.shooter.shooterVeloPID.setState(0);
         }
         //wobbler
         if(gamepad2.left_bumper) {

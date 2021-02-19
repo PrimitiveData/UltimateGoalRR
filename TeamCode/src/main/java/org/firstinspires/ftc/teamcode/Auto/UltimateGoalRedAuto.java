@@ -54,6 +54,15 @@ public class UltimateGoalRedAuto extends AutoMethods {
         telemetry.addData("stack",stack);
         telemetry.update();
          */
+        if(gamepad1.x){
+            stack = 0;
+        }
+        else if(gamepad1.y){
+            stack = 1;
+        }
+        else{
+            stack = 2;
+        }
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
         hardware.turret.turretMotor.readRequested = true;
@@ -87,10 +96,15 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         Trajectory dropWobbler1 = null;
         if(stack==0) {
+            dropWobbler1 = hardware.drive.trajectoryBuilder(goToShootPos.end())
+                    .splineToLinearHeading(new Pose2d(-63,36,-Math.toRadians(90)),Math.toRadians(90))
+                    .build();
 
         }
         else if(stack == 1){
-
+            dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings.end())
+                    .lineToConstantHeading(new Vector2d(-87,15))
+                    .build();
         }
         else{
             dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings2.end())
@@ -99,13 +113,14 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         Trajectory collect2ndWobbler = null;
         if(stack==0) {
-            collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d())
-                    .strafeRight(10)
-                    .forward(5)
+            collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
+                    .lineToLinearHeading(new Pose2d(-28,39,-Math.toRadians(-179)))
                     .build();
         }
         else if(stack == 1){
-
+            collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d(dropWobbler1.end().getX(),dropWobbler1.end().getY(),-Math.toRadians(179)))
+                    .lineToConstantHeading(new Vector2d(-28,39))
+                    .build();
         }else{
             collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d(dropWobbler1.end().getX(),dropWobbler1.end().getY(),-Math.toRadians(179)))
                     .lineToConstantHeading(new Vector2d(-28,39))
@@ -114,9 +129,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         Trajectory dropWobbler2 = null;
         if(stack==0) {
-
+            dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
+                    .splineToLinearHeading(new Pose2d(-56,36,0),Math.toRadians(135))
+                    .build();
         }else if(stack==1){
-
+            dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
+                    .splineToLinearHeading(new Pose2d(-80,12,0),Math.toRadians(135))
+                    .build();
         }else{
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
                     .splineToLinearHeading(new Pose2d(-104,36,0),Math.toRadians(135))
@@ -125,14 +144,18 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
         Trajectory park = null;
         if(stack==0) {
-
+            park = hardware.drive.trajectoryBuilder(dropWobbler2.end())
+                    .lineToConstantHeading(new Vector2d(-69,28))
+                    .build();
         }
         else if(stack == 1){
-
+            park = hardware.drive.trajectoryBuilder(dropWobbler2.end())
+                    .lineToConstantHeading(new Vector2d(-69,12))
+                    .build();
         }
         else if(stack == 2){
             park = hardware.drive.trajectoryBuilder(dropWobbler2.end())
-                    .lineToConstantHeading(new Vector2d(-65,28))
+                    .lineToConstantHeading(new Vector2d(-69,28))
                     .build();
         }
 
@@ -148,13 +171,13 @@ public class UltimateGoalRedAuto extends AutoMethods {
         //CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         //closeCamera.start();
         hardware.shooter.updatePID = true;
+        hardware.shooter.shooterVeloPID.setState(1300);
         hardware.turret.updatePID = true;
         hardware.wobbler.raiseWobble();
         double ps1TurretAngle=-Math.toRadians(174);
         double ps3TurretAngle=-Math.toRadians(180);
         double ps2TurretAngle=-Math.toRadians(184.5);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
-        hardware.shooter.shooterVeloPID.setState(1500);
         double goToShootPosStartTime = hardware.time.milliseconds();
         hardware.drive.followTrajectoryAsync(goToShootPos);
         while(hardware.drive.isBusy() && !isStopRequested()){
@@ -166,46 +189,51 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.intake.dropIntake();
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
-        while(Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
+        while(Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5) && !isStopRequested())
             sleep(1);
         ElapsedTime powershotTimer = new ElapsedTime();
         double prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        /*while(!isStopRequested()) {
-            if (Math.abs(hardware.turret.localTurretAngleRadians() - prevTurretAngle) > Math.toRadians(0.125))
+        while(!isStopRequested()) {
+            double currentTurretAngle = hardware.turret.localTurretAngleRadians();
+            if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.125))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps3TurretAngle) > Math.toRadians(0.5))
+            if (powershotTimer.milliseconds() >= 150 && Math.abs(currentTurretAngle - ps3TurretAngle) < Math.toRadians(0.5))
                 break;
-            prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        }*/
-        sleep(800);
+            prevTurretAngle = currentTurretAngle;
+        }
         shootIndividualRing(hardware);
         hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
-        /*while(!isStopRequested()) {
-            if (Math.abs(hardware.turret.localTurretAngleRadians() - prevTurretAngle) > Math.toRadians(0.125))
+        while(!isStopRequested()) {
+            double currentTurretAngle = hardware.turret.localTurretAngleRadians();
+            if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.125))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 150 && Math.abs(hardware.turret.localTurretAngleRadians() - ps1TurretAngle) > Math.toRadians(0.5))
+            if (powershotTimer.milliseconds() >= 150 && Math.abs(currentTurretAngle - ps1TurretAngle) < Math.toRadians(0.5))
                 break;
-        }*/
-        sleep(800);
+            prevTurretAngle = currentTurretAngle;
+        }
         shootIndividualRing(hardware);
-        hardware.mag.collectRings();
-        hardware.intake.turnIntake(1);
 
+        AutoAim autoAim = null;
         double prevMaxPositiveTurret = hardware.turret.maxPositive;
-        hardware.turret.maxPositive = Math.toRadians(0);
-        AutoAim autoAim = new AutoAim(hardware,telemetry,this);
-        autoAim.start();
-        WiggleTheMag wiggleTheMag = new WiggleTheMag(hardware,this);
-        wiggleTheMag.start();
-        hardware.drive.followTrajectoryAsync(pickUpRingsPrelude);
-        while(hardware.drive.isBusy()&&!isStopRequested()){
-            sleep(1);
-        }
-        hardware.drive.followTrajectoryAsync(pickUpRings);
-        while(hardware.drive.isBusy()&&!isStopRequested()){
-            sleep(1);
-        }
+        WiggleTheMag wiggleTheMag = null;
+        if(stack == 2 || stack == 1) {
+
+            hardware.mag.collectRings();
+            hardware.intake.turnIntake(1);
+            hardware.turret.maxPositive = Math.toRadians(0);
+            autoAim = new AutoAim(hardware, telemetry, this);
+            autoAim.start();
+            wiggleTheMag = new WiggleTheMag(hardware, this);
+            wiggleTheMag.start();
+            hardware.drive.followTrajectoryAsync(pickUpRingsPrelude);
+            while (hardware.drive.isBusy() && !isStopRequested()) {
+                sleep(1);
+            }
+            hardware.drive.followTrajectoryAsync(pickUpRings);
+            while (hardware.drive.isBusy() && !isStopRequested()) {
+                sleep(1);
+            }
         /*for(int i = 0; i < 4; i++){
             hardware.drive.setWeightedDrivePower(new Pose2d(-1, 0, 0));
             sleep(250);
@@ -213,23 +241,42 @@ public class UltimateGoalRedAuto extends AutoMethods {
             sleep(250);
         }
         hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
-        sleep(1500);
-        hardware.intake.turnIntake(0);
-        if(hardware.mag.currentState == Mag.State.COLLECT) {
-            hardware.mag.dropRings();
-            sleep(500);//tune timeout
         }
-        for(int i = 0; i < 3; i++){
-            hardware.mag.pushInRings();
-            sleep(250);// tune time
-            hardware.mag.setRingPusherResting();
-            sleep(150);// tune time
+        if(stack == 1){
+            sleep(1250);
+            hardware.intake.turnIntake(0);
+            if(hardware.mag.currentState == Mag.State.COLLECT) {
+                hardware.mag.dropRings();
+                sleep(500);//tune timeout//
+            }
+            for(int i = 0; i < 1; i++){
+                hardware.mag.pushInRings();
+                sleep(250);// tune time
+                hardware.mag.setRingPusherResting();
+                sleep(150);// tune time
+            }
+            hardware.mag.collectRings();
+            wiggleTheMag.stopRequested = true;
+            autoAim.stopRequested = true;
+            hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
-        hardware.mag.collectRings();
-        sleep(250);
-        hardware.intake.turnIntake(1);
         if(stack == 2){
-            hardware.intake.raiseBumper();
+            sleep(1250);
+            hardware.intake.turnIntake(0);
+            if(hardware.mag.currentState == Mag.State.COLLECT) {
+                hardware.mag.dropRings();
+                sleep(500);//tune timeout//
+            }
+            for(int i = 0; i < 3; i++){
+                hardware.mag.pushInRings();
+                sleep(250);// tune time
+                hardware.mag.setRingPusherResting();
+                sleep(150);// tune time
+            }
+            hardware.mag.collectRings();
+            sleep(250);
+            hardware.intake.turnIntake(1);
+
             hardware.drive.followTrajectoryAsync(pickUpRings2);
             while (hardware.drive.isBusy()&&!isStopRequested()){
                 sleep(1);
@@ -241,7 +288,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 sleep(250);
             }
             hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
-            sleep(1500);
+            sleep(1300);
             wiggleTheMag.stopRequested = true;
             sleep(250);
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
@@ -256,9 +303,10 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.setRingPusherResting();
                 sleep(150);// tune time
             }
+
+            autoAim.stopRequested = true;
+            hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
-        autoAim.stopRequested = true;
-        hardware.turret.maxPositive = prevMaxPositiveTurret;
         hardware.wobbler.goToWobblerDropPosition();
         hardware.drive.followTrajectoryAsync(dropWobbler1);
         while(hardware.drive.isBusy()&&!isStopRequested()){
@@ -271,9 +319,11 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.wobbler.releaseWobble();
         sleep(500);
         hardware.wobbler.goToClawRestingPos();
-        hardware.drive.turnAsync(-Math.toRadians(179));
-        while(hardware.drive.isBusy() && !isStopRequested()){
-            sleep(1);
+        if(stack == 2 || stack == 1) {
+            hardware.drive.turnAsync(-Math.toRadians(179));
+            while (hardware.drive.isBusy() && !isStopRequested()) {
+                sleep(1);
+            }
         }
         hardware.wobbler.moveArmToGrabPos();
         hardware.drive.followTrajectoryAsync(collect2ndWobbler);
@@ -284,7 +334,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             }
         }
         hardware.drive.turnAsync(MathFunctions.keepAngleWithin180Degrees( -Math.toRadians(179)-hardware.getAngle()));
-        while(hardware.drive.isBusy()){
+        while(hardware.drive.isBusy() && !isStopRequested()){
             sleep(1);
         }
         hardware.wobbler.gripWobble();
@@ -307,146 +357,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             telemetry.addLine("X: " + hardware.drive.getPoseEstimate().getX() + ", Y: "+ hardware.drive.getPoseEstimate().getY()+", heading: "+hardware.drive.getPoseEstimate().getHeading());
             telemetry.update();
         }
-        /*
-        hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
-        hardware.shooter.rampAngleAdjustmentConstant = 0;
-        hardware.turret.updatePID = true;
-        hardware.turret.turretPID.setState(0);
-        hardware.intake.turnIntake(0);
 
-        hardware.turret.updatePID = true;
-        hardware.turret.turretPID.setState(0);
-        hardware.drive.followTrajectoryAsync(dropWobbler1);
-        while(hardware.drive.isBusy()){
-            sleep(1);
-        }
-        hardware.turret.turretPID.setState(0);
-        hardware.turret.updatePID = true;
-        hardware.turret.turretPID.setState(0);
-        hardware.wobbler.goToWobblerDropPosition();
-        sleep(600);
-        hardware.wobbler.releaseWobble();
-        sleep(50);
-        hardware.wobbler.goToWobbleStartingPos();
-        sleep(50);
-
-
-
-        hardware.wobbler.moveArmToGrabPos();
-
-        hardware.drive.followTrajectoryAsync(collect2ndWobbler);
-        while(hardware.drive.isBusy()){
-            sleep(1);
-        }
-        hardware.wobbler.gripWobble();
-        sleep(250);
-
-        if(stack == 1 || stack == 2){
-            hardware.wobbler.raiseWobble();
-            sleep(200);
-        }
-        if(stack == 0){
-            hardware.wobbler.raiseWobble();
-            sleep(650);
-        }
-        if(stack == 0){
-            hardware.drive.turnAsync(-Math.toRadians(361));
-            sleep(3000);
-
-        }else if(stack == 1) {
-            hardware.drive.turnAsync(-Math.toRadians(-101));
-            sleep(1200);
-            hardware.intake.turnIntake(1);
-            hardware.turret.updatePID = true;
-            hardware.shooter.updatePID = true;
-            //goStraightEncoder(0.5,8,hardware);
-            hardware.shooter.shooterVeloPID.setState(-1600);
-            AutoAim autoAim2 = new AutoAim(hardware,telemetry,this);
-            hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(2);
-            autoAim2.start();
-            sleep(2000);
-            hardware.intake.turnIntake(1);
-            sleep(500);
-            shootPowershot(hardware);
-            autoAim2.stopRequested = true;
-            hardware.turret.updatePID=false;
-
-            hardware.shooter.updatePID=false;
-            hardware.drive.turnAsync(Math.toRadians(14.5));
-            sleep(2000);
-        }else{
-            hardware.drive.turnAsync(Math.toRadians(-104));
-            sleep(1250);
-            hardware.intake.turnIntake(1);
-            hardware.turret.updatePID = true;
-            hardware.shooter.updatePID = true;
-            hardware.turret.turretPID.setState(Math.toRadians(-40));
-            //goStraightEncoder(0.5,6.5,hardware);
-            sleep(1000);
-            //goStraightEncoder(0.5,1.25,hardware);
-            sleep(1000);
-            //goStraightEncoder(0.5,1.35,hardware);
-            hardware.shooter.shooterVeloPID.setState(-1600);
-            AutoAim autoAim = new AutoAim(hardware,telemetry,this);
-            autoAim.start();
-            hardware.shooter.rampAngleAdjustmentConstant = -0.02;
-            sleep(2650);
-            hardware.intake.turnIntake(0);
-            shootPowershot(hardware);
-            autoAim.stopRequested = true;
-            hardware.turret.updatePID=false;
-            hardware.turret.setTurretMotorPower(0);
-            hardware.drive.turnAsync(Math.toRadians(-3.25));
-            sleep(1600);
-        }
-
-        if(stack==0){
-            //drop 2nd wobble
-        }
-        else if(stack == 1) {
-            //drop 2nd wobble
-        }
-        else{
-            //drop 2nd wobble
-        }
-        if(stack == 0) {
-            hardware.wobbler.goToWobblerDropPosition();
-        }
-        else{
-            hardware.wobbler.goToWobblerDropPosition();
-        }
-        sleep(300);
-        if(stack == 0){
-            sleep(600);
-        }
-        hardware.wobbler.releaseWobble();
-        sleep(100);
-        if(stack == 0){
-            sleep(250);
-        }
-        hardware.wobbler.goToWobbleStartingPos();
-        sleep(50);
-        if(stack == 0){
-            sleep(250);
-        }
-        hardware.wobbler.goToClawRestingPos();
-        if(stack == 0){
-            sleep(100);
-        }
-        if(stack == 0) {
-            //park
-        }
-        else if(stack == 1){
-            //park
-        }
-        else if(stack == 2){
-            //park
-        }
-        while(!isStopRequested()){
-            telemetry.addLine("X: " + hardware.getXAbsoluteCenter() + "Y: " + hardware.getYAbsoluteCenter());
-            telemetry.update();
-        }
-*/
 
 
     }

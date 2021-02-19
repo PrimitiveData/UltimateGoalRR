@@ -114,7 +114,7 @@ public class HardwareMecanum {
         for(Motor motor: hub1Motors){
             if(motor != null && motor.readRequested){
                 motor.currentPosition = motor.motor.getCurrentPosition();
-                motor.currentVelocity = motor.motor.getVelocity(AngleUnit.RADIANS);
+                motor.currentVelocity = motor.motor.getVelocity();
             }
         }
         if(firstLoop){
@@ -125,7 +125,7 @@ public class HardwareMecanum {
         deltaTimeHub1 = currentTimeHub1-prevTimeHub1;
         prevTimeHub1 = currentTimeHub1;
         if(shooter.updatePID) {
-            shooter.updateShooterPIDF(deltaTimeHub1 / 1000);
+            shooter.updateShooterPIDF();
         }
         if(turret.updatePID){
             turret.updateTurretPID();
@@ -160,7 +160,7 @@ public class HardwareMecanum {
             Motor motor = hub2Motors[i];
             if(motor != null && motor.readRequested){
                 motor.currentPosition = motor.motor.getCurrentPosition();
-                motor.currentVelocity = motor.motor.getVelocity(AngleUnit.RADIANS);
+                motor.currentVelocity = motor.motor.getVelocity();
             }
         }
         if(firstLoop){

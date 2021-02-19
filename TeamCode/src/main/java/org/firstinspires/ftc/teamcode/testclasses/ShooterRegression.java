@@ -22,6 +22,7 @@ public class ShooterRegression extends LinearOpMode {
         double rampPos = 0.2;
         boolean shooterOnTogglePrevLoop = false;
         boolean shooterOn = false;
+        double shooterVelo = 1575;
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
@@ -55,16 +56,16 @@ public class ShooterRegression extends LinearOpMode {
                     }
                 }
                 shooterOnTogglePrevLoop = true;
-                hardware.shooter.shooterVeloPID.clearI();
             }
             else{
                 if(shooterOnTogglePrevLoop){
                     shooterOnTogglePrevLoop = false;
                 }
             }
+            shooterVelo -= gamepad1.left_stick_y * 0.1;
             if(shooterOn){
                 hardware.shooter.updatePID = true;
-                hardware.shooter.shooterVeloPID.setState(1500);
+                hardware.shooter.shooterVeloPID.setState(shooterVelo);
             /*double voltage = VelocityPIDDrivetrain.getBatteryVoltage();
             double maxVolts = -10.5;
             hardware.shooter.shooterMotor2.setPower(maxVolts/voltage);
@@ -74,6 +75,7 @@ public class ShooterRegression extends LinearOpMode {
                 hardware.shooter.updatePID = false;
                 hardware.shooter.shooterMotor2.setPower(0);
                 hardware.shooter.shooterMotor1.setPower(0);
+                hardware.shooter.shooterVeloPID.setState(0);
             }
 
             if(gamepad1.a) {

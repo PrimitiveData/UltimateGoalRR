@@ -346,7 +346,7 @@ public class Hardware {
 
          localYVelocity = localY*circumfrence/ticks_per_rotation/((currentTime - prevTime)/1000);
         if(shooter.updatePID) {
-            shooter.updateShooterPIDF(deltaTime / 1000);
+            shooter.updateShooterPIDF();
         }
         if(turret.updatePID){
             turret.updateTurretPID();

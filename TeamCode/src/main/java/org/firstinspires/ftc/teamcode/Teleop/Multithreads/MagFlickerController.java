@@ -57,7 +57,7 @@ public class MagFlickerController extends Thread {
                     hardware.mag.pushInRings();
                     sleeep(200);// tune time
                     hardware.mag.setRingPusherResting();
-                    hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.01);
+                    hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.05);
                     sleeep(100);// tune time
                 }
                 parentOP.currentlyIncrementingMagDuringShooting = false;
