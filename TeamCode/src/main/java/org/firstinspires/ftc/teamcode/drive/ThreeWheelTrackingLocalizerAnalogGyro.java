@@ -75,7 +75,7 @@ public class ThreeWheelTrackingLocalizerAnalogGyro extends TwoTrackingWheelLocal
     @Override
     public List<Double> getWheelPositions() {
         return Arrays.asList(
-                encoderTicksToInches((leftEncoder.getCurrentPosition()+rightEncoder.getCurrentPosition())/2)*X_MULTIPLIER,
+                encoderTicksToInches((leftEncoder.getCurrentPosition()+rightEncoder.getCurrentPosition())/2.0)*X_MULTIPLIER,
                 encoderTicksToInches(frontEncoder.getCurrentPosition())*Y_MULTIPLIER
         );
     }
@@ -88,7 +88,7 @@ public class ThreeWheelTrackingLocalizerAnalogGyro extends TwoTrackingWheelLocal
         //  compensation method
 
         return Arrays.asList(
-                encoderTicksToInches((leftEncoder.getCorrectedVelocity()+rightEncoder.getCorrectedVelocity())/2)*X_MULTIPLIER,
+                encoderTicksToInches((leftEncoder.getCorrectedVelocity()+rightEncoder.getCorrectedVelocity())/2.0)*X_MULTIPLIER,
                 encoderTicksToInches(frontEncoder.getCorrectedVelocity())*Y_MULTIPLIER
         );
     }

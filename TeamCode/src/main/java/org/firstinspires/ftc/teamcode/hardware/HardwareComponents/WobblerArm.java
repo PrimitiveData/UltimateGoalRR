@@ -52,6 +52,10 @@ public class WobblerArm {
         wobblerArm1.setPosition(armRestingPos);
         wobblerArm2.setPosition(wobblerArm2PositionWhenWobblerArm1IsZero-armRestingPos);
     }
+    public void goToWobblerDropPosition2(){
+        wobblerArm1.setPosition((armDropPos+armGrabWobblePos)/2);
+        wobblerArm2.setPosition(wobblerArm2PositionWhenWobblerArm1IsZero-(armDropPos+armGrabWobblePos/2));
+    }
     public enum ArmState{
         START,
         GRIP,

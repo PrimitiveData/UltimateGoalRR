@@ -94,8 +94,11 @@ public class Turret {
     public void updateTurretPID(){
         double output = turretPID.updateCurrentStateAndGetOutput(localTurretAngleRadians());
         setTurretMotorPower(output);
-        packet.put("Turret Desired State: ", hardware.turret.turretPID.desiredState);
-        packet.put("Turret Current State: ", hardware.turret.turretPID.currentState);
+        packet.put("Turret Desired State: ", Math.toDegrees(hardware.turret.turretPID.desiredState));
+        packet.put("Turret Current State: ", Math.toDegrees(hardware.turret.turretPID.currentState));
+        packet.put("Error: ", Math.toDegrees(MathFunctions.keepAngleWithin180Degrees(hardware.turret.turretPID.desiredState-hardware.turret.turretPID.currentState)));
+        packet.put("Heading: ",hardware.getAngle());
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){
