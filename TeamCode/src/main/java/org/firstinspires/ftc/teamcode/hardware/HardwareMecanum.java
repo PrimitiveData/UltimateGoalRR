@@ -74,7 +74,6 @@ public class HardwareMecanum {
         }else{
             currentPose = poseStorage;
         }
-        prevAngle = currentPose.getHeading();
         hub1Motors = new Motor[4];//initialize here
         time = new ElapsedTime();
         hub2Motors = new Motor[4];//initialize here
@@ -156,6 +155,7 @@ public class HardwareMecanum {
             allHubs.get(1).clearBulkCache();
         }
         drive.update();
+        currentPose = drive.getPoseEstimate();
         if(updateDrivePID) {
             drive.updateDrivetrainPID(drive.getPoseEstimate(), targetPose);
             drive.updateDrivetrainHeadingPID(drive.getPoseEstimate(), targetPose);
@@ -176,9 +176,9 @@ public class HardwareMecanum {
         double currentTimeHub2 = time.milliseconds();
         deltaTimeHub2 = currentTimeHub2-prevTimeHub2;
         prevTimeHub2 = currentTimeHub2;
-        currentPose = drive.getPoseEstimate();
         poseStorage = currentPose;
         cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
+        packet.put("prevAngle",MathFunctions.keepAngleWithin180Degrees(prevAngle));
         prevAngle = currentPose.getHeading();
         packet.put("cumulativeAngle",MathFunctions.keepAngleWithin180Degrees(cumulativeAngle));
         packet.put("RRheading",MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading()));

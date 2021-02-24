@@ -16,7 +16,7 @@ public class ShooterRegression extends LinearOpMode {
 
         boolean turretTracking = false;
         boolean magTracking = false;
-        double globalTurretAngle = 0;
+        double localTurretAngle = 0;
         boolean aToggle = false;
         boolean bToggle = false;
         double rampPos = 0.2;
@@ -26,9 +26,9 @@ public class ShooterRegression extends LinearOpMode {
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
-                globalTurretAngle += Math.toRadians(0.1);
+                localTurretAngle += Math.toRadians(0.1);
             if(gamepad1.dpad_right)
-                globalTurretAngle -= Math.toRadians(0.1);
+                localTurretAngle -= Math.toRadians(0.1);
 
             if(gamepad1.dpad_up)
                 rampPos += 0.001;
@@ -100,7 +100,7 @@ public class ShooterRegression extends LinearOpMode {
 
             if(turretTracking){
                 hardware.turret.updatePID = true;
-                hardware.turret.setTurretAngle(globalTurretAngle);
+                hardware.turret.setLocalTurretAngle(localTurretAngle);
             }
             else {
                 hardware.turret.updatePID = false;
@@ -112,7 +112,7 @@ public class ShooterRegression extends LinearOpMode {
             else
                 hardware.mag.collectRings();
 
-            telemetry.addData("Global Turret Angle: ", Math.toDegrees(globalTurretAngle));
+            telemetry.addData("Global Turret Angle: ", Math.toDegrees(localTurretAngle));
             telemetry.addData("Flap Position: ", rampPos);
             telemetry.addData("Hardware Angle: ", hardware.getAngle());
             telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));

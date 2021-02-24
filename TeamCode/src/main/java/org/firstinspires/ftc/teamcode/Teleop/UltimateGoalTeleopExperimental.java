@@ -4,69 +4,28 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
-import org.firstinspires.ftc.teamcode.Ramsete.Pose;
+import org.firstinspires.ftc.teamcode.Teleop.Multithreads.BetorThingyController;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
-import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Intake;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
-import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
-import org.firstinspires.ftc.teamcode.hardware.PID.TurretPID;
+import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
-import java.io.FileWriter;
 import java.io.IOException;
 
-@TeleOp(name = "aUltimateGoalTeleop",group="TeleOp")
-public class UltimateGoalTeleop extends OpMode {
-    HardwareMecanum hardware;
-    //toggles
-    boolean magUpdateStateAndSetPositionPrevLoop = false;
-    boolean bumperDown;
-    boolean bumperPrevLoop = false;
-    int magTrigger = 0;
-    boolean manuelRampControl = true;
-    boolean manuelRampControlTogglePrevLoop = false;
-    boolean shooterOn = false;
-    boolean shooterOnTogglePrevLoop = false;
-    boolean grip = true;
-    boolean gripOnToggledPrevLoop = false;
-    boolean gripperResting = true;
-    boolean armStateToggledPrevLoop = false;
-    public double shooterVelo;
-    public boolean teleopStopped = false;
+@TeleOp(name = "aUltimateGoalTeleopExperimental",group="TeleOp")
+public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
 
-    boolean intakeOn = false;
-    boolean intakeOnToggledPrevLoop = false;
-
-    boolean dPadUpToggledPrevLoop = false;
-    boolean dPadRightToggledPrevLoop = false;
-    boolean dPadLeftToggledPrevLoop = false;
-    boolean dPadDownToggledPrevLoop = false;
-
-    boolean toggleMagStatePrevLoop = false;
-
-    MagFlickerController magFlickerController;
-    boolean firstLoop;
-    double startAngle;
-    public boolean currentlyIncrementingMagDuringShooting;
-
-    enum Mode {DRIVER_CONTROL, ALIGN_TO_POINT}
-    public Mode driveMode;
-    public PIDFController headingController;
-
-    TelemetryPacket packet = new TelemetryPacket();
-    FtcDashboard dashboard = FtcDashboard.getInstance();
-
+    BetorThingyController betorThingyControllerRight;
     public void init(){
         msStuckDetectLoop = 15000;
         /*if (T265.slamra == null) {
@@ -75,11 +34,18 @@ public class UltimateGoalTeleop extends OpMode {
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry);
+
+        hardware.CRservos[0] = null;
+        hardware.CRservos[1] = null;
+        hardware.servos[9] = new RegServo(hardware.hardwareMap.get(Servo.class,"intakeFunnelerStarboard"));
+        hardware.servos[10] = new RegServo(hardware.hardwareMap.get(Servo.class,"intakeFunnelerPort"));
+        hardware.intake = new Intake(hardware.hub1Motors[2],hardware.servos[1],hardware.servos[9],hardware.servos[10]);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1500;
         magFlickerController = new MagFlickerController(hardware,this);
+        betorThingyControllerRight = new BetorThingyController(hardware,this,false);
         hardware.mag.setRingPusherResting();
         hardware.wobbler.goToClawRestingPos();
         hardware.wobbler.goToArmRestingPos();
@@ -90,12 +56,10 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.turret.turretMotor.readRequested = true;
         bumperDown = false;
     }
-    public double logistic(double input, double constantB, double constantC){
-        return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
-    }
     public void start(){
         //T265.slamra.start();
         magFlickerController.start();
+        betorThingyControllerRight.start();
         hardware.mag.collectRings();
     }
     public void loop(){
@@ -150,16 +114,16 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(intakeOn) {
             if(gamepad1.a){
-                hardware.intake.turnIntake(-1);
+                hardware.intake.turnIntakeExperimentalBetorThingy(-1);
             }else {
-                hardware.intake.turnIntake(1);
+                hardware.intake.turnIntakeExperimentalBetorThingy(1);
             }
         }
         else{
-            hardware.intake.turnIntake(0);
+            hardware.intake.turnIntakeExperimentalBetorThingy(0);
         }
         //bumper control
-        if(gamepad1.right_bumper){
+        if(gamepad1.left_trigger > 0){
             if(!bumperPrevLoop) {
                 bumperDown = !bumperDown;
             }
@@ -175,7 +139,7 @@ public class UltimateGoalTeleop extends OpMode {
         }else{
             hardware.intake.raiseBumper();
         }
-        if(gamepad1.left_trigger > 0) {
+        if(gamepad2.a) {
             if(!magUpdateStateAndSetPositionPrevLoop) {
                 magTrigger++;
                 if(magTrigger == 2) {
@@ -193,7 +157,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         //ramp manuel control and automatic control
-        if(gamepad1.x) {
+        if(gamepad2.x) {
             if(!manuelRampControlTogglePrevLoop) {
                 manuelRampControl = !manuelRampControl;
                 if(manuelRampControl){
@@ -236,7 +200,7 @@ public class UltimateGoalTeleop extends OpMode {
             }*/
         }
         //shooter
-        if(gamepad1.left_bumper) {
+        if(gamepad2.y) {
             if(!shooterOnTogglePrevLoop) {
                 shooterOn = !shooterOn;
                 if(shooterOn){
@@ -361,6 +325,15 @@ public class UltimateGoalTeleop extends OpMode {
                 toggleMagStatePrevLoop = false;
             }
         }
+
+        if(gamepad1.right_bumper){
+            betorThingyControllerRight.flickBetorThingy();
+        }
+
+        if(gamepad1.x){
+            hardware.intake.betorThingiesResting();
+        }
+
         telemetry.addData("Shooter Velocity: ",shooterVelo);
         telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         telemetry.addData("Shooter On: ",shooterOn);
@@ -419,42 +392,5 @@ public class UltimateGoalTeleop extends OpMode {
         }
 
     }
-    public void stop(){
-        //T265.slamra.stop();
-        teleopStopped = true;
-        try {
-            magFlickerController.writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public void shootRing(HardwareMecanum hardware) {
-        hardware.mag.pushInRings();
-        sleeep(250);
-        hardware.mag.setRingPusherResting();
-    }
-
-
-    public void sleeepInterrupt(double milliseconds){
-        double startTime = hardware.time.milliseconds();
-        while(hardware.time.milliseconds() < startTime + milliseconds && !teleopStopped && !gamepad2.b){
-            try{
-                Thread.sleep(10);
-            }catch(InterruptedException e){
-
-            }
-        }
-    }
-
-    public void sleeep(double milliseconds){
-        double startTime = hardware.time.milliseconds();
-        while(hardware.time.milliseconds() < startTime + milliseconds && !teleopStopped){
-            try{
-                Thread.sleep(10);
-            }catch(InterruptedException e){
-
-            }
-        }
-    }
 }

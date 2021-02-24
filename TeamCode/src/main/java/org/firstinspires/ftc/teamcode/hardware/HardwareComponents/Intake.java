@@ -15,6 +15,18 @@ public class Intake {
     double bumperInit = 0.1438;
     double bumperRaised = 0.44;
     double releaseIntake = 0.58;
+
+    RegServo leftBetorThingy;
+    RegServo rightBetorThingy;
+
+    double leftBetorThingyIn;
+    double leftBetorThingyOut;
+    double rightBetorThingyIn = 0.57;
+    double rightBetorThingyOut = 0.32;
+
+    double rightBetorThingyResting = 0.15;
+    double leftBetorThingyResting;
+
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
         this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);
@@ -22,6 +34,15 @@ public class Intake {
         this.intakeServoStarboard = intakeServoStarboard;
         this.intakeServoPort = intakeServoPort;
     }
+
+    public Intake(Motor intakeMotor, RegServo intakeDropperGuard, RegServo rightBetorThingy, RegServo leftBetorThingy){
+        this.intakeMotor = intakeMotor;
+        this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);
+        this.intakeDropperGuard =intakeDropperGuard;
+        this.leftBetorThingy = leftBetorThingy;
+        this.rightBetorThingy = rightBetorThingy;
+    }
+
     public void turnIntake(double power){
         intakeMotor.setPower(power);
         if(power != 0) {
@@ -38,5 +59,25 @@ public class Intake {
     }
     public void raiseBumper(){
         intakeDropperGuard.setPosition(bumperRaised);
+    }
+
+    public void turnIntakeExperimentalBetorThingy(double power){
+        intakeMotor.setPower(power);
+    }
+
+    public void leftBetorThingyIn(){
+        leftBetorThingy.setPosition(leftBetorThingyIn);
+    }
+    public void rightBetorThingyIn(){
+        rightBetorThingy.setPosition(rightBetorThingyIn);
+    }
+    public void leftBetorThingyOut(){
+        leftBetorThingy.setPosition(leftBetorThingyOut);
+    }
+    public void rightBetorThingyOut(){
+        rightBetorThingy.setPosition(rightBetorThingyOut);
+    }
+    public void betorThingiesResting(){
+        rightBetorThingy.setPosition(rightBetorThingyResting);
     }
 }

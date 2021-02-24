@@ -113,7 +113,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         Trajectory collect2ndWobbler = null;
         if(stack==0) {
-            collect2ndWobbler = hardware.drive.trajectoryBuilder(dropWobbler1.end())
+            collect2ndWobbler = hardware.drive.trajectoryBuilder(new Pose2d(dropWobbler1.end().getX(), dropWobbler1.end().getY(), MathFunctions.keepAngleWithin180Degrees(dropWobbler1.end().getHeading())))
                     .splineToSplineHeading(new Pose2d(-65,24,Math.toRadians(-179)),0)
                     .splineToSplineHeading(new Pose2d(-30,39,Math.toRadians(-179)),0)
                     .build();
