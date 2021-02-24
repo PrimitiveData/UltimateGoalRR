@@ -26,6 +26,7 @@ import java.io.IOException;
 public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
 
     BetorThingyController betorThingyControllerRight;
+    BetorThingyController betorThingyControllerLeft;
     public void init(){
         msStuckDetectLoop = 15000;
         /*if (T265.slamra == null) {
@@ -46,6 +47,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         shooterVelo = 1500;
         magFlickerController = new MagFlickerController(hardware,this);
         betorThingyControllerRight = new BetorThingyController(hardware,this,false);
+        betorThingyControllerLeft = new BetorThingyController(hardware, this, true);
         hardware.mag.setRingPusherResting();
         hardware.wobbler.goToClawRestingPos();
         hardware.wobbler.goToArmRestingPos();
@@ -60,6 +62,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         //T265.slamra.start();
         magFlickerController.start();
         betorThingyControllerRight.start();
+        betorThingyControllerLeft.start();
         hardware.mag.collectRings();
     }
     public void loop(){
@@ -332,6 +335,10 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
 
         if(gamepad1.x){
             hardware.intake.betorThingiesResting();
+        }
+
+        if(gamepad1.left_bumper){
+            betorThingyControllerLeft.flickBetorThingy();
         }
 
         telemetry.addData("Shooter Velocity: ",shooterVelo);

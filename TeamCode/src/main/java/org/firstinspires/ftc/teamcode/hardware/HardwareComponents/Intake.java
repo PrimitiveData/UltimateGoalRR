@@ -79,5 +79,6 @@ public class Intake {
     }
     public void betorThingiesResting(){
         rightBetorThingy.setPosition(rightBetorThingyResting);
+        leftBetorThingy.setPosition(leftBetorThingyResting);
     }
 }
