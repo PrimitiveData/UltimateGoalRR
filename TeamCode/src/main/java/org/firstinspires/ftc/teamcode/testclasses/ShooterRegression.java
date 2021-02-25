@@ -22,7 +22,7 @@ public class ShooterRegression extends LinearOpMode {
         double rampPos = 0.2;
         boolean shooterOnTogglePrevLoop = false;
         boolean shooterOn = false;
-        double shooterVelo = 1575;
+        double shooterVelo = 1450;
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
@@ -113,6 +113,7 @@ public class ShooterRegression extends LinearOpMode {
                 hardware.mag.collectRings();
 
             telemetry.addData("Global Turret Angle: ", Math.toDegrees(localTurretAngle));
+            telemetry.addData("Shooter Velo:  ", shooterVelo);
             telemetry.addData("Flap Position: ", rampPos);
             telemetry.addData("Hardware Angle: ", hardware.getAngle());
             telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
