@@ -24,6 +24,7 @@ public class Shooter {
     public boolean updatePID;
     public double rampPostion = 1;
     AutoShootInfo info;
+    PowershotAutoShootInfo powershotInfo;
     public double rampAngleAdjustmentConstant=0;
     FtcDashboard dashboard;
     TelemetryPacket packet;
@@ -75,6 +76,16 @@ new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,h
         }
         setRampPosition(rampAngle+rampAngleAdjustmentConstant);
     }
+    public void autoRampPositionForPowershot(double distanceToPowershot){
+        double rampAngle = 0;
+        for(int i = 0; i < powershotInfo.distances.size() - 1; i++){
+            if(MathFunctions.isInBetween(powershotInfo.distances.get(i), powershotInfo.distances.get(i+1), distanceToPowershot)){
+                double slope = (powershotInfo.rampAngles.get(i+1) - powershotInfo.rampAngles.get(i))/(powershotInfo.distances.get(i+1)-powershotInfo.distances.get(i));
+                rampAngle = slope * (distanceToPowershot - powershotInfo.distances.get(i))+powershotInfo.rampAngles.get(i);
+            }
+        }
+        setRampPosition(rampAngle);
+    }
     //Given the distance to the goal, set the shooter speed using regression data
     public double autoaimShooterSpeed(double distanceToGoal){
         double shooterVelo = 0;
@@ -82,6 +93,16 @@ new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,h
             if(MathFunctions.isInBetween(info.distances.get(i), info.distances.get(i+1), distanceToGoal)){
                 double slope = (info.shooterSpeeds.get(i+1) - info.shooterSpeeds.get(i))/(info.distances.get(i+1)-info.distances.get(i));
                 shooterVelo = slope*(distanceToGoal - info.distances.get(i))+info.shooterSpeeds.get(i);
+            }
+        }
+        return shooterVelo;
+    }
+    public double powershotShooterSpeed(double distanceToPowershot){
+        double shooterVelo = 0;
+        for(int i = 0; i < powershotInfo.distances.size()-1; i++){
+            if(MathFunctions.isInBetween(powershotInfo.distances.get(i), powershotInfo.distances.get(i+1), distanceToPowershot)){
+                double slope = (powershotInfo.shooterSpeeds.get(i+1) - powershotInfo.shooterSpeeds.get(i))/(powershotInfo.distances.get(i+1)-powershotInfo.distances.get(i));
+                shooterVelo = slope*(distanceToPowershot - powershotInfo.distances.get(i))+powershotInfo.shooterSpeeds.get(i);
             }
         }
         return shooterVelo;

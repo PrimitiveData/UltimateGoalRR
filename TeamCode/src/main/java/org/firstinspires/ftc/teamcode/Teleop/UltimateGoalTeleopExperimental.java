@@ -53,8 +53,6 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         hardware.wobbler.goToArmRestingPos();
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
-        driveMode = Mode.DRIVER_CONTROL;
-        headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
         hardware.turret.turretMotor.readRequested = true;
         bumperDown = false;
     }
@@ -66,35 +64,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         hardware.mag.collectRings();
     }
     public void loop(){
-        switch(driveMode){
-            case DRIVER_CONTROL:
-                if(gamepad1.b)
-                    driveMode = Mode.ALIGN_TO_POINT;
-                hardware.updateDrivePID = false;
-                //driver contro
-                    /*
-                    Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
-                    double leftYAbs = Math.abs(input.getY());
-                    double leftXAbs = Math.abs(input.getX());
-                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
-                    */
-                    double leftYAbs = gamepad1.left_stick_y;
-                    double leftXAbs = gamepad1.left_stick_x;
-                    double rightXAbs = gamepad1.right_stick_x;
-
-                    // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-                    //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-                    //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-                    //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs, -leftXAbs, -rightXAbs));
-                    //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
-                break;
-            case ALIGN_TO_POINT:
-                if(gamepad1.y)
-                    driveMode = Mode.DRIVER_CONTROL;
-                hardware.updateDrivePID = true;
-        }
-        hardware.loop();
+        hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
 
         //intake dropper
         if(gamepad2.left_trigger > 0){
@@ -143,22 +113,46 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
             hardware.intake.raiseBumper();
         }
         if(gamepad2.a) {
-            if(!magUpdateStateAndSetPositionPrevLoop) {
-                magTrigger++;
-                if(magTrigger == 2) {
-                    magFlickerController.shootAllRings();
-                    magTrigger = 0;
+            if(!powershotAutoShoot) {
+                if (!magUpdateStateAndSetPositionPrevLoop) {
+                    magTrigger++;
+                    if (magTrigger == 2) {
+                        magFlickerController.shootAllRings();
+                        magTrigger = 0;
+                    } else
+                        hardware.mag.dropRings();
                 }
-                else
-                    hardware.mag.dropRings();
+                magUpdateStateAndSetPositionPrevLoop = true;
             }
-            magUpdateStateAndSetPositionPrevLoop = true;
+            else if(powershotAutoShoot){
+                if (!magUpdateStateAndSetPositionPrevLoop) {
+                    powershotSequenceShoot = !powershotSequenceShoot;
+                }
+                magUpdateStateAndSetPositionPrevLoop = true;
+            }
         }
         else{
             if(magUpdateStateAndSetPositionPrevLoop){
                 magUpdateStateAndSetPositionPrevLoop = false;
             }
         }
+        //powershot autoshoot
+        if(gamepad2.b){
+            if(!powershotAutoShootPrevLoop){
+                powershotAutoShoot = !powershotAutoShoot;
+                if(powershotAutoShoot){
+                    hardware.turret.updatePID = false;
+                    manuelRampControl = true;
+                }
+            }
+            powershotAutoShootPrevLoop = true;
+        }
+        else{
+            if(powershotAutoShootPrevLoop){
+                powershotAutoShootPrevLoop = false;
+            }
+        }
+
         //ramp manuel control and automatic control
         if(gamepad2.x) {
             if(!manuelRampControlTogglePrevLoop) {
@@ -174,9 +168,42 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
                 manuelRampControlTogglePrevLoop = false;
             }
         }
-        if(manuelRampControl){
+        if(manuelRampControl || !powershotAutoShoot){
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
+        if(powershotAutoShoot){
+            fakeOdoY = hardware.getYAbsoluteCenter() + odoOffset;
+            double[] turretPosition = MathFunctions.transposeCoordinate(
+                    hardware.getXAbsoluteCenter(),
+                    fakeOdoY,
+                    -4.22,
+                    hardware.getAngle());
+            double distanceToGoal = Math.hypot(
+                    turretPosition[1]- FieldConstants.powershotPosition[1],
+                    turretPosition[0] - FieldConstants.powershotPosition[0]);
+            double angleToGoal = Math.atan2(
+                    FieldConstants.powershotPosition[1]-turretPosition[1],
+                    FieldConstants.powershotPosition[0]-turretPosition[0]) +
+                    hardware.turret.getTurretPowershotOffset(distanceToGoal);
+            if(!currentlyIncrementingMagDuringShooting) {
+                hardware.shooter.autoRampPositionForPowershot(distanceToGoal);
+            }
+            hardware.turret.updatePID = true;
+            hardware.turret.setTurretAngle(angleToGoal);
+            shooterVelo = hardware.shooter.powershotShooterSpeed(distanceToGoal);
+            if(powershotSequenceShoot){
+                magFlickerController.shootPowershotSingleRing();
+                odoOffset -= 7.5;
+                sleeep(200);
+                magFlickerController.shootPowershotSingleRing();
+                odoOffset -= 7.5;
+                sleeep(200);
+                magFlickerController.shootPowershotSingleRing();
+            }
+            telemetry.addLine("Turret XY Position On Field: " + turretPosition[0] + ", " + turretPosition[1]);
+            telemetry.addData("angleToGoal", Math.toDegrees(angleToGoal));
+        }
+
         else{
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);

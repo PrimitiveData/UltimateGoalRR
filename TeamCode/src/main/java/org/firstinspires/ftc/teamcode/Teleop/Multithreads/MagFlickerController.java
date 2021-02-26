@@ -17,6 +17,7 @@ public class MagFlickerController extends Thread {
     UltimateGoalTeleop parentOP;
     ElapsedTime time;
     boolean shootAllRingsRequested;
+    boolean shootPowershotSequenceRequested;
     boolean firstButtonPress = false;
     int numButtonPresses;
     String TAG = "MagFlickerController";
@@ -25,6 +26,7 @@ public class MagFlickerController extends Thread {
         this.hardware = hardware;
         this.parentOP = parentOP;
         shootAllRingsRequested = false;
+        shootPowershotSequenceRequested = false;
         firstButtonPress = true;
         numButtonPresses = 0;
         time = new ElapsedTime();
@@ -64,6 +66,18 @@ public class MagFlickerController extends Thread {
                 hardware.mag.collectRings();
                 shootAllRingsRequested = false;
             }
+            if(shootPowershotSequenceRequested){
+                if(hardware.mag.currentState == Mag.State.COLLECT){
+                    hardware.mag.dropRings();
+                    sleeep(500);
+                }
+                for(int i = 0; i < 3; i++){
+                    parentOP.currentlyIncrementingMagDuringShooting = true;
+                    hardware.mag.pushInRings();
+                    sleeep(200);// tune time
+                    hardware.mag.setRingPusherResting();
+                }
+            }
         }
         /*if(hardware.mag.currentState == Mag.State.COLLECT){
             if(time.milliseconds() % 1000 < 500)
@@ -74,5 +88,8 @@ public class MagFlickerController extends Thread {
     }
     public void shootAllRings(){
         shootAllRingsRequested = true;
+    }
+    public void shootPowershotSingleRing(){
+        shootPowershotSequenceRequested = true;
     }
 }
