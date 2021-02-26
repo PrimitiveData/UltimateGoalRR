@@ -19,13 +19,13 @@ public class Intake {
     RegServo leftBetorThingy;
     RegServo rightBetorThingy;
 
-    double leftBetorThingyIn = 0.53;
-    double leftBetorThingyOut = 0.27;
-    double rightBetorThingyIn = 0.16;
-    double rightBetorThingyOut = 0.45;
+    double leftBetorThingyIn = 0.55;
+    double leftBetorThingyOut = 0.28;
+    double rightBetorThingyIn = 0.47;
+    double rightBetorThingyOut = 0.72;
 
-    double rightBetorThingyResting = 0.6;
-    double leftBetorThingyResting = 0.04;
+    double rightBetorThingyResting = 0.92;
+    double leftBetorThingyResting = 0.115;
 
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;

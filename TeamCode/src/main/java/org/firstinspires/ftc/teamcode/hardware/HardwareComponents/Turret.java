@@ -30,7 +30,6 @@ public class Turret {
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
     AutoShootInfo info;
-    PowershotAutoShootInfo powershotInfo;
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     TelemetryPacket packet = new TelemetryPacket();
@@ -60,22 +59,6 @@ public class Turret {
         }
         if(distanceToGoal < info.distances.get(0)){
             turretAngleOffset = info.turretAngleOffsets.get(0);
-        }
-        return turretAngleOffset+turretAngleOffsetAdjustmentConstant;
-    }
-    public double getTurretPowershotOffset(double distanceToPowershot){
-        double turretAngleOffset = 0;
-        for(int i = 0; i < powershotInfo.distances.size()-1; i++){
-            if(MathFunctions.isInBetween(powershotInfo.distances.get(i), powershotInfo.distances.get(i+1), distanceToPowershot)){
-                double slope = (powershotInfo.turretAngleOffsets.get(i+1) - powershotInfo.turretAngleOffsets.get(i))/(powershotInfo.distances.get(i+1)-powershotInfo.distances.get(i));
-                turretAngleOffset = slope*(distanceToPowershot - powershotInfo.distances.get(i))+powershotInfo.turretAngleOffsets.get(i);
-            }
-        }
-        if(distanceToPowershot > powershotInfo.distances.get(powershotInfo.distances.size()-1)){
-            turretAngleOffset = powershotInfo.turretAngleOffsets.get(powershotInfo.turretAngleOffsets.size()-1);
-        }
-        if(distanceToPowershot < powershotInfo.distances.get(0)){
-            turretAngleOffset = powershotInfo.turretAngleOffsets.get(0);
         }
         return turretAngleOffset+turretAngleOffsetAdjustmentConstant;
     }
