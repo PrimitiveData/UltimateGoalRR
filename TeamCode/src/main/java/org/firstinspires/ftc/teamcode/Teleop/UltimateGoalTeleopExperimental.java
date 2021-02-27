@@ -15,12 +15,16 @@ import org.firstinspires.ftc.teamcode.Teleop.Multithreads.BetorThingyController;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AutoShootInfo;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Intake;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.PowershotAutoShootInfo;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 
 @TeleOp(name = "aUltimateGoalTeleopExperimental",group="TeleOp")
 public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
@@ -36,11 +40,6 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry);
 
-        hardware.CRservos[0] = null;
-        hardware.CRservos[1] = null;
-        hardware.servos[9] = new RegServo(hardware.hardwareMap.get(Servo.class,"intakeFunnelerStarboard"));
-        hardware.servos[10] = new RegServo(hardware.hardwareMap.get(Servo.class,"intakeFunnelerPort"));
-        hardware.intake = new Intake(hardware.hub1Motors[2],hardware.servos[1],hardware.servos[9],hardware.servos[10]);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -65,7 +64,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
     }
     public void loop(){
         hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
-
+        hardware.loop();
         //intake dropper
         if(gamepad2.left_trigger > 0){
             hardware.intake.dropIntake();
@@ -112,8 +111,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         }else{
             hardware.intake.raiseBumper();
         }
-        if(gamepad2.a) {
-            if(!powershotAutoShoot) {
+        if(gamepad2.b) {
                 if (!magUpdateStateAndSetPositionPrevLoop) {
                     magTrigger++;
                     if (magTrigger == 2) {
@@ -123,13 +121,6 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
                         hardware.mag.dropRings();
                 }
                 magUpdateStateAndSetPositionPrevLoop = true;
-            }
-            else if(powershotAutoShoot){
-                if (!magUpdateStateAndSetPositionPrevLoop) {
-                    powershotSequenceShoot = !powershotSequenceShoot;
-                }
-                magUpdateStateAndSetPositionPrevLoop = true;
-            }
         }
         else{
             if(magUpdateStateAndSetPositionPrevLoop){
@@ -137,26 +128,19 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
             }
         }
         //powershot autoshoot
-        if(gamepad2.b){
-            if(!powershotAutoShootPrevLoop){
-                powershotAutoShoot = !powershotAutoShoot;
-                if(powershotAutoShoot){
-                    hardware.turret.updatePID = false;
-                    manuelRampControl = true;
-                }
-            }
-            powershotAutoShootPrevLoop = true;
+        if(gamepad2.a){
+            hardware.shooter.info = new PowershotAutoShootInfo();
+            hardware.turret.info = new PowershotAutoShootInfo();
+            FieldConstants.highGoalPosition[0] = FieldConstants.powershotPosition[0];
+            FieldConstants.highGoalPosition[1] = FieldConstants.powershotPosition[1];
+            magFlickerController.shootPowershotAllRings();
         }
-        else{
-            if(powershotAutoShootPrevLoop){
-                powershotAutoShootPrevLoop = false;
-            }
-        }
-
         //ramp manuel control and automatic control
         if(gamepad2.x) {
             if(!manuelRampControlTogglePrevLoop) {
                 manuelRampControl = !manuelRampControl;
+                hardware.shooter.info = new AutoShootInfo();
+                hardware.turret.info = new AutoShootInfo();
                 if(manuelRampControl){
                     hardware.turret.updatePID = false;
                 }
@@ -168,42 +152,9 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
                 manuelRampControlTogglePrevLoop = false;
             }
         }
-        if(manuelRampControl || !powershotAutoShoot){
+        if(manuelRampControl){
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
-        if(powershotAutoShoot){
-            fakeOdoY = hardware.getYAbsoluteCenter() + odoOffset;
-            double[] turretPosition = MathFunctions.transposeCoordinate(
-                    hardware.getXAbsoluteCenter(),
-                    fakeOdoY,
-                    -4.22,
-                    hardware.getAngle());
-            double distanceToGoal = Math.hypot(
-                    turretPosition[1]- FieldConstants.powershotPosition[1],
-                    turretPosition[0] - FieldConstants.powershotPosition[0]);
-            double angleToGoal = Math.atan2(
-                    FieldConstants.powershotPosition[1]-turretPosition[1],
-                    FieldConstants.powershotPosition[0]-turretPosition[0]) +
-                    hardware.turret.getTurretPowershotOffset(distanceToGoal);
-            if(!currentlyIncrementingMagDuringShooting) {
-                hardware.shooter.autoRampPositionForPowershot(distanceToGoal);
-            }
-            hardware.turret.updatePID = true;
-            hardware.turret.setTurretAngle(angleToGoal);
-            shooterVelo = hardware.shooter.powershotShooterSpeed(distanceToGoal);
-            if(powershotSequenceShoot){
-                magFlickerController.shootPowershotSingleRing();
-                odoOffset -= 7.5;
-                sleeep(200);
-                magFlickerController.shootPowershotSingleRing();
-                odoOffset -= 7.5;
-                sleeep(200);
-                magFlickerController.shootPowershotSingleRing();
-            }
-            telemetry.addLine("Turret XY Position On Field: " + turretPosition[0] + ", " + turretPosition[1]);
-            telemetry.addData("angleToGoal", Math.toDegrees(angleToGoal));
-        }
-
         else{
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
@@ -329,9 +280,11 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
             hardware.shooter.updatePID = false;
             hardwareThreadInterface.stopLooping = true;
         }
-
+*/
         if(gamepad1.dpad_up){
-            hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
+            hardware.drive.setPoseEstimate(new Pose2d(-3.25,hardware.getYAbsoluteCenter(),0));
+            hardware.cumulativeAngle = 0;
+            hardware.prevAngle = 0;
         }
         if(gamepad1.dpad_down){
             hardware.drive.setPoseEstimate(new Pose2d(-3.25,20.75,0));

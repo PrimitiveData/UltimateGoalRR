@@ -29,8 +29,7 @@ public class Turret {
     public boolean updatePID;
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
-    AutoShootInfo info;
-    PowershotAutoShootInfo powershotInfo;
+    public AutoShootInfo info;
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     TelemetryPacket packet = new TelemetryPacket();
@@ -63,22 +62,7 @@ public class Turret {
         }
         return turretAngleOffset+turretAngleOffsetAdjustmentConstant;
     }
-    public double getTurretPowershotOffset(double distanceToPowershot){
-        double turretAngleOffset = 0;
-        for(int i = 0; i < powershotInfo.distances.size()-1; i++){
-            if(MathFunctions.isInBetween(powershotInfo.distances.get(i), powershotInfo.distances.get(i+1), distanceToPowershot)){
-                double slope = (powershotInfo.turretAngleOffsets.get(i+1) - powershotInfo.turretAngleOffsets.get(i))/(powershotInfo.distances.get(i+1)-powershotInfo.distances.get(i));
-                turretAngleOffset = slope*(distanceToPowershot - powershotInfo.distances.get(i))+powershotInfo.turretAngleOffsets.get(i);
-            }
-        }
-        if(distanceToPowershot > powershotInfo.distances.get(powershotInfo.distances.size()-1)){
-            turretAngleOffset = powershotInfo.turretAngleOffsets.get(powershotInfo.turretAngleOffsets.size()-1);
-        }
-        if(distanceToPowershot < powershotInfo.distances.get(0)){
-            turretAngleOffset = powershotInfo.turretAngleOffsets.get(0);
-        }
-        return turretAngleOffset+turretAngleOffsetAdjustmentConstant;
-    }
+
     //sets the  angle of our turret to the global angle specified in the parameters
 
     public void setTurretAngle(double globalTurretAngle){
@@ -103,7 +87,7 @@ public class Turret {
         double desiredLocalTurretAngle = localTurretAngle;
         turretPID.setState(desiredLocalTurretAngle);
         if(magShootingState) {
-            double magAngle = (desiredLocalTurretAngle-maxNegativeServo)/(maxPositive-maxNegativeServo);
+            double magAngle = (desiredLocalTurretAngle-maxNegativeServo)/(maxPositiveServo-maxNegativeServo);
             setMagAngle(magAngle);
         }
     }
@@ -115,7 +99,7 @@ public class Turret {
         packet.put("Turret Current State: ", Math.toDegrees(hardware.turret.turretPID.currentState));
         packet.put("Error: ", Math.toDegrees(MathFunctions.keepAngleWithin180Degrees(hardware.turret.turretPID.desiredState-hardware.turret.turretPID.currentState)));
         packet.put("Heading: ",hardware.getAngle());
-        //FtcDashboard.getInstance().sendTelemetryPacket(packet);
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){

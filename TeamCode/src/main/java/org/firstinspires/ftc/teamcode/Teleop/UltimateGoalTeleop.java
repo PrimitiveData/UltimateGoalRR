@@ -67,7 +67,7 @@ public class UltimateGoalTeleop extends OpMode {
     public Mode driveMode;
     public PIDFController headingController;
 
-    double fakeOdoY = hardware.getYAbsoluteCenter();
+    double fakeOdoY;
     double odoOffset = 0;
 
     TelemetryPacket packet = new TelemetryPacket();

@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Teleop.Multithreads;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.FieldConstants;
+import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.Teleop.UltimateGoalTeleop;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
@@ -11,6 +13,7 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+
 
 public class MagFlickerController extends Thread {
     public HardwareMecanum hardware;
@@ -71,12 +74,17 @@ public class MagFlickerController extends Thread {
                     hardware.mag.dropRings();
                     sleeep(500);
                 }
+                hardware.mag.dropRings();
                 for(int i = 0; i < 3; i++){
-                    parentOP.currentlyIncrementingMagDuringShooting = true;
                     hardware.mag.pushInRings();
                     sleeep(200);// tune time
                     hardware.mag.setRingPusherResting();
+                    FieldConstants.highGoalPosition[1] -= 7.5;
+                    sleeep(250);
                 }
+                FieldConstants.highGoalPosition[0] = FieldConstants.highGoalPositionBackUp[0];
+                FieldConstants.highGoalPosition[1] = FieldConstants.highGoalPositionBackUp[1];
+                shootPowershotSequenceRequested = false;
             }
         }
         /*if(hardware.mag.currentState == Mag.State.COLLECT){
@@ -89,7 +97,7 @@ public class MagFlickerController extends Thread {
     public void shootAllRings(){
         shootAllRingsRequested = true;
     }
-    public void shootPowershotSingleRing(){
+    public void shootPowershotAllRings(){
         shootPowershotSequenceRequested = true;
     }
 }
