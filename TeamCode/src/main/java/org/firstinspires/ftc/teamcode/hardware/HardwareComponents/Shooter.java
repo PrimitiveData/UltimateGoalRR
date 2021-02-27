@@ -23,7 +23,7 @@ public class Shooter {
     public boolean firstUpdateShooterPIDFLoop = true;
     public boolean updatePID;
     public double rampPostion = 1;
-    AutoShootInfo info;
+    public AutoShootInfo info;
     public double rampAngleAdjustmentConstant=0;
     FtcDashboard dashboard;
     TelemetryPacket packet;

@@ -11,21 +11,24 @@ public class Intake {
     RegServo intakeDropperGuard;
     ContRotServo intakeServoStarboard;
     ContRotServo intakeServoPort;
-    double holdIntakeUp = 0.21;
+    double holdIntakeUp = 0.17;
     double bumperInit = 0.1438;
     double bumperRaised = 0.44;
-    double releaseIntake = 0.58;
+    double releaseIntake = 0.55;
 
     RegServo leftBetorThingy;
     RegServo rightBetorThingy;
 
-    double leftBetorThingyIn = 0.55;
-    double leftBetorThingyOut = 0.28;
-    double rightBetorThingyIn = 0.47;
-    double rightBetorThingyOut = 0.72;
+    double leftBetorThingyIn = 0.89693;
+    double leftBetorThingyOut = 0.68224;
+    double rightBetorThingyIn = 0.37327;
+    double rightBetorThingyOut = 0.56787;
 
-    double rightBetorThingyResting = 0.92;
-    double leftBetorThingyResting = 0.115;
+    double rightBetorThingyResting = rightBetorThingyIn;
+    double leftBetorThingyResting = leftBetorThingyIn;
+    double leftBetorThingyStarting = 0.7787;
+    double rightBetorThingyStarting = 0.4235;
+
 
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
@@ -60,7 +63,7 @@ public class Intake {
     public void raiseBumper(){
         intakeDropperGuard.setPosition(bumperRaised);
     }
-
+    public void holdIntakeUp() { intakeDropperGuard.setPosition(holdIntakeUp);}
     public void turnIntakeExperimentalBetorThingy(double power){
         intakeMotor.setPower(power);
     }
@@ -80,5 +83,9 @@ public class Intake {
     public void betorThingiesResting(){
         rightBetorThingy.setPosition(rightBetorThingyResting);
         leftBetorThingy.setPosition(leftBetorThingyResting);
+    }
+    public void betorThingiesStarting(){
+        leftBetorThingy.setPosition(leftBetorThingyStarting);
+        rightBetorThingy.setPosition(rightBetorThingyStarting);
     }
 }

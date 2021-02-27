@@ -36,6 +36,9 @@ public class UltimateGoalTeleop extends OpMode {
     int magTrigger = 0;
     boolean manuelRampControl = true;
     boolean manuelRampControlTogglePrevLoop = false;
+    boolean powershotAutoShoot = false;
+    boolean powershotAutoShootPrevLoop = false;
+    boolean powershotSequenceShoot = false;
     boolean shooterOn = false;
     boolean shooterOnTogglePrevLoop = false;
     boolean grip = true;
@@ -63,6 +66,9 @@ public class UltimateGoalTeleop extends OpMode {
     enum Mode {DRIVER_CONTROL, ALIGN_TO_POINT}
     public Mode driveMode;
     public PIDFController headingController;
+
+    double fakeOdoY;
+    double odoOffset = 0;
 
     TelemetryPacket packet = new TelemetryPacket();
     FtcDashboard dashboard = FtcDashboard.getInstance();
