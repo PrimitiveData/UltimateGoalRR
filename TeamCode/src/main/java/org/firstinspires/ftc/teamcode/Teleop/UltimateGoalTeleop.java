@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.PowershotAutoShootInfo;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
@@ -105,34 +106,7 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.mag.collectRings();
     }
     public void loop(){
-        switch(driveMode){
-            case DRIVER_CONTROL:
-                if(gamepad1.b)
-                    driveMode = Mode.ALIGN_TO_POINT;
-                hardware.updateDrivePID = false;
-                //driver contro
-                    /*
-                    Vector2d input = new Vector2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x).rotated(-hardware.getAngle());
-                    double leftYAbs = Math.abs(input.getY());
-                    double leftXAbs = Math.abs(input.getX());
-                    double rightXAbs = Math.abs(gamepad1.right_stick_x);
-                    */
-                    double leftYAbs = gamepad1.left_stick_y;
-                    double leftXAbs = gamepad1.left_stick_x;
-                    double rightXAbs = gamepad1.right_stick_x;
-
-                    // for field centric references to raw gamepad left stick inputs must be changed to the rotated values
-                    //double leftYWeighted =  logistic(leftYAbs, 1, 7.2) * -gamepad1.left_stick_y / leftYAbs;
-                    //double leftXWeighted = logistic(leftXAbs, 1, 7.2) * -gamepad1.left_stick_x / leftXAbs;
-                    //double rightXWeighted = logistic(rightXAbs, 1, 7.2) * -gamepad1.right_stick_x / rightXAbs;
-                    hardware.drive.setWeightedDrivePower(new Pose2d(-leftYAbs, -leftXAbs, -rightXAbs));
-                    //hardware.drive.setWeightedDrivePower(new Pose2d(-leftYWeighted * 0.3, -leftXWeighted * 0.3, -rightXWeighted * 0.3));
-                break;
-            case ALIGN_TO_POINT:
-                if(gamepad1.y)
-                    driveMode = Mode.DRIVER_CONTROL;
-                hardware.updateDrivePID = true;
-        }
+        hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
         hardware.loop();
 
         //intake dropper
@@ -306,6 +280,13 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad2.right_trigger>0){
             hardware.wobbler.armState = WobblerArm.ArmState.START;
             hardware.wobbler.goToArmRestingPos();
+        }
+        if(gamepad2.a){
+            hardware.shooter.info = new PowershotAutoShootInfo();
+            hardware.turret.info = new PowershotAutoShootInfo();
+            FieldConstants.highGoalPosition[0] = FieldConstants.powershotPosition[0];
+            FieldConstants.highGoalPosition[1] = FieldConstants.powershotPosition[1];
+            magFlickerController.shootPowershotAllRings();
         }
         //end powershot
 

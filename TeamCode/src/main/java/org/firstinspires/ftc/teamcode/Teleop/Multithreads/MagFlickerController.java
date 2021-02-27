@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop.Multithreads;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -32,7 +34,6 @@ public class MagFlickerController extends Thread {
         shootPowershotSequenceRequested = false;
         firstButtonPress = true;
         numButtonPresses = 0;
-        time = new ElapsedTime();
         try {
             writer = new FileWriter("//sdcard//FIRST//MagFlickerControllerData.txt");
         }
@@ -61,6 +62,8 @@ public class MagFlickerController extends Thread {
                     parentOP.currentlyIncrementingMagDuringShooting = true;
                     hardware.mag.pushInRings();
                     sleeep(200);// tune time
+                    hardware.mag.setRingPusherResting();
+                    sleeep(1);
                     hardware.mag.setRingPusherResting();
                     hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.05);
                     sleeep(100);// tune time

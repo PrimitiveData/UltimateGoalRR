@@ -91,11 +91,11 @@ public class HardwareMecanum {
         servos[6] = new RegServo(hardwareMap.get(Servo.class,"ringPusher"));
         servos[7] = new RegServo(hardwareMap.get(Servo.class, "magRotationServo"));
         servos[8] = new RegServo(hardwareMap.get(Servo.class,"wobblerArm2"));
-        servos[9] = new RegServo(hardwareMap.get(Servo.class,"intakeFunnelerStarboard"));
-        servos[10] = new RegServo(hardwareMap.get(Servo.class,"intakeFunnelerPort"));
+        CRservos[0] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerStarboard"));
+        CRservos[1] = new ContRotServo(hardwareMap.get(CRServo.class,"intakeFunnelerPort"));
         shooter = new Shooter(hub1Motors[0],hub1Motors[1],servos[0],this);
         turret = new Turret(hub1Motors[3], servos[7], this);
-        intake = new Intake(hub1Motors[2],servos[1],servos[9],servos[10]);
+        intake = new Intake(hub1Motors[2],servos[1],CRservos[0],CRservos[1]);
         mag = new Mag(servos[2],servos[6],this);
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
         drive = new SampleMecanumDrive(hardwareMap);

@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 public class Mag {
     public RegServo magServo;
-    RegServo ringPusher;
+    public RegServo ringPusher;
     HardwareMecanum hardware;
     double ringPusherResting=0.9;
     double ringPusherPushedIn=0.675;

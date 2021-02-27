@@ -309,17 +309,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
             }
         }
 
-        if(gamepad1.right_bumper){
-            betorThingyControllerRight.flickBetorThingy();
-        }
 
-        if(gamepad1.x){
-            hardware.intake.betorThingiesResting();
-        }
-
-        if(gamepad1.left_bumper){
-            betorThingyControllerLeft.flickBetorThingy();
-        }
 
         telemetry.addData("Shooter Velocity: ",shooterVelo);
         telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
