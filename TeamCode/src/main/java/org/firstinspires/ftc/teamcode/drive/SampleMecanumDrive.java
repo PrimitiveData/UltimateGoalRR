@@ -14,6 +14,7 @@ import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -37,6 +38,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.SanfordAnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
@@ -113,7 +115,12 @@ public class SampleMecanumDrive extends MecanumDrive {
     public TurretPID drivePID;
     private PIDFController headingController;
     public SanfordAnalogGyro analogGyro;
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+
+    public SampleMecanumDrive(HardwareMap hardwareMap){
+        this(hardwareMap, false);
+    }
+
+    public SampleMecanumDrive(HardwareMap hardwareMap, boolean sanfordGyroLocalizer) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
         time = new ElapsedTime();
 
@@ -186,7 +193,11 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
-        setLocalizer(new ThreeWheelTrackingLocalizerAnalogGyro(hardwareMap, this));
+        if(sanfordGyroLocalizer){
+            setLocalizer(new ThreeWheelTrackingLocalizerAnalogGyro(hardwareMap,this));
+        }else{
+            setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
+        }
     }
 
     public double updateDrivetrainPID(Pose2d currentPose, Pose2d targetPose){

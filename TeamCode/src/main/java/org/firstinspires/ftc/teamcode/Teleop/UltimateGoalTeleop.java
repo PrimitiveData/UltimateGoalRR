@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
@@ -74,14 +75,17 @@ public class UltimateGoalTeleop extends OpMode {
     TelemetryPacket packet = new TelemetryPacket();
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
+    boolean slowMode;
+    boolean slowModeToggledPrevLoop;
+
     public void init(){
-        msStuckDetectLoop = 15000;
+        msStuckDetectLoop = 20000;
         /*if (T265.slamra == null) {
             T265.slamra = new T265Camera(new Transform2d(),T265.ODOMETRY_COVARIANCE, hardwareMap.appContext);
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new HardwareMecanum(hardwareMap,telemetry);
+        hardware = new HardwareMecanum(hardwareMap,telemetry,true);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -106,7 +110,24 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.mag.collectRings();
     }
     public void loop(){
-        hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
+
+        if(gamepad1.dpad_right) {
+            if(!slowModeToggledPrevLoop) {
+                slowMode = !slowMode;
+            }
+            slowModeToggledPrevLoop = true;
+        }
+        else{
+            if(slowModeToggledPrevLoop){
+                slowModeToggledPrevLoop = false;
+            }
+        }
+        if(slowMode){
+            hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y*0.3, -gamepad1.left_stick_x *0.3, - gamepad1.right_stick_x * 0.3));
+        }
+        else {
+            hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
+        }
         hardware.loop();
 
         //intake dropper
@@ -282,11 +303,55 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.wobbler.goToArmRestingPos();
         }
         if(gamepad2.a){
-            hardware.shooter.info = new PowershotAutoShootInfo();
-            hardware.turret.info = new PowershotAutoShootInfo();
-            FieldConstants.highGoalPosition[0] = FieldConstants.powershotPosition[0];
-            FieldConstants.highGoalPosition[1] = FieldConstants.powershotPosition[1];
-            magFlickerController.shootPowershotAllRings();
+            HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
+            hardwareThreadInterface.start();
+            hardware.shooter.setRampPosition(0.2);
+            hardware.turret.updatePID = true;
+            hardware.shooter.updatePID = true;
+            hardware.shooter.shooterVeloPID.setState(1300);
+            if(hardware.mag.currentState == Mag.State.COLLECT){
+                hardware.mag.dropRings();
+                sleeep(500);
+            }
+
+            hardware.mag.dropRings();
+            sleeep(1500);
+
+
+            double ps1TurretAngle=Math.toRadians(3);
+            double ps2TurretAngle=Math.toRadians(-2.5);
+            double ps3TurretAngle=Math.toRadians(-8);
+            ElapsedTime powershotTimer = new ElapsedTime();
+
+            for(int i = 0; i < 3; i++) {
+                double powershotAngleCurrent;
+                if(i == 0){
+                    powershotAngleCurrent = ps1TurretAngle;
+                }else if(i == 1){
+                    powershotAngleCurrent = ps2TurretAngle;
+                }else{
+                    powershotAngleCurrent = ps3TurretAngle;
+                }
+                double prevTurretAngle = hardware.turret.localTurretAngleRadians();
+                hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
+                while (!teleopStopped) {
+                    double currentTurretAngle = hardware.turret.localTurretAngleRadians();
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.8))
+                        powershotTimer.reset();
+                    if (powershotTimer.milliseconds() >= 800 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25))
+                        break;
+                    prevTurretAngle = currentTurretAngle;
+                }
+                sleeep(500);
+                hardware.mag.pushInRings();
+                sleeep(1000);// tune time
+                hardware.mag.setRingPusherResting();
+                sleeep(500);
+            }
+
+
+            hardwareThreadInterface.stopLooping = true;
+            sleeep(50);
         }
         //end powershot
 
@@ -322,12 +387,39 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.updatePID = false;
             hardwareThreadInterface.stopLooping = true;
         }
-
+*/
         if(gamepad1.dpad_up){
-            hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(), -32.25, Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(),-32.25,0));
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+            }
         }
         if(gamepad1.dpad_down){
-            hardware.drive.setPoseEstimate(new Pose2d(-3.25,20.75,0));
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(), 45.25, Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(),45.25,0));
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+            }
+        }
+        if(gamepad1.dpad_left){
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(1, hardware.getYAbsoluteCenter(), Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(1,hardware.getYAbsoluteCenter(),0));
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+            }
         }
         /*if(gamepad1.dpad_right){
             hardware.shooter.setRampPosition(0);
