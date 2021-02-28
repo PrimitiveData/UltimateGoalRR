@@ -288,6 +288,57 @@ public class UltimateGoalTeleop extends OpMode {
             FieldConstants.highGoalPosition[1] = FieldConstants.powershotPosition[1];
             magFlickerController.shootPowershotAllRings();
         }
+        if(gamepad1.dpad_up){
+            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
+                hardware.cumulativeAngle = 180;
+                hardware.prevAngle = 180;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
+                hardware.cumulativeAngle = 90;
+                hardware.prevAngle = 90;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
+            }
+        }
+        if(gamepad1.dpad_down){
+            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
+                hardware.cumulativeAngle = 180;
+                hardware.prevAngle = 180;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
+                hardware.cumulativeAngle = 90;
+                hardware.prevAngle = 90;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
+            }
+        }
+        if(gamepad1.dpad_down){
+            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+                hardware.cumulativeAngle = 0;
+                hardware.prevAngle = 0;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
+                hardware.cumulativeAngle = 180;
+                hardware.prevAngle = 180;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
+            }
+            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
+                hardware.cumulativeAngle = 90;
+                hardware.prevAngle = 90;
+                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
+            }
+        }
         //end powershot
 
 

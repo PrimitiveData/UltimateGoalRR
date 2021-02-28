@@ -28,33 +28,33 @@ public class AutoShootInfo {
         distances.add(114.0);
         distances.add(160.0);//upper bounder
 
-        rampAngles.add(0.645);//lower bounder
-        rampAngles.add(0.645);
+        rampAngles.add(0.643);//lower bounder
+        rampAngles.add(0.643);
+        rampAngles.add(0.616);
         rampAngles.add(0.6);
-        rampAngles.add(0.544);
-        rampAngles.add(0.5);
-        rampAngles.add(0.429);
-        rampAngles.add(0.316);
-        rampAngles.add(0.3);
-        rampAngles.add(0.249);
-        rampAngles.add(0.23);
-        rampAngles.add(0.31);
-        rampAngles.add(0.516);
-        rampAngles.add(0.516);//upper bounder
+        rampAngles.add(0.55);
+        rampAngles.add(0.51);
+        rampAngles.add(0.48);
+        rampAngles.add(0.49);
+        rampAngles.add(0.53);
+        rampAngles.add(0.566);
+        rampAngles.add(0.584);
+        rampAngles.add(0.576);//
+        rampAngles.add(0.576);//upper bounder
 
-        turretAngleOffsets.add(-5.14);//lower bounder
+        turretAngleOffsets.add(-6.35);//lower bounder
+        turretAngleOffsets.add(-6.35);
+        turretAngleOffsets.add(-5.57);
         turretAngleOffsets.add(-5.14);
-        turretAngleOffsets.add(-4.61);
-        turretAngleOffsets.add(-4.61);
-        turretAngleOffsets.add(-5.14);
-        turretAngleOffsets.add(-4.0);
-        turretAngleOffsets.add(-4.44);
-        turretAngleOffsets.add(-4.44);
-        turretAngleOffsets.add(-4.5);
-        turretAngleOffsets.add(-2.44);
-        turretAngleOffsets.add(-3.3);
-        turretAngleOffsets.add(-6.0);
-        turretAngleOffsets.add(-6.0); //upper bounder
+        turretAngleOffsets.add(-5.57);
+        turretAngleOffsets.add(-5.57);
+        turretAngleOffsets.add(-5.66);
+        turretAngleOffsets.add(-4.96);
+        turretAngleOffsets.add(-6.08);
+        turretAngleOffsets.add(-4.3);
+        turretAngleOffsets.add(-4.96);
+        turretAngleOffsets.add(-4.7);//
+        turretAngleOffsets.add(-4.7); //upper bounder
 
         shooterSpeeds.add(1400.0);//lower bounder
         shooterSpeeds.add(1400.0);

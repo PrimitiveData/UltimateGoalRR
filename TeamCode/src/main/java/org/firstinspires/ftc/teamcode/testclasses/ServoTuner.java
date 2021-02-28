@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(group = "TeleOp", name = "ServoTuner")
 public class ServoTuner extends LinearOpMode {
-    final double moveSpeed = 0.1; // ticks/sec
+    final double moveSpeed = 0.03; // ticks/sec
     public void runOpMode(){
         Servo servoToTune = hardwareMap.get(Servo.class,"servoToTune");
         ElapsedTime time = new ElapsedTime();

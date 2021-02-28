@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.testclasses;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,6 +13,8 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 public class ShooterRegression extends LinearOpMode {
     public void runOpMode(){
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        TelemetryPacket packet = new TelemetryPacket();
         hardware.turret.turretMotor.readRequested = true;
         waitForStart();
 
@@ -121,6 +125,10 @@ public class ShooterRegression extends LinearOpMode {
             telemetry.addData("Turret Tracking: ", turretTracking);
             telemetry.addData("Mag Tracking: ", magTracking);
             telemetry.addData("Shooter On: ", shooterOn);
+            packet.put("Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
+            packet.put("Shooter Velo: ", shooterVelo);
+            packet.put("Flap Position: ", rampPos);
+            dashboard.sendTelemetryPacket(packet);
             telemetry.update();
             hardware.loop();
         }
