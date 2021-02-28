@@ -8,18 +8,22 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.BetorThingyController;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.ThreeWheelTrackingLocalizerAnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.AutoShootInfo;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Intake;
+import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.PowershotAutoShootInfo;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
+import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
 import java.io.IOException;
@@ -38,8 +42,7 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new HardwareMecanum(hardwareMap,telemetry);
-
+        hardware = new HardwareMecanum(hardwareMap,telemetry,true);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -129,18 +132,62 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         }
         //powershot autoshoot
         if(gamepad2.a){
-            hardware.shooter.info = new PowershotAutoShootInfo();
+            /*hardware.shooter.info = new PowershotAutoShootInfo();
             hardware.turret.info = new PowershotAutoShootInfo();
             FieldConstants.highGoalPosition[0] = FieldConstants.powershotPosition[0];
             FieldConstants.highGoalPosition[1] = FieldConstants.powershotPosition[1];
-            magFlickerController.shootPowershotAllRings();
+            magFlickerController.shootPowershotAllRings();*/
+            HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
+            hardwareThreadInterface.start();
+            hardware.turret.updatePID = true;
+            hardware.shooter.updatePID = true;
+            hardware.shooter.shooterVeloPID.setState(1300);
+            if(hardware.mag.currentState == Mag.State.COLLECT){
+                hardware.mag.dropRings();
+                sleeep(500);
+            }
+            hardware.mag.dropRings();
+
+
+            double ps1TurretAngle=-Math.toRadians(20);
+            double ps3TurretAngle=-Math.toRadians(18);
+            double ps2TurretAngle=-Math.toRadians(16);
+            ElapsedTime powershotTimer = new ElapsedTime();
+
+            for(int i = 0; i < 3; i++) {
+                double powershotAngleCurrent;
+                if(i == 0){
+                    powershotAngleCurrent = ps1TurretAngle;
+                }else if(i == 1){
+                    powershotAngleCurrent = ps2TurretAngle;
+                }else{
+                    powershotAngleCurrent = ps3TurretAngle;
+                }
+                double prevTurretAngle = hardware.turret.localTurretAngleRadians();
+                hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
+                while (!teleopStopped) {
+                    double currentTurretAngle = hardware.turret.localTurretAngleRadians();
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.125))
+                        powershotTimer.reset();
+                    if (powershotTimer.milliseconds() >= 150 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25))
+                        break;
+                    prevTurretAngle = currentTurretAngle;
+                }
+                hardware.mag.pushInRings();
+                sleeep(200);// tune time
+                hardware.mag.setRingPusherResting();
+            }
+
+
+            hardwareThreadInterface.stopLooping = true;
+            sleeep(50);
         }
         //ramp manuel control and automatic control
         if(gamepad2.x) {
             if(!manuelRampControlTogglePrevLoop) {
                 manuelRampControl = !manuelRampControl;
-                hardware.shooter.info = new AutoShootInfo();
-                hardware.turret.info = new AutoShootInfo();
+                //hardware.shooter.info = new AutoShootInfo();
+                //hardware.turret.info = new AutoShootInfo();
                 if(manuelRampControl){
                     hardware.turret.updatePID = false;
                 }

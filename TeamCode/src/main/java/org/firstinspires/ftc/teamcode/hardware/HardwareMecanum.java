@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -20,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.drive.ThreeWheelTrackingLocalizerAnalogGyro;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Intake;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Shooter;
@@ -61,7 +64,7 @@ public class HardwareMecanum {
     public boolean updateDrivePID = false;
     public Pose2d targetPose = new Pose2d(0,0,0);
     public TelemetryPacket packet;
-    public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
+    public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry, boolean sanfordGyroLocalizer){
         this.hardwareMap = hardwareMap;
         hw = this;
         HardwareMecanum.telemetry = telemetry;
@@ -98,9 +101,17 @@ public class HardwareMecanum {
         intake = new Intake(hub1Motors[2],servos[1],CRservos[0],CRservos[1]);
         mag = new Mag(servos[2],servos[6],this);
         wobbler = new WobblerArm(servos[5],servos[8],servos[4]);
-        drive = new SampleMecanumDrive(hardwareMap);
+        if(sanfordGyroLocalizer) {
+            drive = new SampleMecanumDrive(hardwareMap, true);
+        }
+        else{
+            drive = new SampleMecanumDrive(hardwareMap);
+        }
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         packet = new TelemetryPacket();
+    }
+    public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
+        this(hardwareMap,telemetry, false);
     }
 
     public void loop(){
@@ -178,6 +189,7 @@ public class HardwareMecanum {
         prevTimeHub2 = currentTimeHub2;
         poseStorage = currentPose;
         cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
+        cumulativeAngleStorage = cumulativeAngle;
         packet.put("prevAngle",MathFunctions.keepAngleWithin180Degrees(prevAngle));
         prevAngle = currentPose.getHeading();
         packet.put("cumulativeAngle",MathFunctions.keepAngleWithin180Degrees(cumulativeAngle));
