@@ -354,54 +354,36 @@ public class UltimateGoalTeleop extends OpMode {
             sleeep(50);
         }
         if(gamepad1.dpad_up){
-            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(), -32.25, Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(),-32.25,0));
                 hardware.cumulativeAngle = 0;
                 hardware.prevAngle = 0;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
-                hardware.cumulativeAngle = 180;
-                hardware.prevAngle = 180;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
-                hardware.cumulativeAngle = 90;
-                hardware.prevAngle = 90;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
             }
         }
         if(gamepad1.dpad_down){
-            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(), 45.25, Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(),45.25,0));
                 hardware.cumulativeAngle = 0;
                 hardware.prevAngle = 0;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
-                hardware.cumulativeAngle = 180;
-                hardware.prevAngle = 180;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
-                hardware.cumulativeAngle = 90;
-                hardware.prevAngle = 90;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
             }
         }
-        if(gamepad1.dpad_down){
-            if(Math.abs(hardware.cumulativeAngle % 360) < 15) {
+        if(gamepad1.dpad_left){
+            if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
+                hardware.drive.setPoseEstimate(new Pose2d(1, hardware.getYAbsoluteCenter(), Math.toRadians(180)));
+                hardware.cumulativeAngle = Math.toRadians(180);
+                hardware.prevAngle = Math.toRadians(180);
+            }else{
+                hardware.drive.setPoseEstimate(new Pose2d(1,hardware.getYAbsoluteCenter(),0));
                 hardware.cumulativeAngle = 0;
                 hardware.prevAngle = 0;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,0));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 180) < 15){
-                hardware.cumulativeAngle = 180;
-                hardware.prevAngle = 180;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,180));
-            }
-            else if(Math.abs(hardware.cumulativeAngle % 90) < 15){
-                hardware.cumulativeAngle = 90;
-                hardware.prevAngle = 90;
-                hardware.drive.setPoseEstimate(new Pose2d(-3.25,-3,90));
             }
         }
         //end powershot
