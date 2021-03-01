@@ -48,7 +48,7 @@ public class Intake {
 
     public void turnIntake(double power){
         intakeMotor.setPower(power);
-        if(power != 0) {
+        if(power > 0) {
             intakeServoStarboard.setPower(1);
             intakeServoPort.setPower(-1);
         }
