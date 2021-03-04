@@ -127,6 +127,9 @@ public class UltimateGoalTeleop extends OpMode {
         }
         else {
             hardware.drive.setWeightedDrivePower(new Pose2d(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x));
+            telemetry.addData("Left Y Input: ", -gamepad1.left_stick_y);
+            telemetry.addData("Left X Input: ", -gamepad1.left_stick_x);
+            telemetry.addData("Right X Input: ", -gamepad1.right_stick_x);
         }
         hardware.loop();
 

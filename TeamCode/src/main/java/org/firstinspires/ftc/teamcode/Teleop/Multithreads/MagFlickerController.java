@@ -55,6 +55,10 @@ public class MagFlickerController extends Thread {
         while(!parentOP.teleopStopped){
             if(shootAllRingsRequested){
                 if(hardware.mag.currentState == Mag.State.COLLECT) {
+                    hardware.turret.magShootingState = true;
+                    sleeep(100);
+                    //hardware.turret.setMagAngle(0.5);
+                    //sleeep(100);
                     hardware.mag.dropRings();
                     sleeep(500);//tune timeout
                 }
