@@ -75,20 +75,20 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 new AngularVelocityConstraint(MAX_ANG_VEL),
                 new MecanumVelocityConstraint(10, TRACK_WIDTH)
         ));
-        double distanceToPickUp= 13;
+        double distanceToPickUp= 17;
         double headingToPickUp = Math.toRadians(0);
         Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())
                 .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
                 .build();
 
-        double distanceToPickUp2 = 9;
+        double distanceToPickUp2 = 5;
         Trajectory pickUpRings2 = hardware.drive.trajectoryBuilder(pickUpRings.end())
                 .lineToConstantHeading(new Vector2d(pickUpRings.end().getX()+distanceToPickUp2*Math.cos(headingToPickUp),pickUpRings.end().getY() + distanceToPickUp2*Math.sin(headingToPickUp)))
                 .build();
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
-                new MecanumVelocityConstraint(6, TRACK_WIDTH)
+                new MecanumVelocityConstraint(4, TRACK_WIDTH)
         ));
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
@@ -158,7 +158,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         else if(stack == 2){
             park = hardware.drive.trajectoryBuilder(dropWobbler2.end())
-                    .lineToConstantHeading(new Vector2d(-80,28))
+                    .lineToConstantHeading(new Vector2d(-82,28))
                     .build();
         }
 
@@ -179,7 +179,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.shooter.setRampPosition(0.35);
         hardware.turret.updatePID = true;
         hardware.wobbler.raiseWobble();
-        double ps1TurretAngle=-Math.toRadians(174);
+        double ps1TurretAngle=-Math.toRadians(175);
         double ps3TurretAngle=-Math.toRadians(182);
         double ps2TurretAngle=-Math.toRadians(189);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
@@ -260,16 +260,18 @@ public class UltimateGoalRedAuto extends AutoMethods {
         if(stack == 1){
             sleep(1600);
             hardware.intake.turnIntake(0);
+            hardware.turret.setMagAngle(0.5);
+            sleep(150);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
-                sleep(500);//tune timeout//
+                sleep(1000);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.05;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.04;
             for(int i = 0; i < 1; i++){
                 hardware.mag.pushInRings();
-                sleep(250);// tune time
+                sleep(400);// tune time
                 hardware.mag.setRingPusherResting();
-                sleep(150);// tune time
+                sleep(400);// tune time
             }
             hardware.mag.collectRings();
             wiggleTheMag.stopRequested = true;
@@ -277,13 +279,15 @@ public class UltimateGoalRedAuto extends AutoMethods {
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
-            sleep(1800);
+            sleep(2050);
             hardware.intake.turnIntake(0);
+            hardware.turret.setMagAngle(0.5);
+            sleep(150);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.05;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.01;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
@@ -304,20 +308,23 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 sleep(250);
             }
             hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
-            sleep(1500);
+            sleep(700);
             wiggleTheMag.stopRequested = true;
             sleep(250);
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
             hardware.intake.turnIntake(0);
+            hardware.turret.setMagAngle(0.5);
+            sleep(150);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = 0.03;
+            hardware.shooter.rampAngleAdjustmentConstant = 0.05;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
                 hardware.mag.setRingPusherResting();
+                hardware.shooter.rampAngleAdjustmentConstant = 0.04;
                 sleep(150);// tune time
             }
             hardware.shooter.rampAngleAdjustmentConstant = 0;

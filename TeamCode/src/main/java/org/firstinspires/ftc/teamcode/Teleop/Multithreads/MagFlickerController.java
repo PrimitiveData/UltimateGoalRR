@@ -54,7 +54,7 @@ public class MagFlickerController extends Thread {
     public void run(){
         while(!parentOP.teleopStopped){
             if(parentOP.startMagRotation){
-                hardware.turret.setMagAngle(0.5);
+                hardware.turret.setMagAngle(0.8);
                 sleeep(200);
                 parentOP.startMagRotation = false;
                 hardware.mag.dropRings();
@@ -69,12 +69,12 @@ public class MagFlickerController extends Thread {
                 for(int i = 0; i < 3; i++){
                     parentOP.currentlyIncrementingMagDuringShooting = true;
                     hardware.mag.pushInRings();
-                    sleeep(100);// tune time
+                    sleeep(200);// tune time
                     hardware.mag.setRingPusherResting();
                     sleeep(1);
                     hardware.mag.setRingPusherResting();
                     //hardware.shooter.setRampPosition(hardware.shooter.rampPostion);
-                    sleeep(100);// tune time
+                    sleeep(150);// tune time
                 }
                 parentOP.currentlyIncrementingMagDuringShooting = false;
                 hardware.mag.collectRings();

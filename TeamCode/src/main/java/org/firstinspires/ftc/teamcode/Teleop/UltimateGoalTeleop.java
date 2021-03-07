@@ -50,6 +50,8 @@ public class UltimateGoalTeleop extends OpMode {
     public double shooterVelo;
     public boolean teleopStopped = false;
 
+    public boolean startMagRotation = false;
+
     boolean intakeOn = false;
     boolean intakeOnToggledPrevLoop = false;
 
@@ -186,8 +188,9 @@ public class UltimateGoalTeleop extends OpMode {
                     magFlickerController.shootAllRings();
                     magTrigger = 0;
                 }
-                else
-                    hardware.mag.dropRings();
+                else {
+                    startMagRotation = true;
+                }
             }
             magUpdateStateAndSetPositionPrevLoop = true;
         }
@@ -212,6 +215,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         if(manuelRampControl){
+            hardware.turret.setTurretMotorPower(0);
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
         else{
@@ -341,15 +345,14 @@ public class UltimateGoalTeleop extends OpMode {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
                     if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.8))
                         powershotTimer.reset();
-                    if (powershotTimer.milliseconds() >= 800 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25))
+                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25))
                         break;
                     prevTurretAngle = currentTurretAngle;
                 }
-                sleeep(500);
                 hardware.mag.pushInRings();
-                sleeep(1000);// tune time
+                sleeep(200);// tune time
                 hardware.mag.setRingPusherResting();
-                sleeep(500);
+                sleeep(150);
             }
 
 
