@@ -179,9 +179,9 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.shooter.setRampPosition(0.35);
         hardware.turret.updatePID = true;
         hardware.wobbler.raiseWobble();
-        double ps1TurretAngle=-Math.toRadians(175);
+        double ps1TurretAngle=-Math.toRadians(188.5);
         double ps3TurretAngle=-Math.toRadians(182);
-        double ps2TurretAngle=-Math.toRadians(189);
+        double ps2TurretAngle=-Math.toRadians(173);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
         double goToShootPosStartTime = hardware.time.milliseconds();
         hardware.drive.followTrajectoryAsync(goToShootPos);

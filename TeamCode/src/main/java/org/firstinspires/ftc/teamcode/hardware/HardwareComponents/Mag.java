@@ -8,8 +8,8 @@ public class Mag {
     public RegServo magServo;
     public RegServo ringPusher;
     HardwareMecanum hardware;
-    double ringPusherResting=0.9;
-    double ringPusherPushedIn=0.675;
+    double ringPusherResting=0.679;
+    double ringPusherPushedIn=0.477;
     double magCollectRingPosition = 0.07;
     double magDropRingPosition = 0.63;
     public double magRotationCollectPosition = 0.172;
@@ -45,7 +45,13 @@ public class Mag {
     public void pushInRings(){
         ringPusher.setPosition(ringPusherPushedIn);
     }
+    public void pushInRingsThreadBypass(){
+        ringPusher.servo.setPosition(ringPusherPushedIn);
+    }
     public void setRingPusherResting(){
         ringPusher.setPosition(ringPusherResting);
+    }
+    public void setRingPusherRestingThreadBypass(){
+        ringPusher.servo.setPosition(ringPusherResting);
     }
 }

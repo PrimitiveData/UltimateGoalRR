@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -310,6 +311,9 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.wobbler.goToArmRestingPos();
         }
         if(gamepad2.a){
+            hardware.drive.setPoseEstimate(new Pose2d(-59,-32.25,Math.toRadians(180)));
+            hardware.cumulativeAngle = Math.toRadians(180);
+            hardware.prevAngle = Math.toRadians(180);
             HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
             hardwareThreadInterface.start();
             hardware.shooter.setRampPosition(0.2);
@@ -322,12 +326,23 @@ public class UltimateGoalTeleop extends OpMode {
             }
 
             hardware.mag.dropRings();
-            sleeep(1500);
 
+            Trajectory goToPowershotPos = hardware.drive.trajectoryBuilder(hardware.drive.getPoseEstimate())
+                    .lineToConstantHeading(new Vector2d(-59,-2.75))
+                    .build();
 
-            double ps1TurretAngle=Math.toRadians(3);
-            double ps2TurretAngle=Math.toRadians(-2.5);
-            double ps3TurretAngle=Math.toRadians(-8);
+            hardware.drive.followTrajectoryAsync(goToPowershotPos);
+            while(hardware.drive.isBusy()){
+                sleeep(1);
+            }
+            hardware.drive.turnAsync(MathFunctions.keepAngleWithin180Degrees(Math.toRadians(180)-hardware.getAngle()));
+            while(hardware.drive.isBusy()){
+                sleeep(1);
+            }
+
+            double ps1TurretAngle=Math.toRadians(3)-hardware.getAngle() + Math.toRadians(180);
+            double ps2TurretAngle=Math.toRadians(-4)-hardware.getAngle() + Math.toRadians(180);
+            double ps3TurretAngle=Math.toRadians(-10)-hardware.getAngle() + Math.toRadians(180);
             ElapsedTime powershotTimer = new ElapsedTime();
 
             for(int i = 0; i < 3; i++) {
@@ -350,7 +365,7 @@ public class UltimateGoalTeleop extends OpMode {
                     prevTurretAngle = currentTurretAngle;
                 }
                 hardware.mag.pushInRings();
-                sleeep(200);// tune time
+                sleeep(500);// tune time
                 hardware.mag.setRingPusherResting();
                 sleeep(150);
             }
