@@ -100,7 +100,7 @@ public class Turret {
         packet.put("Error: ", Math.toDegrees(MathFunctions.keepAngleWithin180Degrees(hardware.turret.turretPID.desiredState-hardware.turret.turretPID.currentState)));
         packet.put("Heading: ",hardware.getAngle());
         packet.put("Mag Flicker State: ",hardware.mag.ringPusher.position*-100);
-        FtcDashboard.getInstance().sendTelemetryPacket(packet);
+        //FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
     //gets the position of the turret on the field
     public double[] getTurretPosition(){
