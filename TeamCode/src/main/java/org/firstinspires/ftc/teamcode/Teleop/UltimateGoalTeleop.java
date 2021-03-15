@@ -495,6 +495,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         telemetry.addData("Shooter Velocity: ",shooterVelo);
+        telemetry.addData("Current Shooter Velocity: ",hardware.shooter.shooterMotor1.getVelocity());
         telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         telemetry.addData("Shooter On: ",shooterOn);
         telemetry.addLine("Robot Angle: " + Math.toDegrees(hardware.getAngle()));

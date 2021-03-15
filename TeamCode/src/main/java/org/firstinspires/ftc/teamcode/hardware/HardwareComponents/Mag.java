@@ -10,8 +10,8 @@ public class Mag {
     HardwareMecanum hardware;
     double ringPusherResting=0.679;
     double ringPusherPushedIn=0.477;
-    double magCollectRingPosition = 0.07;
-    double magDropRingPosition = 0.63;
+    double magCollectRingPosition = 0.12;
+    double magDropRingPosition = 0.6;
     public double magRotationCollectPosition = 0.172;
     public State currentState;
     public Mag(RegServo magServo, RegServo ringPusher, HardwareMecanum hardware){
