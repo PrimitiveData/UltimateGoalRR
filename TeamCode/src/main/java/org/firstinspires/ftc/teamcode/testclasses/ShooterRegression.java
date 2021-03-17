@@ -34,6 +34,8 @@ public class ShooterRegression extends LinearOpMode {
         int sleep1 = 200;
         int sleep2 = 150;
         double increment = 0;
+        
+        hardwareThreadInterface.start();
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
@@ -167,7 +169,6 @@ public class ShooterRegression extends LinearOpMode {
             packet.put("Increment: ", increment);
             dashboard.sendTelemetryPacket(packet);
             telemetry.update();
-            hardware.loop();
             sleep(10);
         }
     }
