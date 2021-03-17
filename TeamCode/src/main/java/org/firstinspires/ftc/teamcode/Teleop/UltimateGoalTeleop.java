@@ -311,12 +311,63 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.wobbler.goToArmRestingPos();
         }
         if(gamepad2.a){
+            HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
+            hardwareThreadInterface.start();
+            hardware.shooter.setRampPosition(0.2);
+            hardware.turret.updatePID = true;
+            hardware.shooter.updatePID = true;
+            hardware.shooter.shooterVeloPID.setState(1300);
+            if(hardware.mag.currentState == Mag.State.COLLECT){
+                hardware.mag.dropRings();
+                sleeep(500);
+            }
+
+            hardware.mag.dropRings();
+            sleeep(1500);
+
+
+            double ps1TurretAngle=Math.toRadians(3);
+            double ps2TurretAngle=Math.toRadians(-1.5);
+            double ps3TurretAngle=Math.toRadians(-8);
+            ElapsedTime powershotTimer = new ElapsedTime();
+
+            for(int i = 0; i < 3; i++) {
+                double powershotAngleCurrent;
+                if(i == 0){
+                    powershotAngleCurrent = ps1TurretAngle;
+                }else if(i == 1){
+                    powershotAngleCurrent = ps2TurretAngle;
+                }else{
+                    powershotAngleCurrent = ps3TurretAngle;
+                }
+                double prevTurretAngle = hardware.turret.localTurretAngleRadians();
+                hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
+                while (!teleopStopped) {
+                    double currentTurretAngle = hardware.turret.localTurretAngleRadians();
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.8))
+                        powershotTimer.reset();
+                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
+                        break;
+                    prevTurretAngle = currentTurretAngle;
+                }
+                hardware.mag.pushInRings();
+                sleeep(200);// tune time
+                hardware.mag.setRingPusherResting();
+                sleeep(150);
+            }
+
+
+            hardwareThreadInterface.stopLooping = true;
+            sleeep(50);
+        }
+        /*
+        if(gamepad2.a){
             hardware.drive.setPoseEstimate(new Pose2d(-59,-32.25,Math.toRadians(180)));
             hardware.cumulativeAngle = Math.toRadians(180);
             hardware.prevAngle = Math.toRadians(180);
             HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
             hardwareThreadInterface.start();
-            hardware.shooter.setRampPosition(0.2);
+            hardware.shooter.setRampPosition(0.19);
             hardware.turret.updatePID = true;
             hardware.shooter.updatePID = true;
             hardware.shooter.shooterVeloPID.setState(1300);
@@ -344,7 +395,6 @@ public class UltimateGoalTeleop extends OpMode {
             double ps2TurretAngle=Math.toRadians(-4)-hardware.getAngle() + Math.toRadians(180);
             double ps3TurretAngle=Math.toRadians(-10)-hardware.getAngle() + Math.toRadians(180);
             ElapsedTime powershotTimer = new ElapsedTime();
-
             for(int i = 0; i < 3; i++) {
                 double powershotAngleCurrent;
                 if(i == 0){
@@ -360,7 +410,7 @@ public class UltimateGoalTeleop extends OpMode {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
                     if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.8))
                         powershotTimer.reset();
-                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25))
+                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
                         break;
                     prevTurretAngle = currentTurretAngle;
                 }

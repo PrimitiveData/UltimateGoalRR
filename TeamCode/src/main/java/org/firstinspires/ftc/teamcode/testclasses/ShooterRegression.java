@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
+import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
+
 
 @TeleOp(name = "ShooterRegression",group = "TeleOp")
 public class ShooterRegression extends LinearOpMode {
     public void runOpMode(){
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);
+        HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
         FtcDashboard dashboard = FtcDashboard.getInstance();
         TelemetryPacket packet = new TelemetryPacket();
         hardware.turret.turretMotor.readRequested = true;
@@ -27,6 +30,10 @@ public class ShooterRegression extends LinearOpMode {
         boolean shooterOnTogglePrevLoop = false;
         boolean shooterOn = false;
         double shooterVelo = 1450;
+
+        int sleep1 = 200;
+        int sleep2 = 150;
+        double increment = 0;
         while(!isStopRequested()){
 
             if(gamepad1.dpad_left)
@@ -45,7 +52,36 @@ public class ShooterRegression extends LinearOpMode {
             }
 
             if(gamepad1.right_bumper){
-                hardware.mag.pushInRings();
+                for(int i = 0; i < 3; i++){
+                    hardware.mag.pushInRingsThreadBypass();
+                    sleep(sleep1);
+                    hardware.mag.setRingPusherRestingThreadBypass();
+                    sleep(sleep2);
+                    hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);                }
+            }
+
+            if(gamepad2.dpad_up){
+                sleep1 += 10;
+            }
+
+            if(gamepad2.dpad_down){
+                sleep1 -= 10;
+            }
+
+            if(gamepad2.dpad_right){
+                sleep2 += 10;
+            }
+
+            if(gamepad2.dpad_left){
+                sleep2 -= 10;
+            }
+
+            if(gamepad2.y){
+                increment += 0.002;
+            }
+
+            if(gamepad2.a){
+                increment -= 0.002;
             }
 
             if(gamepad1.right_trigger > 0){
@@ -119,18 +155,20 @@ public class ShooterRegression extends LinearOpMode {
             telemetry.addData("Global Turret Angle: ", Math.toDegrees(localTurretAngle));
             telemetry.addData("Shooter Velo:  ", shooterVelo);
             telemetry.addData("Flap Position: ", rampPos);
-            telemetry.addData("Hardware Angle: ", hardware.getAngle());
+            telemetry.addData("Sleep 1: ", sleep1);
+            telemetry.addData("Sleep 2: ", sleep2);
+            telemetry.addData("Increment: ", increment);
             telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
-            telemetry.addData("Robot Heading: ", hardware.getAngle());
-            telemetry.addData("Turret Tracking: ", turretTracking);
-            telemetry.addData("Mag Tracking: ", magTracking);
-            telemetry.addData("Shooter On: ", shooterOn);
             packet.put("Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             packet.put("Shooter Velo: ", shooterVelo);
             packet.put("Flap Position: ", rampPos);
+            packet.put("Sleep 1: ", sleep1);
+            packet.put("Sleep 2: ", sleep2);
+            packet.put("Increment: ", increment);
             dashboard.sendTelemetryPacket(packet);
             telemetry.update();
             hardware.loop();
+            sleep(10);
         }
     }
 }

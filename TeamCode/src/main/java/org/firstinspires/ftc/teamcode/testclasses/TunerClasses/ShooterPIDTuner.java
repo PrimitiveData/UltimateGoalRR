@@ -18,7 +18,7 @@ public class ShooterPIDTuner extends LinearOpMode {
         waitForStart();
         while(!isStopRequested()) {
             if(gamepad1.y){
-                hardware.shooter.shooterVeloPID.setState(1400);
+                hardware.shooter.shooterVeloPID.setState(1200);
             }
             else if(gamepad1.x){
                 hardware.shooter.shooterVeloPID.setState(0);
@@ -32,7 +32,7 @@ public class ShooterPIDTuner extends LinearOpMode {
             hardware.shooter.shooterVeloPID.kD = hardware.shooter.shooterVeloPID.kD + kDChange;
             packet.put("targetHeading: ", hardware.shooter.shooterVeloPID.desiredState);
             packet.put("currentHeading: ", hardware.shooter.shooterVeloPID.currentState);
-            //dashboard.sendTelemetryPacket(packet);
+            dashboard.sendTelemetryPacket(packet);
             telemetry.update();
             hardware.loop();
         }
