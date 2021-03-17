@@ -31,10 +31,9 @@ public class ShooterRegression extends LinearOpMode {
         boolean shooterOn = false;
         double shooterVelo = 1450;
 
-        int sleep1 = 200;
-        int sleep2 = 150;
         double increment = 0;
-        
+        double threshold = 1350;
+
         hardwareThreadInterface.start();
         while(!isStopRequested()){
 
@@ -55,27 +54,24 @@ public class ShooterRegression extends LinearOpMode {
 
             if(gamepad1.right_bumper){
                 for(int i = 0; i < 3; i++){
-                    hardware.mag.pushInRingsThreadBypass();
-                    sleep(sleep1);
-                    hardware.mag.setRingPusherRestingThreadBypass();
-                    sleep(sleep2);
-                    hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);                }
+                    if(hardware.shooter.shooterMotor1.getVelocity() >= threshold){
+                        hardware.mag.pushInRingsThreadBypass();
+                        sleep(80);
+                        hardware.mag.setRingPusherRestingThreadBypass();
+                        sleep(80);
+                        hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);
+                    }
+                    else
+                        i--;
+                }
             }
 
             if(gamepad2.dpad_up){
-                sleep1 += 10;
+                threshold += 25;
             }
 
             if(gamepad2.dpad_down){
-                sleep1 -= 10;
-            }
-
-            if(gamepad2.dpad_right){
-                sleep2 += 10;
-            }
-
-            if(gamepad2.dpad_left){
-                sleep2 -= 10;
+                threshold -= 25;
             }
 
             if(gamepad2.y){
@@ -157,15 +153,13 @@ public class ShooterRegression extends LinearOpMode {
             telemetry.addData("Global Turret Angle: ", Math.toDegrees(localTurretAngle));
             telemetry.addData("Shooter Velo:  ", shooterVelo);
             telemetry.addData("Flap Position: ", rampPos);
-            telemetry.addData("Sleep 1: ", sleep1);
-            telemetry.addData("Sleep 2: ", sleep2);
+            telemetry.addData("Threshold: ", threshold);
             telemetry.addData("Increment: ", increment);
             telemetry.addData("Turret Current Local Position: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             packet.put("Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             packet.put("Shooter Velo: ", shooterVelo);
             packet.put("Flap Position: ", rampPos);
-            packet.put("Sleep 1: ", sleep1);
-            packet.put("Sleep 2: ", sleep2);
+            packet.put("Threshold: ", threshold);
             packet.put("Increment: ", increment);
             dashboard.sendTelemetryPacket(packet);
             telemetry.update();
