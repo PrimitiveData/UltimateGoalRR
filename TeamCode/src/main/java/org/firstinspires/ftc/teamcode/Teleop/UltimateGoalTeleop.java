@@ -92,7 +92,7 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterVelo = 1500;
+        shooterVelo = 1350;
         magFlickerController = new MagFlickerController(hardware,this);
         hardware.mag.setRingPusherResting();
         hardware.wobbler.goToClawRestingPos();

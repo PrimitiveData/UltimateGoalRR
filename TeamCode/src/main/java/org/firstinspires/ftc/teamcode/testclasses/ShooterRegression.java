@@ -29,10 +29,10 @@ public class ShooterRegression extends LinearOpMode {
         double rampPos = 0.2;
         boolean shooterOnTogglePrevLoop = false;
         boolean shooterOn = false;
-        double shooterVelo = 1450;
+        double shooterVelo = 1350;
 
         double increment = 0;
-        double threshold = 1350;
+        double threshold = 1325;
 
         hardwareThreadInterface.start();
         while(!isStopRequested()){
@@ -54,11 +54,11 @@ public class ShooterRegression extends LinearOpMode {
 
             if(gamepad1.right_bumper){
                 for(int i = 0; i < 3; i++){
-                    if(hardware.shooter.shooterMotor1.getVelocity() >= threshold){
+                    if(-hardware.shooter.shooterMotor1.getVelocity() >= threshold){
                         hardware.mag.pushInRingsThreadBypass();
-                        sleep(80);
+                        sleep(100);
                         hardware.mag.setRingPusherRestingThreadBypass();
-                        sleep(80);
+                        sleep(100);
                         hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);
                     }
                     else
@@ -67,11 +67,11 @@ public class ShooterRegression extends LinearOpMode {
             }
 
             if(gamepad2.dpad_up){
-                threshold += 25;
+                threshold += 2;
             }
 
             if(gamepad2.dpad_down){
-                threshold -= 25;
+                threshold -= 2;
             }
 
             if(gamepad2.y){
