@@ -14,7 +14,7 @@ public class Intake {
     double holdIntakeUp = 0.17;
     double bumperInit = 0.1438;
     double bumperRaised = 0.44;
-    double releaseIntake = 0.55;
+    double releaseIntake = 0.56;
 
     RegServo leftBetorThingy;
     RegServo rightBetorThingy;

@@ -311,23 +311,23 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.wobbler.goToArmRestingPos();
         }
         if(gamepad2.a){
+
             HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
             hardwareThreadInterface.start();
             hardware.shooter.setRampPosition(0.2);
             hardware.turret.updatePID = true;
             hardware.shooter.updatePID = true;
             hardware.shooter.shooterVeloPID.setState(1300);
+
             if(hardware.mag.currentState == Mag.State.COLLECT){
                 hardware.mag.dropRings();
                 sleeep(500);
             }
 
             hardware.mag.dropRings();
-            sleeep(1500);
-
 
             double ps1TurretAngle=Math.toRadians(3);
-            double ps2TurretAngle=Math.toRadians(-1.5);
+            double ps2TurretAngle=Math.toRadians(-2.5);
             double ps3TurretAngle=Math.toRadians(-8);
             ElapsedTime powershotTimer = new ElapsedTime();
 
@@ -344,7 +344,7 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
                 while (!teleopStopped) {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
-                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.8))
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.08))
                         powershotTimer.reset();
                     if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
                         break;
