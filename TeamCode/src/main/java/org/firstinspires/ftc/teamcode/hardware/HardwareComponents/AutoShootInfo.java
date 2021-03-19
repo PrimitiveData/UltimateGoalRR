@@ -43,7 +43,7 @@ public class AutoShootInfo {
         rampAngles.add(0.59);//upper bounder
 
         turretAngleOffsets.add(-7.2);//lower bounder
-        turretAngleOffsets.add(-2.3);
+        turretAngleOffsets.add(-7.2);
         turretAngleOffsets.add(-6.9);
         turretAngleOffsets.add(-6.8);
         turretAngleOffsets.add(-6.4);
