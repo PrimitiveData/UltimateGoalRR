@@ -175,7 +175,6 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.loop();
         waitForStart();
         hardware.shooter.setRampPosition(0);
-        hardware.intake.dropIntake();
         hardwareThreadInterface.start();
         CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         closeCamera.start();
@@ -184,28 +183,34 @@ public class UltimateGoalRedAuto extends AutoMethods {
         hardware.shooter.setRampPosition(0.27);
         hardware.turret.updatePID = true;
         hardware.wobbler.raiseWobble();
-        double ps1TurretAngle=-Math.toRadians(188.5);
-        double ps3TurretAngle=-Math.toRadians(182.25);
-        double ps2TurretAngle=-Math.toRadians(176.5);
+        double ps1TurretAngle=-Math.toRadians(189);
+        double ps3TurretAngle=-Math.toRadians(183);
+        double ps2TurretAngle=-Math.toRadians(177.25);
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
         double goToShootPosStartTime = hardware.time.milliseconds();
         hardware.drive.followTrajectoryAsync(goToShootPos);
         while(hardware.drive.isBusy() && !isStopRequested()){
+            if(hardware.time.milliseconds() - goToShootPosStartTime > 750 && hardware.time.milliseconds() - goToShootPosStartTime < 850){
+                hardware.intake.dropIntake();
+            }
             if(hardware.time.milliseconds() - goToShootPosStartTime > 1550 && hardware.time.milliseconds() - goToShootPosStartTime < 1650){
                 hardware.intake.raiseBumper();
             }
             sleep(10);
         }
+        hardware.shooter.shooterVeloPID.powershotAntiWindup = true;
         hardware.intake.dropIntake();
         ps2TurretAngle = ps2TurretAngle - hardware.getAngle();
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
         ElapsedTime powershotTimer = new ElapsedTime();
+        ElapsedTime powershotForcedExitTimer = new ElapsedTime();
         double prevTurretAngle = hardware.turret.localTurretAngleRadians();
+        powershotForcedExitTimer.reset();
         while(!isStopRequested()) {
             double currentTurretAngle = hardware.turret.localTurretAngleRadians();
             if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.08))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 80 && Math.abs(currentTurretAngle - ps2TurretAngle) < Math.toRadians(0.25))
+            if ((powershotTimer.milliseconds() >= 80 && Math.abs(currentTurretAngle - ps2TurretAngle) < Math.toRadians(0.25))||powershotForcedExitTimer.milliseconds() > 1500)
                 break;
             prevTurretAngle = currentTurretAngle;
         }
@@ -213,11 +218,12 @@ public class UltimateGoalRedAuto extends AutoMethods {
         ps3TurretAngle = ps3TurretAngle - hardware.getAngle();
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
+        powershotForcedExitTimer.reset();
         while(!isStopRequested()) {
             double currentTurretAngle = hardware.turret.localTurretAngleRadians();
             if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.08))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 150 && Math.abs(currentTurretAngle - ps3TurretAngle) < Math.toRadians(0.25))
+            if ((powershotTimer.milliseconds() >= 80 && Math.abs(currentTurretAngle - ps3TurretAngle) < Math.toRadians(0.25))||powershotForcedExitTimer.milliseconds() > 2000)
                 break;
             prevTurretAngle = currentTurretAngle;
         }
@@ -225,18 +231,19 @@ public class UltimateGoalRedAuto extends AutoMethods {
         ps1TurretAngle = ps1TurretAngle - hardware.getAngle();
         hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
+        powershotForcedExitTimer.reset();
         while(!isStopRequested()) {
             double currentTurretAngle = hardware.turret.localTurretAngleRadians();
             if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.08))
                 powershotTimer.reset();
-            if (powershotTimer.milliseconds() >= 150 && Math.abs(currentTurretAngle - ps1TurretAngle) < Math.toRadians(0.25))
+            if ((powershotTimer.milliseconds() >= 80 && Math.abs(currentTurretAngle - ps1TurretAngle) < Math.toRadians(0.25))||powershotForcedExitTimer.milliseconds() > 2000)
                 break;
             prevTurretAngle = currentTurretAngle;
         }
         shootIndividualRing(hardware);
         AutoAimVelo autoAim = null;
         WiggleTheMag wiggleTheMag = null;
-
+        hardware.shooter.shooterVeloPID.powershotAntiWindup = false;
         double prevMaxPositiveTurret = hardware.turret.maxPositive;
         if(stack == 2 || stack == 1) {
             hardware.mag.collectRings();
@@ -271,7 +278,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(1000);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.04;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.03;
             for(int i = 0; i < 1; i++){
                 hardware.mag.pushInRings();
                 sleep(400);// tune time
@@ -285,7 +292,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         if(stack == 2){
             hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1);
-            sleep(1950);
+            sleep(2150);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.5);
             sleep(150);
@@ -293,7 +300,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.045;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.035;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(250);// tune time
@@ -326,7 +333,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = 0;
+            hardware.shooter.rampAngleAdjustmentConstant = -0.005;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
@@ -386,10 +393,15 @@ public class UltimateGoalRedAuto extends AutoMethods {
         while(hardware.drive.isBusy() && !isStopRequested()){
             sleep(1);
         }
-        hardware.wobbler.releaseWobble();
+        if(stack == 2){
+            hardware.wobbler.releaseWobble();
+            hardware.wobbler.raiseWobble();
+        }else if(stack == 0 || stack == 1) {
+            hardware.wobbler.releaseWobble();
 
-        sleep(350);
-        hardware.wobbler.goToClawRestingPos();
+            sleep(350);
+            hardware.wobbler.goToClawRestingPos();
+        }
         hardware.drive.followTrajectoryAsync(park);
         while(hardware.drive.isBusy() && !isStopRequested()){
             sleep(1);

@@ -9,11 +9,12 @@ public class ShooterPID extends VelocityPID {
     public double disableIntegralThreshold;
     public boolean speedyRecoveryOn = true;
     public boolean spinningUp;
+    public boolean powershotAntiWindup;
     public ShooterPID(double kP, double kI, double kD, double kV, double kStatic, double kA, double disableIntegralThreshold, ElapsedTime time, String outputFileName) {
         super(kP, kI, kD, kV, kStatic, kA, time, outputFileName);
         this.disableIntegralThreshold = disableIntegralThreshold;
         spinningUp = true;
-
+        powershotAntiWindup = false;
     }
     @Override
     public synchronized double updateCurrentStateAndGetOutput(double currentVelocity){
@@ -31,6 +32,8 @@ public class ShooterPID extends VelocityPID {
         double error = desiredState - currentVelocity;
         double deltaError = error-prevError;
         prevError = error;
+        //powershot antiwindup
+
         integral+=error*deltaTime;
         if(integralAntiWindupActive && shouldIntegralBeZeroed(error)){
             clearI();
@@ -49,7 +52,17 @@ public class ShooterPID extends VelocityPID {
         /*if(currentVelocity > desiredState+75 && speedyRecoveryOn){
             return -1;
         }*/
-
+        if(powershotAntiWindup) {
+            if (desiredState > 0) {
+                if ((error * kP + integral * kI + derivative * kD + kStatic + (desiredState * kV)) / voltage > 1) {
+                    integral -= error * deltaTime;
+                }
+            } else if (desiredState < 0) {
+                if ((error * kP + integral * kI + derivative * kD - kStatic + (desiredState * kV)) / voltage < -1) {
+                    integral -= error * deltaTime;
+                }
+            }
+        }
         if(spinningUp){
             clearI();
             if(desiredState < 0 && currentVelocity < desiredState + 50){

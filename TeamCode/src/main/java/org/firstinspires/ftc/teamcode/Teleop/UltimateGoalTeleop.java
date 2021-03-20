@@ -82,7 +82,7 @@ public class UltimateGoalTeleop extends OpMode {
     boolean slowModeToggledPrevLoop;
 
     public void init(){
-        msStuckDetectLoop = 20000;
+        msStuckDetectLoop = 30000;
         /*if (T265.slamra == null) {
             T265.slamra = new T265Camera(new Transform2d(),T265.ODOMETRY_COVARIANCE, hardwareMap.appContext);
         }*/
@@ -95,14 +95,15 @@ public class UltimateGoalTeleop extends OpMode {
         shooterVelo = 1350;
         magFlickerController = new MagFlickerController(hardware,this);
         hardware.mag.setRingPusherResting();
+        hardware.wobbler.raiseWobble();
         hardware.wobbler.goToClawRestingPos();
-        hardware.wobbler.goToArmRestingPos();
         firstLoop = true;
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
         hardware.turret.turretMotor.readRequested = true;
         bumperDown = false;
+        hardware.loop();
     }
     public double logistic(double input, double constantB, double constantC){
         return constantB*(1/(1+ Math.pow(Math.E,-constantC*(input-0.6)))) - constantB/2+0.5532;
@@ -326,9 +327,9 @@ public class UltimateGoalTeleop extends OpMode {
 
             hardware.mag.dropRings();
 
-            double ps1TurretAngle=Math.toRadians(3);
-            double ps2TurretAngle=Math.toRadians(-2.5);
-            double ps3TurretAngle=Math.toRadians(-8);
+            double ps1TurretAngle=Math.toRadians(3.25);
+            double ps2TurretAngle=Math.toRadians(-2.75);
+            double ps3TurretAngle=Math.toRadians(-9.25);
             ElapsedTime powershotTimer = new ElapsedTime();
 
             for(int i = 0; i < 3; i++) {
@@ -344,9 +345,9 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
                 while (!teleopStopped) {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
-                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.08))
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.1))
                         powershotTimer.reset();
-                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.25) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
+                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.1) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
                         break;
                     prevTurretAngle = currentTurretAngle;
                 }
