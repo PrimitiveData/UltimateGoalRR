@@ -6,13 +6,13 @@ public class WobblerArm {
     public RegServo wobblerArm1;
     public RegServo wobblerArm2;
     //wobbler arm positions
-    public double wobblerArm2PositionWhenWobblerArm1IsZero=1.038;
+    public double wobblerArm2PositionWhenWobblerArm1IsZero=1 ;
     //ALL ARM POS VARIABLES ARE FOR WOBBLE ARM SERVO 1
-    public double armGrabWobblePos=0.1;
-    public double armRaiseWobble=0.584;
-    public double armStartingPos=0.79;
-    public double armRestingPos=1;
-    public double armDropPos = 0.4;
+    public double armGrabWobblePos=0.05;
+    public double armRaiseWobble=0.58;
+    public double armStartingPos=0.717;
+    public double armRestingPos=0.9;
+    public double armDropPos = 0.15;
     RegServo wobblerClaw;
     public double clawReleasePos = 0.607;
     public double clawGrip = 0.97;

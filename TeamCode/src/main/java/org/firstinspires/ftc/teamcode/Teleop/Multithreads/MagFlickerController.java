@@ -60,12 +60,14 @@ public class MagFlickerController extends Thread {
                 hardware.mag.dropRings();
             }
             if(shootAllRingsRequested){
+                /*
                 if(hardware.mag.currentState == Mag.State.COLLECT) {
                     hardware.turret.setMagAngle(0.5);
                     sleeep(100);
                     hardware.mag.dropRings();
                     sleeep(450);//tune timeout
                 }
+                */
                 for(int i = 0; i < 3; i++){
                     parentOP.currentlyIncrementingMagDuringShooting = true;
                     if(-hardware.shooter.shooterMotor1.getVelocity() >= 1325) {

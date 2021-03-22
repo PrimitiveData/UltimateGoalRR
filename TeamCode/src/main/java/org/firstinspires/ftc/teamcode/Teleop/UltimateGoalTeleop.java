@@ -148,6 +148,8 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.right_trigger>0) {
             if(!intakeOnToggledPrevLoop) {
                 intakeOn = !intakeOn;
+                if(intakeOn)
+                    hardware.mag.collectRings();
             }
             intakeOnToggledPrevLoop = true;
         }
@@ -356,8 +358,7 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.mag.setRingPusherResting();
                 sleeep(150);
             }
-
-
+            hardware.mag.collectRings();
             hardwareThreadInterface.stopLooping = true;
             sleeep(50);
         }
