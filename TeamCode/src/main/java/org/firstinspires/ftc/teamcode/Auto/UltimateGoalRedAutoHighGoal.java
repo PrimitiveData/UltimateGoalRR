@@ -255,7 +255,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(100);
                 hardware.mag.setRingPusherRestingThreadBypass();
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion-0.005);
                 sleep(100);
             }
             else
