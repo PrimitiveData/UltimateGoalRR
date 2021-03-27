@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstra
 import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -45,6 +46,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 public class UltimateGoalRedAuto extends AutoMethods {
     int stack = 2;
     OpenCvCamera webcam;
+    String powershotLogTag = "powershotLog";
     public void runOpMode(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -63,7 +65,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
 
 
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry, false);
-        hardware.shooter.shooterVeloPID = new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
+        hardware.shooter.shooterVeloPID = new ShooterPID(0,0,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
         hardware.turret.turretMotor.readRequested = true;
 
@@ -179,7 +181,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         closeCamera.start();
         hardware.shooter.updatePID = true;
-        hardware.shooter.shooterVeloPID.setState(1300);
+        hardware.shooter.shooterVeloPID.setState(1200);
         hardware.shooter.setRampPosition(0.27);
         hardware.turret.updatePID = true;
         hardware.wobbler.raiseWobble();
@@ -200,7 +202,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
         }
         hardware.shooter.shooterVeloPID.powershotAntiWindup = true;
         hardware.intake.dropIntake();
-        ps2TurretAngle = ps2TurretAngle - hardware.getAngle();
+        ps2TurretAngle = ps2TurretAngle - hardware.drive.getRawExternalHeading();
         hardware.turret.setLocalTurretAngleAuto(ps2TurretAngle);
         ElapsedTime powershotTimer = new ElapsedTime();
         ElapsedTime powershotForcedExitTimer = new ElapsedTime();
@@ -214,8 +216,10 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 break;
             prevTurretAngle = currentTurretAngle;
         }
+        RobotLog.dd(powershotLogTag,"Powershot 1, Desired Angle: " + Math.toDegrees(ps2TurretAngle) + ", Current Angle: " + Math.toRadians(hardware.turret.localTurretAngleRadians()));
         shootIndividualRing(hardware);
-        ps3TurretAngle = ps3TurretAngle - hardware.getAngle();
+        RobotLog.dd(powershotLogTag,"Powershot 1.2, Desired Angle: " + Math.toDegrees(ps2TurretAngle) + ", Current Angle: " + Math.toRadians(hardware.turret.localTurretAngleRadians()));
+        ps3TurretAngle = ps3TurretAngle - hardware.drive.getRawExternalHeading();
         hardware.turret.setLocalTurretAngleAuto(ps3TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
         powershotForcedExitTimer.reset();
@@ -227,8 +231,10 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 break;
             prevTurretAngle = currentTurretAngle;
         }
+        RobotLog.dd(powershotLogTag,"Powershot 2, Desired Angle: " + Math.toDegrees(ps3TurretAngle) + ", Current Angle: " + Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         shootIndividualRing(hardware);
-        ps1TurretAngle = ps1TurretAngle - hardware.getAngle();
+        RobotLog.dd(powershotLogTag,"Powershot 2.2, Desired Angle: " + Math.toDegrees(ps3TurretAngle) + ", Current Angle: " + Math.toDegrees(hardware.turret.localTurretAngleRadians()));
+        ps1TurretAngle = ps1TurretAngle - hardware.drive.getRawExternalHeading();
         hardware.turret.setLocalTurretAngleAuto(ps1TurretAngle);
         prevTurretAngle = hardware.turret.localTurretAngleRadians();
         powershotForcedExitTimer.reset();
@@ -240,7 +246,12 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 break;
             prevTurretAngle = currentTurretAngle;
         }
+        RobotLog.dd(powershotLogTag,"Powershot 3, Desired Angle: " + Math.toDegrees(ps1TurretAngle) + ", Current Angle: " + Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         shootIndividualRing(hardware);
+        RobotLog.dd(powershotLogTag,"Powershot 3.2, Desired Angle: " + Math.toDegrees(ps1TurretAngle) + ", Current Angle: " + Math.toDegrees(hardware.turret.localTurretAngleRadians()));
+        hardware.shooter.shooterVeloPID.clearI();
+        hardware.shooter.shooterVeloPID.kP = 0.1;
+        hardware.shooter.shooterVeloPID.kI = 0.5;
         AutoAimVelo autoAim = null;
         WiggleTheMag wiggleTheMag = null;
         hardware.shooter.shooterVeloPID.powershotAntiWindup = false;
@@ -249,7 +260,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             hardware.mag.collectRings();
             hardware.intake.turnIntake(1);
             hardware.turret.maxPositive = Math.toRadians(0);
-            autoAim = new AutoAimVelo(hardware, telemetry, this, 1300);
+            autoAim = new AutoAimVelo(hardware, telemetry, this, 1000);
             autoAim.start();
             wiggleTheMag = new WiggleTheMag(hardware, this);
             wiggleTheMag.start();

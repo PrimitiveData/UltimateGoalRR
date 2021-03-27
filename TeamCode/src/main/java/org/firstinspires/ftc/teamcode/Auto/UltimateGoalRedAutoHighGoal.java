@@ -249,13 +249,13 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(10);
         }
         sleep(500);
-        hardware.shooter.rampAngleAdjustmentConstant = -0.05;
+        hardware.shooter.rampAngleAdjustmentConstant = -0.01;
         for(int i = 0; i < 3; i++){
             if(-hardware.shooter.shooterMotor1.getVelocity() >= 1325) {
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(100);
                 hardware.mag.setRingPusherRestingThreadBypass();
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion-0.005);
                 sleep(100);
             }
             else
