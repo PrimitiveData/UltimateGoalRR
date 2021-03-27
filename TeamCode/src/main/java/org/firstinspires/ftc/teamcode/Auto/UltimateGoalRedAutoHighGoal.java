@@ -249,7 +249,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(10);
         }
         sleep(500);
-        hardware.shooter.rampAngleAdjustmentConstant = -0.05;
+        hardware.shooter.rampAngleAdjustmentConstant = -0.01;
         for(int i = 0; i < 3; i++){
             if(-hardware.shooter.shooterMotor1.getVelocity() >= 1325) {
                 hardware.mag.pushInRingsThreadBypass();
@@ -381,7 +381,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         sleep(300);
         hardware.wobbler.goToClawRestingPos();
         if(stack == 2 || stack == 1) {
-            hardware.wobbler.raiseWobble();
+            hardware.wobbler.goToWobbleStartingPos();
             hardware.drive.turnAsync(-Math.toRadians(179));
             while (hardware.drive.isBusy() && !isStopRequested()) {
                 sleep(1);
