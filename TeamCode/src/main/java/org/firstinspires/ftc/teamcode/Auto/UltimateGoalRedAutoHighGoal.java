@@ -172,7 +172,6 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         hardware.loop();
         waitForStart();
         hardware.shooter.setRampPosition(0);
-        hardware.intake.dropIntake();
         hardwareThreadInterface.start();
         CloseTheCamera closeCamera = new CloseTheCamera(webcam);
         closeCamera.start();
@@ -234,9 +233,8 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         }
         shootIndividualRing(hardware);
          */
-        hardware.intake.dropIntake();
         AutoAimVelo autoAimStack = null;
-        autoAimStack = new AutoAimVelo(hardware, telemetry, this, 1400);
+        autoAimStack = new AutoAimVelo(hardware, telemetry, this, 1350);
         autoAimStack.start();
         AutoAimVelo autoAim = null;
         WiggleTheMag wiggleTheMag = null;
@@ -251,14 +249,17 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(10);
         }
         sleep(500);
-        hardware.shooter.rampAngleAdjustmentConstant = -0.08;
+        hardware.shooter.rampAngleAdjustmentConstant = -0.05;
         for(int i = 0; i < 3; i++){
-            hardware.mag.pushInRingsThreadBypass();
-            sleep(250);// tune time
-            hardware.mag.setRingPusherRestingThreadBypass();
-            hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.015);
-            sleep(150);
-
+            if(-hardware.shooter.shooterMotor1.getVelocity() >= 1325) {
+                hardware.mag.pushInRingsThreadBypass();
+                sleep(100);
+                hardware.mag.setRingPusherRestingThreadBypass();
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion);
+                sleep(100);
+            }
+            else
+                i--;
         }
         hardware.shooter.rampAngleAdjustmentConstant = 0;
         hardware.intake.dropIntake();
