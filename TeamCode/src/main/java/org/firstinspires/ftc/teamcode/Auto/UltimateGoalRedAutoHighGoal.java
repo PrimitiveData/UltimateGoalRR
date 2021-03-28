@@ -75,9 +75,9 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
-                new MecanumVelocityConstraint(10, TRACK_WIDTH)
+                new MecanumVelocityConstraint(7, TRACK_WIDTH)
         ));
-        double distanceToPickUp= 20;
+        double distanceToPickUp= 15;
         double headingToPickUp = Math.toRadians(0);
         Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())
                 .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
@@ -234,7 +234,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         shootIndividualRing(hardware);
          */
         AutoAimVelo autoAimStack = null;
-        autoAimStack = new AutoAimVelo(hardware, telemetry, this, 1350);
+        autoAimStack = new AutoAimVelo(hardware, telemetry, this, 1225);
         autoAimStack.start();
         AutoAimVelo autoAim = null;
         WiggleTheMag wiggleTheMag = null;
@@ -249,9 +249,9 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(10);
         }
         sleep(500);
-        hardware.shooter.rampAngleAdjustmentConstant = -0.01;
+        hardware.shooter.rampAngleAdjustmentConstant = -0.08;
         for(int i = 0; i < 3; i++){
-            if(-hardware.shooter.shooterMotor1.getVelocity() >= 1325) {
+            if(-hardware.shooter.shooterMotor1.getVelocity() >= 1200) {
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(100);
                 hardware.mag.setRingPusherRestingThreadBypass();
@@ -299,13 +299,13 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(1000);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.02;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.035;
             for(int i = 0; i < 1; i++){
                 hardware.mag.pushInRings();
                 sleep(400);// tune time
                 hardware.mag.setRingPusherResting();
                 sleep(400);// tune time
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.02);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion);
 
             }
             hardware.mag.collectRings();
@@ -323,13 +323,13 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.025;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.04;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(250);// tune time
                 hardware.mag.setRingPusherRestingThreadBypass();
                 sleep(150);// tune time
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion + 0.02);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.05);
             }
             hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toDegrees(0);
             hardware.mag.collectRings();
@@ -346,7 +346,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 sleep(250);
             }
             hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
-            sleep(700);
+            sleep(950);
             wiggleTheMag.stopRequested = true;
             sleep(250);
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
@@ -357,7 +357,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = 0.07;
+            hardware.shooter.rampAngleAdjustmentConstant = -0.02;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time

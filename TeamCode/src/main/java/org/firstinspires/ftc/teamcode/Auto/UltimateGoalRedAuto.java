@@ -260,7 +260,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
             hardware.mag.collectRings();
             hardware.intake.turnIntake(1);
             hardware.turret.maxPositive = Math.toRadians(0);
-            autoAim = new AutoAimVelo(hardware, telemetry, this, 1000);
+            autoAim = new AutoAimVelo(hardware, telemetry, this, 1225);
             autoAim.start();
             wiggleTheMag = new WiggleTheMag(hardware, this);
             wiggleTheMag.start();
@@ -289,7 +289,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(1000);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.03;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.035;
             for(int i = 0; i < 1; i++){
                 hardware.mag.pushInRings();
                 sleep(400);// tune time
@@ -311,7 +311,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.04;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.035;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(250);// tune time
@@ -344,7 +344,7 @@ public class UltimateGoalRedAuto extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = 0.015;
+            hardware.shooter.rampAngleAdjustmentConstant = 0.0;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
