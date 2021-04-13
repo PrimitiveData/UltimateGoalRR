@@ -55,6 +55,7 @@ public class UltimateGoalTeleop extends OpMode {
 
     boolean intakeOn = false;
     boolean intakeOnToggledPrevLoop = false;
+    boolean intakeOnToggledPrevLoop2 = false;
 
     boolean dPadUpToggledPrevLoop = false;
     boolean dPadRightToggledPrevLoop = false;
@@ -160,22 +161,22 @@ public class UltimateGoalTeleop extends OpMode {
                 intakeOnToggledPrevLoop = false;
             }
         }
-
+/*
         if(gamepad1.dpad_left){
-            if(!intakeOnToggledPrevLoop) {
+            if(!intakeOnToggledPrevLoop2) {
                 intakeOn = !intakeOn;
                 if(intakeOn) {
                     hardware.mag.collectRings();
                     hardware.intake.crServoOn = false;
                 }
             }
-            intakeOnToggledPrevLoop = true;
+            intakeOnToggledPrevLoop2 = true;
         }
         else{
-            if(intakeOnToggledPrevLoop){
-                intakeOnToggledPrevLoop = false;
+            if(intakeOnToggledPrevLoop2){
+                intakeOnToggledPrevLoop2 = false;
             }
-        }
+        }*/
         if(intakeOn) {
             if(gamepad1.a){
                 hardware.intake.turnIntake(-1);
@@ -220,6 +221,10 @@ public class UltimateGoalTeleop extends OpMode {
             if(magUpdateStateAndSetPositionPrevLoop){
                 magUpdateStateAndSetPositionPrevLoop = false;
             }
+        }
+
+        if(gamepad2.y){
+            magFlickerController.shootSingleRing();
         }
         //ramp manuel control and automatic control
         if(gamepad1.x) {
