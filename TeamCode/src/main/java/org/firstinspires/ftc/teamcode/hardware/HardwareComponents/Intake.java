@@ -29,6 +29,8 @@ public class Intake {
     double leftBetorThingyStarting = 0.7787;
     double rightBetorThingyStarting = 0.4235;
 
+    public boolean crServoOn = false;
+
 
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
@@ -48,7 +50,7 @@ public class Intake {
 
     public void turnIntake(double power){
         intakeMotor.setPower(power);
-        if(power > 0) {
+        if(power > 0 && crServoOn) {
             intakeServoStarboard.setPower(1);
             intakeServoPort.setPower(-1);
         }

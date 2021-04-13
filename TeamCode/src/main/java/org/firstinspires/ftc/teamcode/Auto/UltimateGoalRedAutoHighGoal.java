@@ -42,41 +42,41 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 
 @Autonomous(name = "RedAutoHighGoal", group = "Autonomous")
 public class UltimateGoalRedAutoHighGoal extends AutoMethods {
-    int stack = 2;
-    OpenCvCamera webcam;
-    public void runOpMode(){
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        webcam.openCameraDevice();
-        UltimateGoalReturnPositionPipeline pipeline = new UltimateGoalReturnPositionPipeline();
-        webcam.setPipeline(pipeline);
-        webcam.startStreaming(640,480, OpenCvCameraRotation.UPRIGHT);
-        webcam.resumeViewport();
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        TelemetryPacket packet = new TelemetryPacket();
+            int stack = 2;
+            OpenCvCamera webcam;
+            public void runOpMode(){
+                int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+                webcam.openCameraDevice();
+                UltimateGoalReturnPositionPipeline pipeline = new UltimateGoalReturnPositionPipeline();
+                webcam.setPipeline(pipeline);
+                webcam.startStreaming(640,480, OpenCvCameraRotation.UPRIGHT);
+                webcam.resumeViewport();
+                FtcDashboard dashboard = FtcDashboard.getInstance();
+                TelemetryPacket packet = new TelemetryPacket();
 
-        sleep(2000);
-        stack = pipeline.stack;
-        telemetry.addData("stack",stack);
-        telemetry.update();
+                sleep(2000);
+                stack = pipeline.stack;
+                telemetry.addData("stack",stack);
+                telemetry.update();
 
 
-        HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry, false);
-        hardware.shooter.shooterVeloPID = new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
-        HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
-        hardware.turret.turretMotor.readRequested = true;
-        Trajectory goToShootPos = hardware.drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(-60,0))
-                .build();
+                HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry, false);
+                hardware.shooter.shooterVeloPID = new ShooterPID(0.1,0.5,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
+                HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
+                hardware.turret.turretMotor.readRequested = true;
+                Trajectory goToShootPos = hardware.drive.trajectoryBuilder(new Pose2d())
+                        .lineToConstantHeading(new Vector2d(-60,0))
+                        .build();
 
-        Trajectory pickUpRingsPrelude = hardware.drive.trajectoryBuilder(goToShootPos.end())
-                .lineToConstantHeading(new Vector2d(goToShootPos.end().getX(), goToShootPos.end().getY()+20))
-                .build();
+                Trajectory pickUpRingsPrelude = hardware.drive.trajectoryBuilder(goToShootPos.end())
+                        .lineToConstantHeading(new Vector2d(goToShootPos.end().getX(), goToShootPos.end().getY()+20))
+                        .build();
 
-        hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
-                new AngularVelocityConstraint(MAX_ANG_VEL),
-                new MecanumVelocityConstraint(7, TRACK_WIDTH)
-        ));
+                hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
+                        new AngularVelocityConstraint(MAX_ANG_VEL),
+                        new MecanumVelocityConstraint(7, TRACK_WIDTH)
+                ));
         double distanceToPickUp= 15;
         double headingToPickUp = Math.toRadians(0);
         Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())

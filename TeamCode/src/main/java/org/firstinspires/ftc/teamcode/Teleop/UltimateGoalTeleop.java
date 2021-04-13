@@ -148,8 +148,26 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.right_trigger>0) {
             if(!intakeOnToggledPrevLoop) {
                 intakeOn = !intakeOn;
-                if(intakeOn)
+                if(intakeOn) {
                     hardware.mag.collectRings();
+                    hardware.intake.crServoOn = true;
+                }
+            }
+            intakeOnToggledPrevLoop = true;
+        }
+        else{
+            if(intakeOnToggledPrevLoop){
+                intakeOnToggledPrevLoop = false;
+            }
+        }
+
+        if(gamepad1.dpad_left){
+            if(!intakeOnToggledPrevLoop) {
+                intakeOn = !intakeOn;
+                if(intakeOn) {
+                    hardware.mag.collectRings();
+                    hardware.intake.crServoOn = false;
+                }
             }
             intakeOnToggledPrevLoop = true;
         }
