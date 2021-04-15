@@ -161,22 +161,11 @@ public class UltimateGoalTeleop extends OpMode {
                 intakeOnToggledPrevLoop = false;
             }
         }
-/*
-        if(gamepad1.dpad_left){
-            if(!intakeOnToggledPrevLoop2) {
-                intakeOn = !intakeOn;
-                if(intakeOn) {
-                    hardware.mag.collectRings();
-                    hardware.intake.crServoOn = false;
-                }
-            }
-            intakeOnToggledPrevLoop2 = true;
+
+        if(gamepad1.b){
+            hardware.intake.crServoOn = !hardware.intake.crServoOn;
         }
-        else{
-            if(intakeOnToggledPrevLoop2){
-                intakeOnToggledPrevLoop2 = false;
-            }
-        }*/
+
         if(intakeOn) {
             if(gamepad1.a){
                 hardware.intake.turnIntake(-1);
@@ -584,7 +573,7 @@ public class UltimateGoalTeleop extends OpMode {
 //correcting autoaim
         if(gamepad2.dpad_up) {
             if(!dPadUpToggledPrevLoop) {
-                hardware.shooter.rampAngleAdjustmentConstant += 0.05;
+                hardware.shooter.rampAngleAdjustmentConstant += 0.025;
             }
             dPadUpToggledPrevLoop = true;
         }
@@ -595,7 +584,7 @@ public class UltimateGoalTeleop extends OpMode {
         }
         if(gamepad2.dpad_down) {
             if(!dPadDownToggledPrevLoop) {
-                hardware.shooter.rampAngleAdjustmentConstant -= 0.05;
+                hardware.shooter.rampAngleAdjustmentConstant -= 0.025;
             }
             dPadDownToggledPrevLoop = true;
         }

@@ -29,7 +29,7 @@ public class Intake {
     double leftBetorThingyStarting = 0.7787;
     double rightBetorThingyStarting = 0.4235;
 
-    public boolean crServoOn = false;
+    public boolean crServoOn = true;
 
 
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
