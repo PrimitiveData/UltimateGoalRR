@@ -89,7 +89,7 @@ public class UltimateGoalTeleop extends OpMode {
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new HardwareMecanum(hardwareMap,telemetry,true);
+        hardware = new HardwareMecanum(hardwareMap,telemetry,false);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -151,7 +151,6 @@ public class UltimateGoalTeleop extends OpMode {
                 intakeOn = !intakeOn;
                 if(intakeOn) {
                     hardware.mag.collectRings();
-                    hardware.intake.crServoOn = true;
                 }
             }
             intakeOnToggledPrevLoop = true;
@@ -163,7 +162,15 @@ public class UltimateGoalTeleop extends OpMode {
         }
 
         if(gamepad1.b){
-            hardware.intake.crServoOn = !hardware.intake.crServoOn;
+            if(!intakeOnToggledPrevLoop2) {
+                hardware.intake.crServoOn = !hardware.intake.crServoOn;
+            }
+            intakeOnToggledPrevLoop2 = true;
+        }
+        else{
+            if(intakeOnToggledPrevLoop2){
+                intakeOnToggledPrevLoop2 = false;
+            }
         }
 
         if(intakeOn) {

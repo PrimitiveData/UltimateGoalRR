@@ -28,7 +28,7 @@ public class MagFlickerController extends Thread {
     int numButtonPresses;
     String TAG = "MagFlickerController";
     public Writer writer;
-    double increment = 0.018;
+    double increment = 0.012;
     public MagFlickerController(HardwareMecanum hardware, UltimateGoalTeleop parentOP){
         this.hardware = hardware;
         this.parentOP = parentOP;
@@ -73,11 +73,11 @@ public class MagFlickerController extends Thread {
                 */
                 for(int i = 0; i < 3; i++){
                     parentOP.currentlyIncrementingMagDuringShooting = true;
-                    if(-hardware.shooter.shooterMotor1.getVelocity() >= 991) {
+                    if(-hardware.shooter.shooterMotor1.getVelocity() >= 1081) {
                         hardware.mag.pushInRingsThreadBypass();
                         sleeep(100);
                         hardware.mag.setRingPusherRestingThreadBypass();
-                        sleeep(100);
+                        sleeep(150);
                         hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);
 
                     }

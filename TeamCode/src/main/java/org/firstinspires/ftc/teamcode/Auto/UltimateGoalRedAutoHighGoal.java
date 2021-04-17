@@ -83,14 +83,14 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
                 .build();
 
-        double distanceToPickUp2 = 5;
+        double distanceToPickUp2 = 10;
         Trajectory pickUpRings2 = hardware.drive.trajectoryBuilder(pickUpRings.end())
                 .lineToConstantHeading(new Vector2d(pickUpRings.end().getX()+distanceToPickUp2*Math.cos(headingToPickUp),pickUpRings.end().getY() + distanceToPickUp2*Math.sin(headingToPickUp)))
                 .build();
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
-                new MecanumVelocityConstraint(4, TRACK_WIDTH)
+                new MecanumVelocityConstraint(6, TRACK_WIDTH)
         ));
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
@@ -315,7 +315,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
-            sleep(1750);
+            sleep(1400);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
             sleep(150);
@@ -329,7 +329,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 sleep(250);// tune time
                 hardware.mag.setRingPusherRestingThreadBypass();
                 sleep(150);// tune time
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.05);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.06);
             }
             hardware.mag.collectRings();
             sleep(500);
@@ -345,7 +345,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 sleep(250);
             }
             hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
-            sleep(950);
+            sleep(750);
             wiggleTheMag.stopRequested = true;
             sleep(250);
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
@@ -356,13 +356,14 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = -0.02;
+            hardware.shooter.rampAngleAdjustmentConstant = -0.04;
             hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
                 hardware.mag.setRingPusherResting();
                 sleep(150);// tune time
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.1);
             }
             hardware.shooter.rampAngleAdjustmentConstant = 0;
             autoAim.stopRequested = true;
