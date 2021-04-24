@@ -89,7 +89,7 @@ public class UltimateGoalTeleop extends OpMode {
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new HardwareMecanum(hardwareMap,telemetry,false);
+        hardware = new HardwareMecanum(hardwareMap,telemetry,true);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -339,7 +339,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(0.2);
             hardware.turret.updatePID = true;
             hardware.shooter.updatePID = true;
-            hardware.shooter.shooterVeloPID.setState(1300);
+            hardware.shooter.shooterVeloPID.setState(1200);
 
             if(hardware.mag.currentState == Mag.State.COLLECT){
                 hardware.mag.dropRings();
@@ -366,9 +366,9 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
                 while (!teleopStopped) {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
-                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.1))
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.5))
                         powershotTimer.reset();
-                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.1) && -hardware.shooter.shooterMotor1.getVelocity() > 1250)
+                    if (powershotTimer.milliseconds() >= 50 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.1) && -hardware.shooter.shooterMotor1.getVelocity() > 1150)
                         break;
                     prevTurretAngle = currentTurretAngle;
                 }

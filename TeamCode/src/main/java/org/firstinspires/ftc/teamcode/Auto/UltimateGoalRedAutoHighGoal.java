@@ -315,6 +315,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.06;
             sleep(1400);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
@@ -323,13 +324,12 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.04;
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(250);// tune time
                 hardware.mag.setRingPusherRestingThreadBypass();
                 sleep(150);// tune time
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.06);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.08);
             }
             hardware.mag.collectRings();
             sleep(500);
@@ -351,19 +351,19 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
+            hardware.shooter.rampAngleAdjustmentConstant = -0.06;
             sleep(150);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.shooter.rampAngleAdjustmentConstant = -0.04;
             hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
                 hardware.mag.setRingPusherResting();
                 sleep(150);// tune time
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.1);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - 0.3);
             }
             hardware.shooter.rampAngleAdjustmentConstant = 0;
             autoAim.stopRequested = true;
@@ -420,14 +420,11 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(1);
         }
         hardware.wobbler.releaseWobble();
-
-        sleep(350);
-        hardware.wobbler.goToClawRestingPos();
         hardware.drive.followTrajectoryAsync(park);
         while(hardware.drive.isBusy() && !isStopRequested()){
             sleep(1);
         }
-
+        hardware.wobbler.goToClawRestingPos();
         if(stack == 1) {
             hardware.drive.turnAsync(Math.toRadians(180));
             while (hardware.drive.isBusy() && !isStopRequested()) {
