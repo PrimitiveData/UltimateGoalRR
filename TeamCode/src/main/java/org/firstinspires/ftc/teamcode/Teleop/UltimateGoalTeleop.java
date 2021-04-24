@@ -56,6 +56,8 @@ public class UltimateGoalTeleop extends OpMode {
     boolean intakeOn = false;
     boolean intakeOnToggledPrevLoop = false;
     boolean intakeOnToggledPrevLoop2 = false;
+    boolean intakeReverseToggledPrevLoop = false;
+    boolean intakeReverse = false;
 
     boolean dPadUpToggledPrevLoop = false;
     boolean dPadRightToggledPrevLoop = false;
@@ -173,8 +175,20 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
 
+        if(gamepad1.a){
+            if(!intakeReverseToggledPrevLoop) {
+                intakeReverse = !intakeReverse;
+            }
+            intakeReverseToggledPrevLoop = true;
+        }
+        else{
+            if(intakeReverseToggledPrevLoop){
+                intakeReverseToggledPrevLoop = false;
+            }
+        }
+
         if(intakeOn) {
-            if(gamepad1.a){
+            if(intakeReverse){
                 hardware.intake.turnIntake(-1);
             }else {
                 hardware.intake.turnIntake(1);

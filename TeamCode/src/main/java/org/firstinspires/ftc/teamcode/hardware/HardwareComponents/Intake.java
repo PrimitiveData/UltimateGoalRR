@@ -31,7 +31,6 @@ public class Intake {
 
     public boolean crServoOn = true;
 
-
     public Intake(Motor intakeMotor, RegServo intakeDropperGuard, ContRotServo intakeServoStarboard, ContRotServo intakeServoPort){
         this.intakeMotor = intakeMotor;
         this.intakeMotor.motor.setDirection(DcMotorEx.Direction.FORWARD);
