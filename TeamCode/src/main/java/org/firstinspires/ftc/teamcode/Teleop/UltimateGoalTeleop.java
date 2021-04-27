@@ -56,8 +56,6 @@ public class UltimateGoalTeleop extends OpMode {
     boolean intakeOn = false;
     boolean intakeOnToggledPrevLoop = false;
     boolean intakeOnToggledPrevLoop2 = false;
-    boolean intakeReverseToggledPrevLoop = false;
-    boolean intakeReverse = false;
 
     boolean dPadUpToggledPrevLoop = false;
     boolean dPadRightToggledPrevLoop = false;
@@ -91,7 +89,7 @@ public class UltimateGoalTeleop extends OpMode {
         }*/
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
-        hardware = new HardwareMecanum(hardwareMap,telemetry,true);
+        hardware = new HardwareMecanum(hardwareMap,telemetry,false);
         hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -175,20 +173,8 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
 
-        if(gamepad1.a){
-            if(!intakeReverseToggledPrevLoop) {
-                intakeReverse = !intakeReverse;
-            }
-            intakeReverseToggledPrevLoop = true;
-        }
-        else{
-            if(intakeReverseToggledPrevLoop){
-                intakeReverseToggledPrevLoop = false;
-            }
-        }
-
         if(intakeOn) {
-            if(intakeReverse){
+            if(gamepad1.a){
                 hardware.intake.turnIntake(-1);
             }else {
                 hardware.intake.turnIntake(1);
@@ -353,7 +339,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(0.2);
             hardware.turret.updatePID = true;
             hardware.shooter.updatePID = true;
-            hardware.shooter.shooterVeloPID.setState(1200);
+            hardware.shooter.shooterVeloPID.setState(1350);
 
             if(hardware.mag.currentState == Mag.State.COLLECT){
                 hardware.mag.dropRings();
@@ -380,9 +366,9 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.turret.setLocalTurretAngle(powershotAngleCurrent);
                 while (!teleopStopped) {
                     double currentTurretAngle = hardware.turret.localTurretAngleRadians();
-                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.5))
+                    if (Math.abs(currentTurretAngle - prevTurretAngle) > Math.toRadians(0.1))
                         powershotTimer.reset();
-                    if (powershotTimer.milliseconds() >= 50 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.1) && -hardware.shooter.shooterMotor1.getVelocity() > 1150)
+                    if (powershotTimer.milliseconds() >= 200 && Math.abs(currentTurretAngle - powershotAngleCurrent) < Math.toRadians(0.1) && -hardware.shooter.shooterMotor1.getVelocity() > 1300)
                         break;
                     prevTurretAngle = currentTurretAngle;
                 }
@@ -410,13 +396,10 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.mag.dropRings();
                 sleeep(500);
             }
-
             hardware.mag.dropRings();
-
             Trajectory goToPowershotPos = hardware.drive.trajectoryBuilder(hardware.drive.getPoseEstimate())
                     .lineToConstantHeading(new Vector2d(-59,-2.75))
                     .build();
-
             hardware.drive.followTrajectoryAsync(goToPowershotPos);
             while(hardware.drive.isBusy()){
                 sleeep(1);
@@ -425,7 +408,6 @@ public class UltimateGoalTeleop extends OpMode {
             while(hardware.drive.isBusy()){
                 sleeep(1);
             }
-
             double ps1TurretAngle=Math.toRadians(3)-hardware.getAngle() + Math.toRadians(180);
             double ps2TurretAngle=Math.toRadians(-4)-hardware.getAngle() + Math.toRadians(180);
             double ps3TurretAngle=Math.toRadians(-10)-hardware.getAngle() + Math.toRadians(180);
@@ -454,8 +436,6 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.mag.setRingPusherResting();
                 sleeep(150);
             }
-
-
             hardwareThreadInterface.stopLooping = true;
             sleeep(50);
         }
@@ -493,8 +473,6 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
         //end powershot
-
-
         /*
         if(gamepad1.dpad_left){
             HardwareThreadInterface hardwareThreadInterface = new HardwareThreadInterface(hardware,this);
@@ -621,7 +599,7 @@ public class UltimateGoalTeleop extends OpMode {
             dPadLeftToggledPrevLoop = true;
         }
         else{
-            if(dPadLeftToggledPrevLoop){    
+            if(dPadLeftToggledPrevLoop){
                 dPadLeftToggledPrevLoop = false;
             }
         }

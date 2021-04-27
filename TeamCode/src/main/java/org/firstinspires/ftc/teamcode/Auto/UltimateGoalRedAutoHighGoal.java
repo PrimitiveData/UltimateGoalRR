@@ -90,7 +90,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                 new AngularVelocityConstraint(MAX_ANG_VEL),
-                new MecanumVelocityConstraint(6, TRACK_WIDTH)
+                new MecanumVelocityConstraint(8, TRACK_WIDTH)
         ));
 
         hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
@@ -249,13 +249,13 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             sleep(10);
         }
         sleep(500);
-        hardware.shooter.rampAngleAdjustmentConstant = -0.08;
+        hardware.shooter.rampAngleAdjustmentConstant = -0.03;
         for(int i = 0; i < 3; i++){
             if(-hardware.shooter.shooterMotor1.getVelocity() >= 1200) {
                 hardware.mag.pushInRingsThreadBypass();
                 sleep(100);
                 hardware.mag.setRingPusherRestingThreadBypass();
-                hardware.shooter.setRampPosition(hardware.shooter.rampPostion-0.005);
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion-0.015);
                 sleep(100);
             }
             else
@@ -273,7 +273,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             autoAim = new AutoAimVelo(hardware, telemetry, this, 1300);
             autoAim.start();
             wiggleTheMag = new WiggleTheMag(hardware, this);
-            wiggleTheMag.start();
+            //wiggleTheMag.start();
             hardware.drive.followTrajectoryAsync(pickUpRingsPrelude);
             while (hardware.drive.isBusy() && !isStopRequested()) {
                 sleep(1);
@@ -310,12 +310,12 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
 
             }
             hardware.mag.collectRings();
-            wiggleTheMag.stopRequested = true;
+            //wiggleTheMag.stopRequested = true;
             autoAim.stopRequested = true;
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.06;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.03;
             sleep(1400);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
@@ -346,7 +346,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             }
             hardware.drive.setWeightedDrivePower(new Pose2d(0,0,0));*/
             sleep(750);
-            wiggleTheMag.stopRequested = true;
+            //wiggleTheMag.stopRequested = true;
             sleep(250);
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
             hardware.intake.turnIntake(0);
@@ -399,7 +399,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         double collect2ndWobblerStartTime = hardware.time.milliseconds();
         while(hardware.drive.isBusy()&&!isStopRequested()){
             if(stack == 0){
-                if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 400){
+                if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 1200){
                     hardware.wobbler.moveArmToGrabPos();
                 }
             }
