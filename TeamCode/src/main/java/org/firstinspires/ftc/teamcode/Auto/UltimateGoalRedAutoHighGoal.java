@@ -75,9 +75,9 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
 
                 hardware.drive.velConstraint = new MinVelocityConstraint(Arrays.asList(
                         new AngularVelocityConstraint(MAX_ANG_VEL),
-                        new MecanumVelocityConstraint(7, TRACK_WIDTH)
+                        new MecanumVelocityConstraint(6, TRACK_WIDTH)
                 ));
-        double distanceToPickUp= 15;
+        double distanceToPickUp= 13;
         double headingToPickUp = Math.toRadians(0);
         Trajectory pickUpRings = hardware.drive.trajectoryBuilder(pickUpRingsPrelude.end())
                 .lineToConstantHeading(new Vector2d(pickUpRingsPrelude.end().getX() + distanceToPickUp*Math.cos(headingToPickUp),pickUpRingsPrelude.end().getY() + distanceToPickUp*Math.sin(headingToPickUp)))
@@ -106,7 +106,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         }
         else if(stack == 1){
             dropWobbler1 = hardware.drive.trajectoryBuilder(pickUpRings.end())
-                    .lineToConstantHeading(new Vector2d(-81,14))
+                    .lineToConstantHeading(new Vector2d(-83,14))
                     .build();
         }
         else{
@@ -134,11 +134,11 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         Trajectory dropWobbler2 = null;
         if(stack==0) {
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
-                    .splineToLinearHeading(new Pose2d(-82,24,-Math.toRadians(90)),Math.toRadians(135))
+                    .splineToLinearHeading(new Pose2d(-80,24,-Math.toRadians(90)),Math.toRadians(135))
                     .build();
         }else if(stack==1){
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
-                    .splineToLinearHeading(new Pose2d(-77,12,0),Math.toRadians(135))
+                    .splineToLinearHeading(new Pose2d(-75,12,0),Math.toRadians(135))
                     .build();
         }else{
             dropWobbler2 = hardware.drive.trajectoryBuilder(collect2ndWobbler.end())
@@ -315,8 +315,9 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.03;
-            sleep(1400);
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.0325;
+            hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
+            sleep(1000);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
             sleep(150);
@@ -351,13 +352,13 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.setMagAngle(hardware.mag.magRotationCollectPosition + 180/540);
             hardware.intake.turnIntake(0);
             hardware.turret.setMagAngle(0.51);
-            hardware.shooter.rampAngleAdjustmentConstant = -0.06;
+            hardware.shooter.rampAngleAdjustmentConstant = 0;
+            hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
             sleep(150);
             if(hardware.mag.currentState == Mag.State.COLLECT) {
                 hardware.mag.dropRings();
                 sleep(500);//tune timeout
             }
-            hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
             for(int i = 0; i < 3; i++){
                 hardware.mag.pushInRings();
                 sleep(250);// tune time
@@ -399,7 +400,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
         double collect2ndWobblerStartTime = hardware.time.milliseconds();
         while(hardware.drive.isBusy()&&!isStopRequested()){
             if(stack == 0){
-                if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 1200){
+                if(hardware.time.milliseconds() > collect2ndWobblerStartTime + 1800){
                     hardware.wobbler.moveArmToGrabPos();
                 }
             }
