@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
+import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
@@ -28,6 +29,14 @@ public class Mag {
     }
     public void dropRings(){
         hardware.turret.magShootingState = true;
+        if(!hardware.turret.updatePID) {
+            double magAngle = MathFunctions.correctedTargetServoScale(
+                    hardware.turret.magRotationServo.position,
+                    hardware.turret.localTurretAngleRadians(),
+                    hardware.turret.maxNegativeServo,
+                    hardware.turret.maxPositiveServo);
+            hardware.turret.setMagAngle(magAngle);
+        }
         currentState = State.DROP;
         magServo.setPosition(magDropRingPosition);
     }
