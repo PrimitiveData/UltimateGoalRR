@@ -10,4 +10,7 @@ dependencies {
 
     implementation 'com.acmerobotics.roadrunner:core:0.5.3'
     implementation 'com.acmerobotics.dashboard:dashboard:0.3.10'
+
+    implementation 'org.ftclib.ftclib:vision:1.2.0' // vision
+    implementation 'org.ftclib.ftclib:core:1.2.0' // core
 }

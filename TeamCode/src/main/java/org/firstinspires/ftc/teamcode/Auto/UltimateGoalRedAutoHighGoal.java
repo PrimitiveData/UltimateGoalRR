@@ -300,7 +300,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
                 hardware.mag.dropRings();
                 sleep(1000);//tune timeout//
             }
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.035;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.045;
             for(int i = 0; i < 1; i++){
                 hardware.mag.pushInRings();
                 sleep(400);// tune time
@@ -315,7 +315,7 @@ public class UltimateGoalRedAutoHighGoal extends AutoMethods {
             hardware.turret.maxPositive = prevMaxPositiveTurret;
         }
         if(stack == 2){
-            hardware.shooter.rampAngleAdjustmentConstant -= 0.0325;
+            hardware.shooter.rampAngleAdjustmentConstant -= 0.045;
             hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1.5);
             sleep(1000);
             hardware.intake.turnIntake(0);
