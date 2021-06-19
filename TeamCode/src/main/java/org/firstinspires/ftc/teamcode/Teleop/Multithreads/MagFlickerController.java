@@ -71,20 +71,19 @@ public class MagFlickerController extends Thread {
                     sleeep(450);//tune timeout
                 }
                 */
-                for(int i = 0; i < 3; i++){
+                for(int i = 0; i < 3; i++) {
                     parentOP.currentlyIncrementingMagDuringShooting = true;
-                    if(-hardware.shooter.shooterMotor1.getVelocity() >= 1081) {
+                    if (-hardware.shooter.shooterMotor1.getVelocity() >= 1081) {
                         hardware.mag.pushInRingsThreadBypass();
                         sleeep(100);
                         hardware.mag.setRingPusherRestingThreadBypass();
                         sleeep(150);
                         hardware.shooter.setRampPosition(hardware.shooter.rampPostion + increment);
-
-                    }
-                    else
+                    } else
                         i--;
                 }
                 parentOP.currentlyIncrementingMagDuringShooting = false;
+                hardware.shooter.setRampPosition(hardware.shooter.rampPostion - (3 * increment));
                 hardware.mag.collectRings();
                 shootAllRingsRequested = false;
             }

@@ -219,7 +219,7 @@ public class UltimateGoalTeleop extends OpMode {
             }
         }
 
-        if(gamepad2.y){
+        if(gamepad1.y){
             magFlickerController.shootSingleRing();
         }
         //ramp manuel control and automatic control
@@ -544,7 +544,7 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.dpad_up){
             hardware.turret.setLocalTurretAngle(0);
             hardware.turret.updatePID = true;
-            hardware.shooter.setRampPosition(0.55);
+            hardware.shooter.setRampPosition(0.57);
         }
         if(gamepad1.dpad_left){
             hardware.turret.setLocalTurretAngle(0);

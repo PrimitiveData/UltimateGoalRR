@@ -29,14 +29,12 @@ public class Mag {
     }
     public void dropRings(){
         hardware.turret.magShootingState = true;
-        if(!hardware.turret.updatePID) {
             double magAngle = MathFunctions.correctedTargetServoScale(
                     hardware.turret.magRotationServo.position,
                     hardware.turret.localTurretAngleRadians(),
                     hardware.turret.maxNegativeServo,
                     hardware.turret.maxPositiveServo);
             hardware.turret.setMagAngle(magAngle);
-        }
         currentState = State.DROP;
         magServo.setPosition(magDropRingPosition);
     }
