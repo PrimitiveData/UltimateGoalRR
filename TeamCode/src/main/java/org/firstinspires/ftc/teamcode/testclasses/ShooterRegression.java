@@ -31,8 +31,8 @@ public class ShooterRegression extends LinearOpMode {
         boolean shooterOn = false;
         double shooterVelo = 1350;
 
-        double increment = 0;
-        double threshold = 1325;
+        double increment = 0.012;
+        double threshold = 990;
 
         hardwareThreadInterface.start();
         while(!isStopRequested()){

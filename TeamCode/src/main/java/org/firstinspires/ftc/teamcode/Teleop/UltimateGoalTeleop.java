@@ -505,6 +505,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardwareThreadInterface.stopLooping = true;
         }
 */
+        /*
         if(gamepad1.dpad_up){
             if(MathFunctions.keepAngleWithin180Degrees(hardware.getAngle()) < Math.toRadians(-90) || MathFunctions.keepAngleWithin180Degrees(hardware.getAngle())> Math.toRadians(90)) {
                 hardware.drive.setPoseEstimate(new Pose2d(hardware.getXAbsoluteCenter(), -32.25, Math.toRadians(180)));
@@ -538,6 +539,24 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.prevAngle = 0;
             }
         }
+         */
+
+        if(gamepad1.dpad_up){
+            hardware.turret.setLocalTurretAngle(0);
+            hardware.turret.updatePID = true;
+            hardware.shooter.setRampPosition(0.55);
+        }
+        if(gamepad1.dpad_left){
+            hardware.turret.setLocalTurretAngle(0);
+            hardware.turret.updatePID = true;
+            hardware.shooter.setRampPosition(0.2);
+        }
+        if(gamepad1.dpad_down){
+            hardware.turret.setLocalTurretAngle(0);
+            hardware.turret.updatePID = true;
+            hardware.shooter.setRampPosition(0.35);
+        }
+
         /*if(gamepad1.dpad_right){
             hardware.shooter.setRampPosition(0);
             hardware.mag.updateStateAndSetPosition();
