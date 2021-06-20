@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,6 +33,8 @@ public class Turret {
     public boolean magShootingState;
     public double turretAngleOffsetAdjustmentConstant = 0;
     public AutoShootInfo info;
+    Vector2d redGoal = new Vector2d(72, -36);
+    Vector2d blueGoal = new Vector2d(72, 36);
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     TelemetryPacket packet = new TelemetryPacket();
@@ -124,5 +129,31 @@ public class Turret {
         magRotationServo.setPosition(position);
     }
 
+    public void update(double shooterVelo){
+        double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
+        double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
+        double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
+        hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
+        hardware.turret.updatePID = true;
+        hardware.turret.setTurretAngle(angleToGoal);
+        hardware.shooter.shooterVeloPID.setState(shooterVelo);
+    }
 
+    public void update(double shooterVelo, Pose2d poseEstimate, boolean red){
+        double distanceToGoal, turretTarget;
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(), poseEstimate.getY(),-4.72974566929, Angle.norm(poseEstimate.getHeading()));
+        if(red) {
+            distanceToGoal = redGoal.distTo(poseEstimate.vec());
+            turretTarget = redGoal.minus(poseEstimate.vec()).angle();
+        }
+        else {
+            distanceToGoal = blueGoal.distTo(poseEstimate.vec());
+            turretTarget = blueGoal.minus(poseEstimate.vec()).angle();
+        }
+        double angleToGoal = turretTarget - poseEstimate.getHeading();
+        hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
+        hardware.turret.updatePID = true;
+        hardware.turret.setTurretAngle(angleToGoal);
+        hardware.shooter.shooterVeloPID.setState(shooterVelo);
+    }
 }
