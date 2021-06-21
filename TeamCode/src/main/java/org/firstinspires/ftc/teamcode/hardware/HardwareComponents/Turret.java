@@ -139,20 +139,18 @@ public class Turret {
         hardware.shooter.shooterVeloPID.setState(shooterVelo);
     }
 
-    public void update(double shooterVelo, Pose2d poseEstimate, boolean red){
+    public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
         double distanceToGoal, turretTarget;
-        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(), poseEstimate.getY(),-4.72974566929, Angle.norm(poseEstimate.getHeading()));
         if(red) {
             distanceToGoal = redGoal.distTo(poseEstimate.vec());
             turretTarget = redGoal.minus(poseEstimate.vec()).angle();
-        }
-        else {
+        } else {
             distanceToGoal = blueGoal.distTo(poseEstimate.vec());
             turretTarget = blueGoal.minus(poseEstimate.vec()).angle();
         }
         double angleToGoal = turretTarget - poseEstimate.getHeading();
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
-        hardware.turret.updatePID = true;
+        hardware.turret.updatePID = update;
         hardware.turret.setTurretAngle(angleToGoal);
         hardware.shooter.shooterVeloPID.setState(shooterVelo);
     }

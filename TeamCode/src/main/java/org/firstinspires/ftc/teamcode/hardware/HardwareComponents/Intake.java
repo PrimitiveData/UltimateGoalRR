@@ -11,10 +11,10 @@ public class Intake {
     RegServo intakeDropperGuard;
     ContRotServo intakeServoStarboard;
     ContRotServo intakeServoPort;
-    double holdIntakeUp = 0.2;
+    double holdIntakeUp = 0.21;
     double bumperInit = 0.1438;
-    double bumperRaised = 0.44;
-    double releaseIntake = 0.56;
+    double bumperRaised = 0.24;
+    double releaseIntake = 0.53;
 
     RegServo leftBetorThingy;
     RegServo rightBetorThingy;

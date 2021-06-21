@@ -9,8 +9,8 @@ public class Mag {
     public RegServo magServo;
     public RegServo ringPusher;
     HardwareMecanum hardware;
-    double ringPusherResting=0.69;
-    double ringPusherPushedIn=0.46;
+    public double ringPusherResting=0.92;
+    public double ringPusherPushedIn=0.7;
     double magCollectRingPosition = 0.165;
     double magDropRingPosition = 0.64;
     public double magRotationCollectPosition = 0.172;

@@ -544,7 +544,7 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.dpad_up){
             hardware.turret.setLocalTurretAngle(0);
             hardware.turret.updatePID = true;
-            hardware.shooter.setRampPosition(0.57);
+            hardware.shooter.setRampPosition(0.6);
         }
         if(gamepad1.dpad_left){
             hardware.turret.setLocalTurretAngle(0);
@@ -554,7 +554,7 @@ public class UltimateGoalTeleop extends OpMode {
         if(gamepad1.dpad_down){
             hardware.turret.setLocalTurretAngle(0);
             hardware.turret.updatePID = true;
-            hardware.shooter.setRampPosition(0.35);
+            hardware.shooter.setRampPosition(0.4);
         }
 
         /*if(gamepad1.dpad_right){

@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
-import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.TimedAction;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Autonomous(name = "RedMTINoStack", group = "Autonomous")
 public class RMTINoStack extends LinearOpMode {
     public static double velo = 0;
+    public static boolean updateTurret = true;
     TimedAction flicker;
 
     //state machine
@@ -36,8 +37,8 @@ public class RMTINoStack extends LinearOpMode {
     }
     public State state = State.IDLE;
 
-    Pose2d startPose = new Pose2d(-63.25, -54, Math.PI); //starting pose
-    Vector2d shooterVector = new Vector2d(-8,-59); //shooting vector
+    Pose2d startPose = new Pose2d(-63, -47, Math.PI); //starting pose
+    Vector2d shooterVector = new Vector2d(-8,-55); //shooting vector
 
     @Override
     public void runOpMode() {
@@ -45,20 +46,24 @@ public class RMTINoStack extends LinearOpMode {
         hardware.shooter.shooterVeloPID = new ShooterPID(0,0,0,0.004893309156,3.238478883,0,Double.POSITIVE_INFINITY,hardware.time,"/sdcard/FIRST/shooterFFdata.txt");
         HardwareThreadInterface hardwareThreadInterface= new HardwareThreadInterface(hardware, this);
         hardware.turret.turretMotor.readRequested = true;
+        hardware.shooter.updatePID = true;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
+        //servo init
         hardware.wobbler.goToWobbleStartingPos();
         hardware.wobbler.gripWobble();
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
         hardware.intake.holdIntakeUp();
+        hardware.loop();
 
 
         //flicker timing
+        Servo flickServo = hardwareMap.get(Servo.class, "ringPusher");
         flicker = new TimedAction(
-                ()->hardware.mag.ringPusher.setPosition(0.46),
-                ()->hardware.mag.ringPusher.setPosition(0.69),
+                ()->flickServo.setPosition(0.7),
+                ()->flickServo.setPosition(0.92),
                 200,
                 true
         );
@@ -67,68 +72,66 @@ public class RMTINoStack extends LinearOpMode {
         //zero stack path
         TrajectorySequence zeroStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addDisplacementMarker(()->state = State.STARTED)
-                .splineTo(shooterVector, 0) //shooting
-                .addTemporalMarker(1, ()-> hardware.intake.dropIntake()) //time after starting path to drop intake
-                .addDisplacementMarker(()->state = State.ARMDOWN)
-                .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.OPENCLAW)
-                .waitSeconds(0.5)
-                .addDisplacementMarker(()->state = State.ARMUP)
-                .waitSeconds(1.5)
-                .addDisplacementMarker(()->state = State.SHOOTERON)
-                .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.SHOOTERSHOOT)
-                .waitSeconds(3)
-                .addDisplacementMarker(()->state = State.SHOOTEROFF)
-                .forward(50)
-                .waitSeconds(15)
+                .addTemporalMarker(0.1, () -> state = State.STARTED)
+                .addTemporalMarker(1, ()->hardware.intake.dropIntake())
+                .splineTo(new Vector2d(-1,-59), 0)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                .waitSeconds(2.5)
+                .lineTo(shooterVector)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
+                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
+                .waitSeconds(5)
+                .forward(40)
+                .waitSeconds(10)
                 .splineToLinearHeading(new Pose2d(14, -36,
                         new Vector2d(14, -36).angleBetween(new Vector2d(72, -22)) //park
                 ), 0)
-                .addDisplacementMarker(()->state = State.IDLE)
+                .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //one stack path
         TrajectorySequence oneStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addDisplacementMarker(()->state = State.STARTED)
+                .addDisplacementMarker(shooterVector, ()->state = State.STARTED)
                 .splineToConstantHeading(shooterVector, 0) //shooting
                 .addTemporalMarker(1, ()-> hardware.intake.dropIntake()) //time after starting path to drop intake
-                .addDisplacementMarker(()->state = State.SHOOTERON)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERON)
                 .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.SHOOTERSHOOT)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERSHOOT)
                 .waitSeconds(3)
-                .addDisplacementMarker(()->state = State.SHOOTEROFF)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTEROFF)
                 .splineToConstantHeading(new Vector2d(24, -37), 0) //wobble
-                .addDisplacementMarker(()->state = State.ARMDOWN)
+                .addDisplacementMarker(shooterVector, ()->state = State.ARMDOWN)
                 .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.OPENCLAW)
+                .addDisplacementMarker(shooterVector, ()->state = State.OPENCLAW)
                 .waitSeconds(0.5)
-                .addDisplacementMarker(()->state = State.ARMUP)
+                .addDisplacementMarker(shooterVector, ()->state = State.ARMUP)
                 .waitSeconds(1.5)
                 .lineToLinearHeading(new Pose2d(10,-58, Math.toRadians(90))) //park
-                .addDisplacementMarker(()->state = State.IDLE)
+                .addDisplacementMarker(shooterVector, ()->state = State.IDLE)
                 .build();
         //four stack path
         TrajectorySequence fourStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addDisplacementMarker(()->state = State.STARTED)
+                .addDisplacementMarker(shooterVector, ()->state = State.STARTED)
                 .splineTo(shooterVector, 0) //shooting
                 .addTemporalMarker(1, ()-> hardware.intake.dropIntake()) //time after starting path to drop intake
-                .addDisplacementMarker(()->state = State.SHOOTERON)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERON)
                 .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.SHOOTERSHOOT)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERSHOOT)
                 .waitSeconds(3)
-                .addDisplacementMarker(()->state = State.SHOOTEROFF)
+                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTEROFF)
                 .splineTo(new Vector2d(48, -59), 0) //wobble
-                .addDisplacementMarker(()->state = State.ARMDOWN)
+                .addDisplacementMarker(shooterVector, ()->state = State.ARMDOWN)
                 .waitSeconds(1)
-                .addDisplacementMarker(()->state = State.OPENCLAW)
+                .addDisplacementMarker(shooterVector, ()->state = State.OPENCLAW)
                 .waitSeconds(0.5)
-                .addDisplacementMarker(()->state = State.ARMUP)
+                .addDisplacementMarker(shooterVector, ()->state = State.ARMUP)
                 .waitSeconds(1.5)
                 .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
-                .addDisplacementMarker(()->state = State.IDLE)
+                .addDisplacementMarker(shooterVector, ()->state = State.IDLE)
                 .build();
 
         //camera control
@@ -158,9 +161,17 @@ public class RMTINoStack extends LinearOpMode {
         }
 
         while(!isStopRequested()){
+            //hardware and drive updating
             drive.update();
-            hardware.turret.update(velo, drive.getPoseEstimate(), true);
             hardware.loop();
+            //turret autoaim update
+            hardware.turret.update(velo, drive.getPoseEstimate(), true, updateTurret);
+
+            hardware.shooter.updateShooterPIDF();
+
+            telemetry.addData("Requested shooter velo: ", velo);
+            telemetry.addData("State", state);
+            telemetry.update();
 
             //states for auto
             switch (state) {
@@ -186,6 +197,7 @@ public class RMTINoStack extends LinearOpMode {
                     break;
                 case SHOOTEROFF:
                     velo = 0;
+                    updateTurret = false;
                     break;
                 case IDLE:
                     break;
