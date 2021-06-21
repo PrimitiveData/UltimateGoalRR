@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.TimedAction;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
@@ -18,8 +19,8 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.hardware.PID.ShooterPID;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
-@Autonomous(name = "RedMTINoStack", group = "Autonomous")
-public class RMTINoStack extends LinearOpMode {
+@Autonomous(name = "BlueMTINoStack", group = "Autonomous")
+public class BMTINoStack extends LinearOpMode {
     public static double velo = 0;
     public static boolean updateTurret = true;
     TimedAction flicker;
@@ -37,8 +38,8 @@ public class RMTINoStack extends LinearOpMode {
     }
     public State state = State.IDLE;
 
-    Pose2d startPose = new Pose2d(-63, -47, Math.PI); //starting pose
-    Vector2d shooterVector = new Vector2d(-8,-55); //shooting vector
+    Pose2d startPose = new Pose2d(-63.25, 54, Math.PI); //starting pose
+    Pose2d shootingPose = new Pose2d(-8,56, Math.toRadians(160)); //shooting pose
 
     @Override
     public void runOpMode() {
@@ -74,19 +75,18 @@ public class RMTINoStack extends LinearOpMode {
                 .setReversed(true)
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
                 .addTemporalMarker(1, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
-                .splineTo(new Vector2d(-1,-59), 0) //wobble
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
                 .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
                 .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
-                .lineTo(shooterVector) //shooting
+                .splineToLinearHeading(new Pose2d(-8,56, Math.PI), 0) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
-                .waitSeconds(5) //total time for shooting sequence
-                .forward(40) //get out of the way for partner
-                .waitSeconds(13) //time to wait before park
-                .splineToLinearHeading(new Pose2d(14, -36, Math.toRadians(1)), 0) //park
+                .waitSeconds(5) //total time for shooter sequence
+                .lineToLinearHeading(new Pose2d(-40,56, Math.PI)) //get out of the way for partner
+                .waitSeconds(13)
+                .splineToLinearHeading(new Pose2d(14, 36, Math.toRadians(1)), 0) //park
                 .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //one stack path
@@ -94,17 +94,17 @@ public class RMTINoStack extends LinearOpMode {
                 .setReversed(true)
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
                 .addTemporalMarker(1, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
-                .splineToConstantHeading(shooterVector, 0) //shooting
+                .splineToLinearHeading(shootingPose, 0) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
-                .waitSeconds(5) //total time for shooting sequence
-                .splineToConstantHeading(new Vector2d(24, -37), 0) //wobble
+                .waitSeconds(5) //total time for shooter sequence
+                .splineToLinearHeading(new Pose2d(24, 48, Math.toRadians(180)), 0) //wobble
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
                 .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
                 .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
-                .lineToLinearHeading(new Pose2d(10,-58, Math.toRadians(90))) //park
+                .lineToLinearHeading(new Pose2d(10,58, Math.toRadians(-90))) //park
                 .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //four stack path
@@ -112,17 +112,17 @@ public class RMTINoStack extends LinearOpMode {
                 .setReversed(true)
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
                 .addTemporalMarker(1, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
-                .splineTo(shooterVector, 0) //shooting
+                .splineToLinearHeading(shootingPose, 0) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
-                .waitSeconds(5) //total time for shooting sequence
-                .splineTo(new Vector2d(48, -59), 0) //wobble
+                .waitSeconds(5) //total time for shooter sequence
+                .lineToSplineHeading(new Pose2d(48, 56, Math.toRadians(225))) //wobble
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
                 .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
                 .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
-                .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
+                .lineToSplineHeading(new Pose2d(4,56, Math.toRadians(-60))) //park
                 .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
 

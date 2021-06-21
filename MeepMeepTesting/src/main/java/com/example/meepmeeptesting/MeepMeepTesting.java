@@ -21,21 +21,23 @@ public class MeepMeepTesting {
                 // Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(55, 60, Math.toRadians(211.05948602103072), Math.toRadians(211.05948602103072), 15.7471307087)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(startPose)
+                        drive.trajectorySequenceBuilder(new Pose2d(-63.25, 54, Math.PI))
                                 .setReversed(true)
                                 .addTemporalMarker(0.1, () -> {})
                                 .addTemporalMarker(1, ()->{})
-                                .splineTo(shooterVector, 0) //shooting
-                                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
-                                .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> {})
-                                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> {})
-                                .waitSeconds(5)
-                                .splineTo(new Vector2d(48, -59), 0) //wobble
+                                .lineToLinearHeading(new Pose2d(1,56, Math.toRadians(220)))
                                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
                                 .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> {})
                                 .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> {})
                                 .waitSeconds(2.5)
-                                .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
+                                .splineToLinearHeading(new Pose2d(-8,56, Math.PI), 0) //shooting
+                                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
+                                .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> {})
+                                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> {})
+                                .waitSeconds(5)
+                                .lineToLinearHeading(new Pose2d(-40,56, Math.PI))
+                                .waitSeconds(13)
+                                .splineToLinearHeading(new Pose2d(14, 36, Math.toRadians(1)), 0)
                                 .addTemporalMarker(0.9, 0.1, ()->{})
                                 .build()
                 )
