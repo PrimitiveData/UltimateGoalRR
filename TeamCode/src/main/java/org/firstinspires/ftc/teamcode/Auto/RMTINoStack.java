@@ -85,53 +85,45 @@ public class RMTINoStack extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
                 .waitSeconds(5)
                 .forward(40)
-                .waitSeconds(10)
-                .splineToLinearHeading(new Pose2d(14, -36,
-                        new Vector2d(14, -36).angleBetween(new Vector2d(72, -22)) //park
-                ), 0)
+                .waitSeconds(13)
+                .splineToLinearHeading(new Pose2d(14, -36, Math.toRadians(1)), 0)
                 .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //one stack path
         TrajectorySequence oneStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addDisplacementMarker(shooterVector, ()->state = State.STARTED)
+                .addTemporalMarker(0.1, () -> state = State.STARTED)
+                .addTemporalMarker(1, ()->hardware.intake.dropIntake())
                 .splineToConstantHeading(shooterVector, 0) //shooting
-                .addTemporalMarker(1, ()-> hardware.intake.dropIntake()) //time after starting path to drop intake
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERON)
-                .waitSeconds(1)
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERSHOOT)
-                .waitSeconds(3)
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
+                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
+                .waitSeconds(5)
                 .splineToConstantHeading(new Vector2d(24, -37), 0) //wobble
-                .addDisplacementMarker(shooterVector, ()->state = State.ARMDOWN)
-                .waitSeconds(1)
-                .addDisplacementMarker(shooterVector, ()->state = State.OPENCLAW)
-                .waitSeconds(0.5)
-                .addDisplacementMarker(shooterVector, ()->state = State.ARMUP)
-                .waitSeconds(1.5)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                .waitSeconds(2.5)
                 .lineToLinearHeading(new Pose2d(10,-58, Math.toRadians(90))) //park
-                .addDisplacementMarker(shooterVector, ()->state = State.IDLE)
+                .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //four stack path
         TrajectorySequence fourStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addDisplacementMarker(shooterVector, ()->state = State.STARTED)
+                .addTemporalMarker(0.1, () -> state = State.STARTED)
+                .addTemporalMarker(1, ()->hardware.intake.dropIntake())
                 .splineTo(shooterVector, 0) //shooting
-                .addTemporalMarker(1, ()-> hardware.intake.dropIntake()) //time after starting path to drop intake
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERON)
-                .waitSeconds(1)
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTERSHOOT)
-                .waitSeconds(3)
-                .addDisplacementMarker(shooterVector, ()->state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
+                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
+                .waitSeconds(5)
                 .splineTo(new Vector2d(48, -59), 0) //wobble
-                .addDisplacementMarker(shooterVector, ()->state = State.ARMDOWN)
-                .waitSeconds(1)
-                .addDisplacementMarker(shooterVector, ()->state = State.OPENCLAW)
-                .waitSeconds(0.5)
-                .addDisplacementMarker(shooterVector, ()->state = State.ARMUP)
-                .waitSeconds(1.5)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                .waitSeconds(2.5)
                 .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
-                .addDisplacementMarker(shooterVector, ()->state = State.IDLE)
+                .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
 
         //camera control
