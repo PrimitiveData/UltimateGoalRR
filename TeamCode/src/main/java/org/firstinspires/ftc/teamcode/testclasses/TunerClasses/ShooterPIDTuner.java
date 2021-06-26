@@ -32,7 +32,7 @@ public class ShooterPIDTuner extends LinearOpMode {
             hardware.shooter.shooterVeloPID.kD = hardware.shooter.shooterVeloPID.kD + kDChange;
             packet.put("targetHeading: ", hardware.shooter.shooterVeloPID.desiredState);
             packet.put("currentHeading: ", hardware.shooter.shooterVeloPID.currentState);
-            dashboard.sendTelemetryPacket(packet);
+            //dashboard.sendTelemetryPacket(packet);
             telemetry.update();
             hardware.loop();
         }

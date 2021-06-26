@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware.HardwareComponents;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
 
+@Config
 public class Turret {
     public static double ticks_per_radian=658.003123166;
     HardwareMecanum hardware;
@@ -45,7 +47,7 @@ public class Turret {
         this.hardware = hardware;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
-        turretPID = new PIDwithBasePower(3.4498,8,0,0, Math.toRadians(0), Math.toRadians(20), hardware.time);
+        turretPID = new PIDwithBasePower(9,10.5,0.1,0, Math.toRadians(0), Math.toRadians(20), hardware.time);
         updatePID = false;
         magShootingState = false;
         info = new AutoShootInfo();
@@ -141,12 +143,13 @@ public class Turret {
 
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
         double distanceToGoal, turretTarget;
-        if(red) {
+        if(red){
             distanceToGoal = redGoal.distTo(poseEstimate.vec());
-            turretTarget = redGoal.minus(poseEstimate.vec()).angle();
-        } else {
+            turretTarget = redGoal.angleBetween(poseEstimate.vec());
+        }
+        else{
             distanceToGoal = blueGoal.distTo(poseEstimate.vec());
-            turretTarget = blueGoal.minus(poseEstimate.vec()).angle();
+            turretTarget = blueGoal.angleBetween(poseEstimate.vec());
         }
         double angleToGoal = turretTarget - poseEstimate.getHeading();
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);

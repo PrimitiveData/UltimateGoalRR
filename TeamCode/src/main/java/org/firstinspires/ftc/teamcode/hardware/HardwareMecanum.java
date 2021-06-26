@@ -73,7 +73,7 @@ public class HardwareMecanum {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
         if(poseStorage == null){
-            currentPose = new Pose2d(0,0,0);
+            Pose2d startPose = new Pose2d(-63, -47, Math.PI);
         }else{
             currentPose = poseStorage;
         }
