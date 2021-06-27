@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -25,10 +26,12 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.hardware.PID.TurretPID;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Config
 @TeleOp(name = "aUltimateGoalTeleop",group="TeleOp")
 public class UltimateGoalTeleop extends OpMode {
     HardwareMecanum hardware;
@@ -242,10 +245,11 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
         else{
+
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
-            double angleToGoal = Math.PI - Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
+            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
             telemetry.addData("angleToGoal", Math.toDegrees(angleToGoal));
             if(!currentlyIncrementingMagDuringShooting) {
                 hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
@@ -253,6 +257,11 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.turret.updatePID = true;
             hardware.turret.setTurretAngle(angleToGoal);
             shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
+            packet.put("turret angle", hardware.turret.localTurretAngleRadians());
+            packet.put("angle to goal", angleToGoal);
+            packet.put("distance to goal", distanceToGoal);
+            TrajectorySequenceRunner.turretHeading = hardware.turret.localTurretAngleRadians();
+
             /*if(gamepad2.dpad_down){
                 hardware.shooter.rampAngleAdjustmentConstant -= 0.001;
             }
@@ -580,13 +589,19 @@ public class UltimateGoalTeleop extends OpMode {
         telemetry.addData("Current Shooter Velocity: ",hardware.shooter.shooterMotor1.getVelocity());
         telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         telemetry.addData("Shooter On: ",shooterOn);
+        /*
         telemetry.addLine("Robot Angle: " + Math.toDegrees(hardware.getAngle()));
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
         telemetry.addLine("Left Odo Pos: " + -hardware.hub1Motors[0].getCurrentPosition() + ", Right Odo Pos: " + -hardware.hub1Motors[3].motor.getCurrentPosition() + ", Lateral Odo Pos: " + hardware.hub1Motors[1].getCurrentPosition());
         packet.put("targetVelocity: ", hardware.shooter.shooterVeloPID.desiredState);
         packet.put("currentVelocity: ", hardware.shooter.shooterVeloPID.currentState);
         packet.put("Velocity Difference: ", hardware.shooter.shooterVeloPID.desiredState - hardware.shooter.shooterVeloPID.currentState);
-        //dashboard.sendTelemetryPacket(packet);
+         */
+        dashboard.sendTelemetryPacket(packet);
+        telemetry.addData("Odo x: ", hardware.getXAbsoluteCenter());
+        telemetry.addData("Odo y: ", hardware.getYAbsoluteCenter());
+        telemetry.addData("Robot Angle: ", hardware.getAngle());
+        telemetry.addData("Turret Angle: ", hardware.turret.localTurretAngleRadians());
         telemetry.update();
 //correcting autoaim
         if(gamepad2.dpad_up) {

@@ -51,8 +51,8 @@ public class RMTINoStack extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         //servo init
-        hardware.wobbler.goToWobbleStartingPos();
-        hardware.wobbler.gripWobble();
+        //hardware.wobbler.goToWobbleStartingPos();
+        //hardware.wobbler.gripWobble();
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
         hardware.intake.holdIntakeUp();
@@ -75,9 +75,9 @@ public class RMTINoStack extends LinearOpMode {
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
                 .addTemporalMarker(1, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
                 .splineTo(new Vector2d(-1,-59), 0) //wobble
-                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
-                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
-                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                //.UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                //.UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                //.UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
                 .lineTo(shooterVector) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
@@ -170,6 +170,7 @@ public class RMTINoStack extends LinearOpMode {
                 case STARTED:
                     hardware.turret.updatePID = true;
                     velo = 0;
+                    hardware.turret.maxPositive = Math.toRadians(5);
                     break;
                 case ARMDOWN:
                     hardware.wobbler.goToWobblerDropPosition();
@@ -180,6 +181,7 @@ public class RMTINoStack extends LinearOpMode {
                 case ARMUP:
                     hardware.wobbler.goToClawRestingPos();
                     hardware.wobbler.goToArmRestingPos();
+                    hardware.turret.maxPositive = Math.toRadians(315);
                     break;
                 case SHOOTERON:
                     velo = 1225;

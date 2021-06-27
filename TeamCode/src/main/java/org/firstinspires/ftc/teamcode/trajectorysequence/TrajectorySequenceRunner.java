@@ -16,6 +16,8 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryMarker;
 import com.acmerobotics.roadrunner.util.NanoClock;
 
+import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.SequenceSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TrajectorySegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
@@ -56,6 +58,9 @@ public class TrajectorySequenceRunner {
 
     private final FtcDashboard dashboard;
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
+
+
+    public static double turretHeading;
 
     public TrajectorySequenceRunner(TrajectoryFollower follower, PIDCoefficients headingPIDCoefficients) {
         this.follower = follower;
@@ -194,7 +199,7 @@ public class TrajectorySequenceRunner {
 
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 
-        //dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);
 
         return driveSignal;
     }
@@ -255,12 +260,18 @@ public class TrajectorySequenceRunner {
             fieldOverlay.setStroke("#4CAF50");
             DashboardUtil.drawRobot(fieldOverlay, targetPose);
         }
-
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
 
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
+
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,poseEstimate.getHeading());
+        fieldOverlay.setStrokeWidth(1);
+        fieldOverlay.setStroke("ADD9F5");
+        double x2Line = 72 - turretPosition[0];
+        double y2Line = x2Line * Math.tan(turretHeading - poseEstimate.getHeading());
+        fieldOverlay.strokeLine(turretPosition[0], turretPosition[1], x2Line, y2Line);
     }
 
     public Pose2d getLastPoseError() {

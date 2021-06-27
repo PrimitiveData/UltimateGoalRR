@@ -142,19 +142,29 @@ public class Turret {
     }
 
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
-        double distanceToGoal, turretTarget;
-        if(red){
-            distanceToGoal = redGoal.distTo(poseEstimate.vec());
-            turretTarget = redGoal.angleBetween(poseEstimate.vec());
-        }
-        else{
-            distanceToGoal = blueGoal.distTo(poseEstimate.vec());
-            turretTarget = blueGoal.angleBetween(poseEstimate.vec());
-        }
-        double angleToGoal = turretTarget - poseEstimate.getHeading();
+        double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
+        double distanceToGoal = Math.hypot(turretPosition[1]- redGoal.getX(),turretPosition[0] - redGoal.getY());
+        double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-redGoal.getX(), redGoal.getY()) + hardware.turret.getTurretOffset(distanceToGoal);
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
         hardware.turret.updatePID = update;
         hardware.turret.setTurretAngle(angleToGoal);
         hardware.shooter.shooterVeloPID.setState(shooterVelo);
+
+        /*
+        double distanceToGoal, turretTarget;
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,poseEstimate.getHeading());
+        if(red){
+            distanceToGoal = redGoal.distTo(poseEstimate.vec());
+            turretTarget = Math.atan2(redGoal.getX()-turretPosition[1], redGoal.getY()-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
+        }
+        else{
+            distanceToGoal = blueGoal.distTo(poseEstimate.vec());
+            turretTarget = Math.atan2(blueGoal.getX()-turretPosition[1], blueGoal.getY()-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
+        }
+        hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
+        hardware.turret.updatePID = update;
+        hardware.turret.setTurretAngle(turretTarget);
+        hardware.shooter.shooterVeloPID.setState(shooterVelo);
+         */
     }
 }

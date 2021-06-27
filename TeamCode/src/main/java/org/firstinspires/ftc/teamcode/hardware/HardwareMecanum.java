@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
@@ -57,14 +58,16 @@ public class HardwareMecanum {
     public List<LynxModule> allHubs;
     public SampleMecanumDrive drive;
     public Pose2d currentPose;
-    public static Pose2d poseStorage = new Pose2d();
-    public static double cumulativeAngleStorage=0;
+    public static Pose2d poseStorage;
+    public static double cumulativeAngleStorage=Math.PI;
     public double cumulativeAngle = 0;
     public double prevAngle;
     public boolean updateDrivePID = false;
-    public Pose2d targetPose = new Pose2d(0,0,0);
+    public Pose2d targetPose = new Pose2d(-63,-47,Math.PI);
     public TelemetryPacket packet;
+    public static boolean autoRan = false;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry, boolean sanfordGyroLocalizer){
+        poseStorage = new Pose2d(-63, -47, Math.PI);
         this.hardwareMap = hardwareMap;
         hw = this;
         HardwareMecanum.telemetry = telemetry;
@@ -72,11 +75,19 @@ public class HardwareMecanum {
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+        if (autoRan){
+            currentPose = poseStorage;
+        }
+        else{
+            currentPose = new Pose2d(-63, -47, Math.PI);
+        }
+        /*
         if(poseStorage == null){
-            Pose2d startPose = new Pose2d(-63, -47, Math.PI);
+            currentPose = new Pose2d(-63, -47, Math.PI);
         }else{
             currentPose = poseStorage;
         }
+         */
         hub1Motors = new Motor[4];//initialize here
         time = new ElapsedTime();
         hub2Motors = new Motor[4];//initialize here
@@ -166,6 +177,7 @@ public class HardwareMecanum {
             allHubs.get(1).clearBulkCache();
         }
         drive.update();
+        telemetry.update();
         currentPose = drive.getPoseEstimate();
         if(updateDrivePID) {
             drive.updateDrivetrainPID(drive.getPoseEstimate(), targetPose);
@@ -194,7 +206,9 @@ public class HardwareMecanum {
         prevAngle = currentPose.getHeading();
         packet.put("cumulativeAngle",MathFunctions.keepAngleWithin180Degrees(cumulativeAngle));
         packet.put("RRheading",MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading()));
+        Canvas fieldOverlay = packet.fieldOverlay();
         //FtcDashboard.getInstance().sendTelemetryPacket(packet);
+
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){
                 servo.servo.setPosition(servo.position);
