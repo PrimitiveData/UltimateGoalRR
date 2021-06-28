@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.Motor;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 import org.firstinspires.ftc.teamcode.hardware.RegServo;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 
 @Config
 public class Turret {
@@ -74,7 +75,7 @@ public class Turret {
 
     public void setTurretAngle(double globalTurretAngle){
         //global turret angle is the angle with respect to the field, local is the angle with respect to the robot
-        double trackingTarget = globalTurretAngle - hardware.getAngle();
+        double trackingTarget = globalTurretAngle - hardware.getAngle() - Math.PI;
         double desiredLocalTurretAngle = MathFunctions.correctedTargetWithinRange(localTurretAngleRadians(), trackingTarget, maxNegative, maxPositive);
         turretPID.setState(desiredLocalTurretAngle);
         if(magShootingState) {
@@ -142,13 +143,14 @@ public class Turret {
     }
 
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
-        double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
-        double distanceToGoal = Math.hypot(turretPosition[1]- redGoal.getX(),turretPosition[0] - redGoal.getY());
-        double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-redGoal.getX(), redGoal.getY()) + hardware.turret.getTurretOffset(distanceToGoal);
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,poseEstimate.getHeading() - Math.PI);
+        double distanceToGoal = Math.hypot(turretPosition[1]-redGoal.getY(),turretPosition[0]-redGoal.getX());
+        double angleToGoal = Math.atan2(redGoal.getY()-turretPosition[1], redGoal.getX()-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
         hardware.turret.updatePID = update;
         hardware.turret.setTurretAngle(angleToGoal);
         hardware.shooter.shooterVeloPID.setState(shooterVelo);
+        TrajectorySequenceRunner.turretHeading = hardware.turret.localTurretAngleRadians();
 
         /*
         double distanceToGoal, turretTarget;

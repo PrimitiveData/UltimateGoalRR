@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import org.firstinspires.ftc.teamcode.FieldConstants;
+import org.firstinspires.ftc.teamcode.MathFunctions;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.TimedAction;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
@@ -48,7 +50,8 @@ public class RMTINoStack extends LinearOpMode {
         hardware.turret.turretMotor.readRequested = true;
         hardware.shooter.updatePID = true;
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SampleMecanumDrive drive = hardware.drive;
+        drive.setPoseEstimate(startPose);
 
         //servo init
         //hardware.wobbler.goToWobbleStartingPos();
@@ -154,15 +157,19 @@ public class RMTINoStack extends LinearOpMode {
 
         while(!isStopRequested()){
             //hardware and drive updating
-            drive.update();
             hardware.loop();
             //turret autoaim update
             hardware.turret.update(velo, drive.getPoseEstimate(), true, updateTurret);
 
             hardware.shooter.updateShooterPIDF();
 
+            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
+            double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             telemetry.addData("Requested shooter velo: ", velo);
             telemetry.addData("State", state);
+            telemetry.addData("Turret heading:", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
+            telemetry.addData("Angle to goal:", Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal));
+            telemetry.addData("Distance to goal:", distanceToGoal);
             telemetry.update();
 
             //states for auto
