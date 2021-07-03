@@ -40,7 +40,7 @@ public class RMTINoStack extends LinearOpMode {
     public State state = State.IDLE;
 
     Pose2d startPose = new Pose2d(-63, -47, Math.PI); //starting pose
-    Vector2d shooterVector = new Vector2d(-8,-55); //shooting vector
+    Vector2d shooterVector = new Vector2d(-8,-58); //shooting vector
 
     @Override
     public void runOpMode() {
@@ -52,10 +52,11 @@ public class RMTINoStack extends LinearOpMode {
 
         SampleMecanumDrive drive = hardware.drive;
         drive.setPoseEstimate(startPose);
+        hardware.autoRan = true;
 
         //servo init
-        //hardware.wobbler.goToWobbleStartingPos();
-        //hardware.wobbler.gripWobble();
+        hardware.wobbler.goToWobbleStartingPos();
+        hardware.wobbler.gripWobble();
         hardware.mag.setRingPusherResting();
         hardware.mag.dropRings();
         hardware.intake.holdIntakeUp();
@@ -67,7 +68,7 @@ public class RMTINoStack extends LinearOpMode {
         flicker = new TimedAction(
                 ()->flickServo.setPosition(0.7),
                 ()->flickServo.setPosition(0.92),
-                200,
+                150,
                 true
         );
 
@@ -76,20 +77,19 @@ public class RMTINoStack extends LinearOpMode {
         TrajectorySequence zeroStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
-                .addTemporalMarker(1, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
+                .addTemporalMarker(18, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
+                .waitSeconds(16)
                 .splineTo(new Vector2d(-1,-59), 0) //wobble
-                //.UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
-                //.UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
-                //.UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
                 .lineTo(shooterVector) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
                 .waitSeconds(5) //total time for shooting sequence
-                .forward(40) //get out of the way for partner
-                .waitSeconds(13) //time to wait before park
-                .splineToLinearHeading(new Pose2d(14, -36, Math.toRadians(1)), 0) //park
+                .splineToLinearHeading(new Pose2d(10, -38, Math.toRadians(30)), 0) //park
                 .addTemporalMarker(0.9, 0.1, ()->state = State.IDLE)
                 .build();
         //one stack path
@@ -168,7 +168,7 @@ public class RMTINoStack extends LinearOpMode {
             telemetry.addData("Requested shooter velo: ", velo);
             telemetry.addData("State", state);
             telemetry.addData("Turret heading:", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
-            telemetry.addData("Angle to goal:", Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal));
+            telemetry.addData("Angle to goal:", Math.toDegrees(Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal)));
             telemetry.addData("Distance to goal:", distanceToGoal);
             telemetry.update();
 
@@ -191,6 +191,8 @@ public class RMTINoStack extends LinearOpMode {
                     hardware.turret.maxPositive = Math.toRadians(315);
                     break;
                 case SHOOTERON:
+                    hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1);
+                    hardware.shooter.rampAngleAdjustmentConstant = -0.025;
                     velo = 1225;
                     break;
                 case SHOOTERSHOOT:
