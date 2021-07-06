@@ -43,7 +43,8 @@ public class UltimateGoalTeleopExperimental extends UltimateGoalTeleop {
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry,true);
-        hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
+        Pose2d poseStorage = new Pose2d(HardwareMecanum.PoseStorageX, HardwareMecanum.PoseStorageY, HardwareMecanum.PoseStorageHeading);
+        hardware.drive.setPoseEstimate(poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1500;

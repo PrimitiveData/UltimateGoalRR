@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.hardware.BussinKalman;
 import org.firstinspires.ftc.teamcode.hardware.ContRotServo;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
@@ -39,6 +40,8 @@ public class Turret {
     Vector2d redGoal = new Vector2d(72, -36);
     Vector2d blueGoal = new Vector2d(72, 36);
 
+    BussinKalman bussinKalman = new BussinKalman(hardware.PoseStorageHeading);
+
     FtcDashboard dashboard = FtcDashboard.getInstance();
     TelemetryPacket packet = new TelemetryPacket();
     public Turret(Motor turretMotor, RegServo magRotationServo, HardwareMecanum hardware){
@@ -48,7 +51,7 @@ public class Turret {
         this.hardware = hardware;
         //startTurretPosition = localTurretAngleRadians();
         //turretPID = new TurretPID(1,1,1,Math.toRadians(20),hardware.time);
-        turretPID = new PIDwithBasePower(9,10.5,0.1,0, Math.toRadians(0), Math.toRadians(20), hardware.time);
+        turretPID = new PIDwithBasePower(5,5,0.006,0, Math.toRadians(0), Math.toRadians(20), hardware.time);
         updatePID = false;
         magShootingState = false;
         info = new AutoShootInfo();
@@ -133,7 +136,8 @@ public class Turret {
     }
 
     public void update(double shooterVelo){
-        double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.72974566929,hardware.getAngle());
+        double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
+        double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,bussinAngle);
         double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
         double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
@@ -143,7 +147,8 @@ public class Turret {
     }
 
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
-        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,poseEstimate.getHeading() - Math.PI);
+        double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,bussinAngle - Math.PI);
         double distanceToGoal = Math.hypot(turretPosition[1]-redGoal.getY(),turretPosition[0]-redGoal.getX());
         double angleToGoal = Math.atan2(redGoal.getY()-turretPosition[1], redGoal.getX()-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);

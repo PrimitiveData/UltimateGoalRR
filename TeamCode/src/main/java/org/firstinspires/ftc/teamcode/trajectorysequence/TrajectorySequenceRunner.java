@@ -265,13 +265,6 @@ public class TrajectorySequenceRunner {
 
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
-
-        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,poseEstimate.getHeading());
-        fieldOverlay.setStrokeWidth(1);
-        fieldOverlay.setStroke("ADD9F5");
-        double x2Line = 72 - turretPosition[0];
-        double y2Line = x2Line * Math.tan(turretHeading - poseEstimate.getHeading());
-        fieldOverlay.strokeLine(turretPosition[0], turretPosition[1], x2Line, y2Line);
     }
 
     public Pose2d getLastPoseError() {

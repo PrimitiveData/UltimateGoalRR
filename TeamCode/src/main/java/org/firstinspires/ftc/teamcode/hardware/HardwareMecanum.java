@@ -58,7 +58,10 @@ public class HardwareMecanum {
     public List<LynxModule> allHubs;
     public SampleMecanumDrive drive;
     public Pose2d currentPose;
-    public static Pose2d poseStorage;
+    //public static Pose2d poseStorage;
+    public static volatile double PoseStorageX;
+    public static volatile double PoseStorageY;
+    public static volatile double PoseStorageHeading;
     public static double cumulativeAngleStorage=Math.PI;
     public double cumulativeAngle = 0;
     public double prevAngle;
@@ -66,8 +69,8 @@ public class HardwareMecanum {
     public Pose2d targetPose = new Pose2d(-63,-47,Math.PI);
     public TelemetryPacket packet;
     public static boolean autoRan = false;
+    public boolean recordPoseStorage = true;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry, boolean sanfordGyroLocalizer){
-        poseStorage = new Pose2d(-63, -47, Math.PI);
         this.hardwareMap = hardwareMap;
         hw = this;
         HardwareMecanum.telemetry = telemetry;
@@ -75,12 +78,10 @@ public class HardwareMecanum {
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        if (autoRan){
-            currentPose = poseStorage;
-        }
-        else{
+        if (autoRan)
+            currentPose = new Pose2d(PoseStorageX, PoseStorageY, PoseStorageHeading);
+        else
             currentPose = new Pose2d(-63, -47, Math.PI);
-        }
         /*
         if(poseStorage == null){
             currentPose = new Pose2d(-63, -47, Math.PI);
@@ -199,7 +200,11 @@ public class HardwareMecanum {
         double currentTimeHub2 = time.milliseconds();
         deltaTimeHub2 = currentTimeHub2-prevTimeHub2;
         prevTimeHub2 = currentTimeHub2;
-        poseStorage = currentPose;
+        if (recordPoseStorage) {
+            PoseStorageX = currentPose.getX();
+            PoseStorageY = currentPose.getY();
+            PoseStorageHeading = currentPose.getHeading();
+        }
         cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
         cumulativeAngleStorage = cumulativeAngle;
         packet.put("prevAngle",MathFunctions.keepAngleWithin180Degrees(prevAngle));

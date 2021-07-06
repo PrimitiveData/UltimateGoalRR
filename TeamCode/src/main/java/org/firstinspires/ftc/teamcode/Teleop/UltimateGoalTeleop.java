@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.hardware.BussinKalman;
 import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.PowershotAutoShootInfo;
@@ -85,6 +86,8 @@ public class UltimateGoalTeleop extends OpMode {
     boolean slowMode;
     boolean slowModeToggledPrevLoop;
 
+    BussinKalman bussinKalman = new BussinKalman(hardware.PoseStorageHeading);
+
     public void init(){
         msStuckDetectLoop = 30000;
         /*if (T265.slamra == null) {
@@ -93,7 +96,8 @@ public class UltimateGoalTeleop extends OpMode {
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry,false);
-        hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
+        Pose2d poseStorage = new Pose2d(HardwareMecanum.PoseStorageX, HardwareMecanum.PoseStorageY, HardwareMecanum.PoseStorageHeading);
+        hardware.drive.setPoseEstimate(poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1350;
@@ -245,7 +249,7 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
         else{
-
+            double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);

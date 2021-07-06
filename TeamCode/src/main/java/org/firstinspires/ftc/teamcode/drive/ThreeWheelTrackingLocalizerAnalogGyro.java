@@ -35,13 +35,13 @@ import java.util.List;
  */
 public class ThreeWheelTrackingLocalizerAnalogGyro extends TwoTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 0.7134484467359772; // in
+    public static double WHEEL_RADIUS = 35.0/25.4/2.0; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
     public static double FORWARD_OFFSET = -8.07464133858; // in; offset of the lateral wheel
 
-    public static double X_MULTIPLIER = 0.97819119737; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 0.97819119737; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 0.9991568; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 1.0048540; // Multiplier in the Y direction
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 

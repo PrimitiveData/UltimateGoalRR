@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 @Config
 @TeleOp(group = "TeleOp", name = "TurretPIDTuner")
 public class TurretPIDTuner extends LinearOpMode {
-    public static double kP = 9;
-    public static double kI = 10;
-    public static double kD = 0.1;
+    public static double kP = 5;
+    public static double kI = 5;
+    public static double kD = 0.006;
 
     private boolean move = false;
     ElapsedTime timer = new ElapsedTime();
