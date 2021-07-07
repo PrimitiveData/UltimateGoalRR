@@ -78,7 +78,8 @@ public class Turret {
 
     public void setTurretAngle(double globalTurretAngle){
         //global turret angle is the angle with respect to the field, local is the angle with respect to the robot
-        double trackingTarget = globalTurretAngle - hardware.getAngle() - Math.PI;
+        double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
+        double trackingTarget = globalTurretAngle - bussinAngle;
         double desiredLocalTurretAngle = MathFunctions.correctedTargetWithinRange(localTurretAngleRadians(), trackingTarget, maxNegative, maxPositive);
         turretPID.setState(desiredLocalTurretAngle);
         if(magShootingState) {
