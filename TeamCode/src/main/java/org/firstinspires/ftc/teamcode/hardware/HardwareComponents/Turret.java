@@ -148,7 +148,7 @@ public class Turret {
 
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
         double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
-        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,bussinAngle - Math.PI);
+        double[] turretPosition = MathFunctions.transposeCoordinate(poseEstimate.getX(),poseEstimate.getY(),-4.22,bussinAngle);
         double distanceToGoal = Math.hypot(turretPosition[1]-redGoal.getY(),turretPosition[0]-redGoal.getX());
         double angleToGoal = Math.atan2(redGoal.getY()-turretPosition[1], redGoal.getX()-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
         hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);

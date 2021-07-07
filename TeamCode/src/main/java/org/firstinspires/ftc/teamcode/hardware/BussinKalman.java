@@ -16,7 +16,7 @@ public class BussinKalman {
          * Q
          */
         protected double Q = 0.41504936835155863;
-        protected double R = .904936835155863;
+        protected double R = 1.8;
 
         protected double A = 1;
         protected double C = 1;

@@ -63,7 +63,7 @@ public class HardwareMecanum {
     public static volatile double PoseStorageY;
     public static volatile double PoseStorageHeading;
     public static double cumulativeAngleStorage=Math.PI;
-    public double cumulativeAngle = 0;
+    public double cumulativeAngle = Math.PI;
     public double prevAngle;
     public boolean updateDrivePID = false;
     public Pose2d targetPose = new Pose2d(-63,-47,Math.PI);
@@ -121,6 +121,7 @@ public class HardwareMecanum {
         }
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         packet = new TelemetryPacket();
+        drive.setPoseEstimate(currentPose);
     }
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this(hardwareMap,telemetry, false);

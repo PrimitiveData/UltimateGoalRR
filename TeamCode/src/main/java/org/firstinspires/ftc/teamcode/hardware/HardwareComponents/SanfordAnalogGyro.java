@@ -17,7 +17,7 @@ public class SanfordAnalogGyro {
         this.hardwareMap = hardwareMap;
         out = hardwareMap.get(AnalogInput.class,"SanfordAnalogGyroOutput");
         firstUpdateLoop = true;
-        cumulativeAngle = 0;
+        cumulativeAngle = Math.PI;
     }
     public double getAngleRaw(){
         return out.getVoltage() / 3.3 *360/354* 360/360.22187981510024*2*Math.PI;
@@ -32,6 +32,6 @@ public class SanfordAnalogGyro {
         prevAngle = currentAngle;
     }
     public double getAngleCorrected(){
-        return cumulativeAngle;
+        return MathFunctions.keepAngleWithin180Degrees(cumulativeAngle);
     }
 }

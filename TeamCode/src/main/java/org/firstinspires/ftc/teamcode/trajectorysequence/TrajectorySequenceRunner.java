@@ -191,7 +191,7 @@ public class TrajectorySequenceRunner {
 
         packet.put("x", poseEstimate.getX());
         packet.put("y", poseEstimate.getY());
-        packet.put("heading (deg)", Math.toDegrees(poseEstimate.getHeading()));
+        packet.put("odo heading (deg)", Math.toDegrees(poseEstimate.getHeading()));
 
         packet.put("xError", getLastPoseError().getX());
         packet.put("yError", getLastPoseError().getY());
@@ -199,7 +199,7 @@ public class TrajectorySequenceRunner {
 
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 
-        dashboard.sendTelemetryPacket(packet);
+        //dashboard.sendTelemetryPacket(packet);
 
         return driveSignal;
     }
