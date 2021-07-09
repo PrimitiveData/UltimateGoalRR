@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.PoseStorage;
+import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.drive.ThreeWheelTrackingLocalizerAnalogGyro;
@@ -29,6 +31,7 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Mag;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Shooter;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.Turret;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.WobblerArm;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 
 import java.util.List;
 
@@ -68,7 +71,7 @@ public class HardwareMecanum {
     public boolean updateDrivePID = false;
     public Pose2d targetPose = new Pose2d(-63,-47,Math.PI);
     public TelemetryPacket packet;
-    public static boolean autoRan = false;
+    public static boolean autoRan;
     public boolean recordPoseStorage = true;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry, boolean sanfordGyroLocalizer){
         this.hardwareMap = hardwareMap;
@@ -78,10 +81,16 @@ public class HardwareMecanum {
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        if (autoRan)
-            currentPose = new Pose2d(PoseStorageX, PoseStorageY, PoseStorageHeading);
-        else
+        if (PoseStorageX == 0.0)
             currentPose = new Pose2d(-63, -47, Math.PI);
+        else
+            currentPose = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
+
+//        if (autoRan)
+//            currentPose = new Pose2d(PoseStorageX, PoseStorageY, PoseStorageHeading);
+//        else
+//            currentPose = new Pose2d(-63, -47, Math.PI);
+//        autoRan = false;
         /*
         if(poseStorage == null){
             currentPose = new Pose2d(-63, -47, Math.PI);
@@ -121,7 +130,6 @@ public class HardwareMecanum {
         }
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         packet = new TelemetryPacket();
-        drive.setPoseEstimate(currentPose);
     }
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry){
         this(hardwareMap,telemetry, false);
@@ -180,7 +188,7 @@ public class HardwareMecanum {
         }
         drive.update();
         telemetry.update();
-        currentPose = drive.getPoseEstimate();
+        
         if(updateDrivePID) {
             drive.updateDrivetrainPID(drive.getPoseEstimate(), targetPose);
             drive.updateDrivetrainHeadingPID(drive.getPoseEstimate(), targetPose);
@@ -201,11 +209,9 @@ public class HardwareMecanum {
         double currentTimeHub2 = time.milliseconds();
         deltaTimeHub2 = currentTimeHub2-prevTimeHub2;
         prevTimeHub2 = currentTimeHub2;
-        if (recordPoseStorage) {
-            PoseStorageX = currentPose.getX();
-            PoseStorageY = currentPose.getY();
-            PoseStorageHeading = currentPose.getHeading();
-        }
+
+        currentPose = drive.getPoseEstimate();
+
         cumulativeAngle += MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading() - prevAngle);
         cumulativeAngleStorage = cumulativeAngle;
         packet.put("prevAngle",MathFunctions.keepAngleWithin180Degrees(prevAngle));
@@ -214,6 +220,13 @@ public class HardwareMecanum {
         packet.put("RRheading",MathFunctions.keepAngleWithin180Degrees(currentPose.getHeading()));
         Canvas fieldOverlay = packet.fieldOverlay();
         //FtcDashboard.getInstance().sendTelemetryPacket(packet);
+
+        PoseStorageX = currentPose.getX();
+        PoseStorageY = currentPose.getY();
+        PoseStorageHeading = currentPose.getHeading();
+        PoseStorage.PoseStorageX = currentPose.getX();
+        PoseStorage.PoseStorageY = currentPose.getY();
+        PoseStorage.PoseStorageHeading = cumulativeAngle;
 
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){

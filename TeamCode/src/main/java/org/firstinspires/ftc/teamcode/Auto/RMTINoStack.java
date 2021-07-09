@@ -198,8 +198,8 @@ public class RMTINoStack extends LinearOpMode {
                     hardware.turret.maxPositive = Math.toRadians(315);
                     break;
                 case SHOOTERON:
-                    hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1);
-                    hardware.shooter.rampAngleAdjustmentConstant = -0.025;
+//                    hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1);
+//                    hardware.shooter.rampAngleAdjustmentConstant = -0.025;
                     velo = 1350;
                     break;
                 case SHOOTERSHOOT:
@@ -214,6 +214,7 @@ public class RMTINoStack extends LinearOpMode {
                     hardware.turret.setLocalTurretAngle(0);
                     break;
                 case STOP:
+                    hardware.turret.updatePID = false;
                     hardware.recordPoseStorage = false;
                     hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
                     hardware.shooter.rampAngleAdjustmentConstant = 0;

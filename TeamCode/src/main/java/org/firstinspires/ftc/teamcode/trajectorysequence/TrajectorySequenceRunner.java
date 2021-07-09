@@ -61,6 +61,7 @@ public class TrajectorySequenceRunner {
 
 
     public static double turretHeading;
+    public static boolean recordPose;
 
     public TrajectorySequenceRunner(TrajectoryFollower follower, PIDCoefficients headingPIDCoefficients) {
         this.follower = follower;
@@ -197,9 +198,11 @@ public class TrajectorySequenceRunner {
         packet.put("yError", getLastPoseError().getY());
         packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));
 
+        packet.put("recordPose", recordPose);
+
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 
-        //dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
 
         return driveSignal;
     }

@@ -251,11 +251,12 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void update() {
         analogGyro.update();
-        updatePoseEstimate();
-        Pose2d currentPose = getPoseEstimate();
+        if (!Thread.currentThread().isInterrupted()) {
+            updatePoseEstimate();
+            Pose2d currentPose = getPoseEstimate();
+            poseHistory.add(currentPose);
+        }
         Pose2d lastError = getLastError();
-
-        poseHistory.add(currentPose);
 
         if (POSE_HISTORY_LIMIT > -1 && poseHistory.size() > POSE_HISTORY_LIMIT) {
             poseHistory.removeFirst();

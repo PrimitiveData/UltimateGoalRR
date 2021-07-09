@@ -5,19 +5,18 @@ import com.acmerobotics.dashboard.config.Config;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 
 @Config
-public class BussinKalman{
+public class BussinKalman {
 
     protected double x;
     protected double p;
     protected double x_previous;
     protected double p_previous;
+    public static double Q = 6.504936835155863;
+    public static double R = 7.815049368351558;
     protected double currentSensor1;
     protected double previousSensor1;
     protected double currentSensor2;
     protected double previousSensor2;
-
-    public static double Q = 0.0504936835155863;
-    public static double R = 7.815049368351558;
 
     protected double A = 1;
     protected double C = 1;
@@ -56,7 +55,7 @@ public class BussinKalman{
 
         x = x_previous + u;
         p = p_previous + Q;
-        kalmanGain = p * H * (H * p * H + R);
+        kalmanGain = p * H * (1 / (H * p * H + R));
 
         x = normalizeRadians(x + kalmanGain * normalizeRadians((currentSensor2 - previousSensor2) - H * normalizeRadians(x - x_previous)));
 
@@ -71,4 +70,4 @@ public class BussinKalman{
 
         return x;
     }
-} 
+}

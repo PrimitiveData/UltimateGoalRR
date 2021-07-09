@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.FieldConstants;
 import org.firstinspires.ftc.teamcode.MathFunctions;
+import org.firstinspires.ftc.teamcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.Teleop.Multithreads.MagFlickerController;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
@@ -96,8 +97,8 @@ public class UltimateGoalTeleop extends OpMode {
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry,false);
-        Pose2d poseStorage = new Pose2d(HardwareMecanum.PoseStorageX, HardwareMecanum.PoseStorageY, HardwareMecanum.PoseStorageHeading);
-//        hardware.drive.setPoseEstimate(poseStorage);
+        Pose2d poseStorage = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
+        hardware.drive.setPoseEstimate(poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1350;
@@ -244,7 +245,7 @@ public class UltimateGoalTeleop extends OpMode {
                 manuelRampControlTogglePrevLoop = false;
             }
         }
-        double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.drive.getRawExternalHeading(), hardware.getAngle());
+        double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.getAngle(), hardware.drive.getRawExternalHeading());
         packet.put("turret heading", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
 //        packet.put("angle to goal", Math.toDegrees(angleToGoal));
         packet.put("odo heading (deg)", Math.toDegrees(hardware.drive.getPoseEstimate().getHeading()));
@@ -264,13 +265,13 @@ public class UltimateGoalTeleop extends OpMode {
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             packet.put("distance to goal", distanceToGoal);
-            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal);
+            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]);
             packet.put("angle to goal", Math.toDegrees(angleToGoal));
             if(!currentlyIncrementingMagDuringShooting) {
                 hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
             }
             hardware.turret.updatePID = true;
-            hardware.turret.setTurretAngle(angleToGoal);
+            hardware.turret.setTurretAngle(angleToGoal + hardware.turret.getTurretOffset(distanceToGoal));
             shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
 
             /*if(gamepad2.dpad_down){
