@@ -44,6 +44,7 @@ public class HardwareMecanum {
     public RegServo[] servos;
     public ContRotServo[] CRservos;
     public ElapsedTime time;
+    public ElapsedTime timer;
     public int loops = 0;
     public boolean firstLoop = true;
     public double startTimeHub1;
@@ -72,7 +73,6 @@ public class HardwareMecanum {
     public Pose2d targetPose = new Pose2d(-63,-47,Math.PI);
     public TelemetryPacket packet;
     public static boolean autoRan;
-    public boolean recordPoseStorage = true;
     public HardwareMecanum(HardwareMap hardwareMap, Telemetry telemetry, boolean sanfordGyroLocalizer){
         this.hardwareMap = hardwareMap;
         hw = this;
@@ -100,6 +100,7 @@ public class HardwareMecanum {
          */
         hub1Motors = new Motor[4];//initialize here
         time = new ElapsedTime();
+        timer = new ElapsedTime();
         hub2Motors = new Motor[4];//initialize here
         servos = new RegServo[12];//initialize here
         CRservos = new ContRotServo[12];
@@ -136,6 +137,8 @@ public class HardwareMecanum {
     }
 
     public void loop(){
+        System.out.println(timer.milliseconds());
+        timer.reset();
         loops++;
         boolean hub1ReadNeeded = false;
         for(Motor motor: hub1Motors){

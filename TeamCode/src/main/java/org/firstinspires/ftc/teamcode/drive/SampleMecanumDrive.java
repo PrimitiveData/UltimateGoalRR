@@ -96,6 +96,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     public SanfordAnalogGyro analogGyro;
     private int POSE_HISTORY_LIMIT = 100;
 
+    public boolean recordPose = true;
+
     public SampleMecanumDrive(HardwareMap hardwareMap){
         this(hardwareMap, false);
     }
@@ -114,7 +116,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                new Pose2d(0.5, 0.5, Math.toRadians(1.0)), 0.5);
 
         poseHistory = new LinkedList<>();
 
@@ -252,9 +254,11 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void update() {
         analogGyro.update();
         if (!Thread.currentThread().isInterrupted()) {
-            updatePoseEstimate();
-            Pose2d currentPose = getPoseEstimate();
-            poseHistory.add(currentPose);
+            if (recordPose) {
+                updatePoseEstimate();
+                Pose2d currentPose = getPoseEstimate();
+                poseHistory.add(currentPose);
+            }
         }
         Pose2d lastError = getLastError();
 
