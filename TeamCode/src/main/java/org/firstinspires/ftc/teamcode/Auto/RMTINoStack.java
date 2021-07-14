@@ -38,7 +38,7 @@ public class RMTINoStack extends LinearOpMode {
         RESET, //nothing happens here (end of auto state)
         STOP //stop reading odo
     }
-    public State state = State.STOP;
+    public State state = State.STARTED;
 
     Pose2d startPose = new Pose2d(-63, -47, Math.PI); //starting pose
     Vector2d shooterVector = new Vector2d(-8,-58); //shooting vector
@@ -78,7 +78,7 @@ public class RMTINoStack extends LinearOpMode {
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
                 .addTemporalMarker(18, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
                 .addTemporalMarker(20, ()->hardware.intake.raiseBumper()) //bring bumper back up
-                .waitSeconds(13)
+                .waitSeconds(11)
                 .splineTo(new Vector2d(-11,-58), 0) //wobble
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
                 .UNSTABLE_addTemporalMarkerOffset(1, ()-> state = State.ARMDOWN2)
@@ -174,6 +174,7 @@ public class RMTINoStack extends LinearOpMode {
             telemetry.addData("Turret heading:", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
             telemetry.addData("Angle to goal:", Math.toDegrees(Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal)));
             telemetry.addData("Distance to goal:", distanceToGoal);
+            telemetry.addData("Record pose:", hardware.drive.recordPose);
             telemetry.update();
 
             //states for auto
@@ -215,7 +216,7 @@ public class RMTINoStack extends LinearOpMode {
                     break;
                 case STOP:
                     hardware.turret.updatePID = false;
-                    hardware.recordPoseStorage = false;
+                    hardware.drive.recordPose = false;
                     hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
                     hardware.shooter.rampAngleAdjustmentConstant = 0;
                     break;

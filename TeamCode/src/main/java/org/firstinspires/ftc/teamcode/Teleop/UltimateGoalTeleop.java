@@ -287,7 +287,7 @@ public class UltimateGoalTeleop extends OpMode {
                 hardware.turret.turretAngleOffsetAdjustmentConstant -= Math.toDegrees(0.01);
             }*/
         }
-        dashboard.sendTelemetryPacket(packet);
+//        dashboard.sendTelemetryPacket(packet);
         //shooter
         if(gamepad1.left_bumper) {
             if(!shooterOnTogglePrevLoop) {
