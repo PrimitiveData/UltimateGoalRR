@@ -60,6 +60,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(14, 0, 0.9);
+//    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(13.37, 0.03404, 8.322);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0.6);
 
     public static double LATERAL_MULTIPLIER = 1;
@@ -144,6 +145,9 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightFront.setDirection(DcMotorEx.Direction.FORWARD);
         rightRear.setDirection(DcMotorEx.Direction.FORWARD);
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -253,9 +257,9 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void update() {
         analogGyro.update();
+        updatePoseEstimate();
         if (!Thread.currentThread().isInterrupted()) {
             if (recordPose) {
-                updatePoseEstimate();
                 Pose2d currentPose = getPoseEstimate();
                 poseHistory.add(currentPose);
             }

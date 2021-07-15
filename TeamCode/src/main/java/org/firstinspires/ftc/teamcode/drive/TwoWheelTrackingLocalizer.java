@@ -49,6 +49,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     // Perpendicular is perpendicular to the forward axis
     private Encoder parallelEncoder, perpendicularEncoder;
 
+    public double lastParallel, lastPerp = 0;
+
     private SampleMecanumDrive drive;
 
     public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
@@ -77,9 +79,23 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
+        double parallelPos = parallelEncoder.getCurrentPosition();
+        double perpPos = perpendicularEncoder.getCurrentPosition();
+
+        if (parallelPos == 0 && Math.abs(lastParallel) > 4000) {
+            parallelPos = lastParallel;
+        }
+
+        if (perpPos == 0 && Math.abs(lastPerp) > 4000) {
+            perpPos = lastPerp;
+        }
+
+        lastParallel = parallelPos;
+        lastPerp = perpPos;
+
         return Arrays.asList(
-                encoderTicksToInches(parallelEncoder.getCurrentPosition()),
-                encoderTicksToInches(perpendicularEncoder.getCurrentPosition())
+                encoderTicksToInches(parallelPos),
+                encoderTicksToInches(perpPos)
         );
     }
 

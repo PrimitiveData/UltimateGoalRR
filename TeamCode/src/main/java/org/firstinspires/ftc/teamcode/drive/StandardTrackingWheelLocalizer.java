@@ -37,6 +37,7 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double X_MULTIPLIER = 0.9991568; // Multiplier in the X direction
     public static double Y_MULTIPLIER = 1.0048540; // Multiplier in the Y direction
     private Encoder leftEncoder, rightEncoder, frontEncoder;
+    public double lastLeft, lastRight, lastFront = 0;
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
@@ -59,12 +60,52 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
+
+        double leftPos = leftEncoder.getCurrentPosition();
+        double rightPos = rightEncoder.getCurrentPosition();
+        double frontPos = frontEncoder.getCurrentPosition();
+
+
+        if (leftPos == 0 && Math.abs(lastLeft) > 4000) {
+            leftPos = lastLeft;
+        }
+
+        if (rightPos == 0 && Math.abs(lastRight) > 4000) {
+            rightPos = lastRight;
+        }
+
+        if (frontPos == 0 && Math.abs(lastFront) > 4000) {
+            frontPos = lastFront;
+        }
+
+        lastLeft = leftPos;
+        lastRight = rightPos;
+        lastFront = frontPos;
+
         return Arrays.asList(
-                encoderTicksToInches(leftEncoder.getCurrentPosition())*X_MULTIPLIER,
-                encoderTicksToInches(rightEncoder.getCurrentPosition())*X_MULTIPLIER,
-                encoderTicksToInches(frontEncoder.getCurrentPosition())*Y_MULTIPLIER
+                encoderTicksToInches(leftPos) * X_MULTIPLIER,
+                encoderTicksToInches(rightPos) * X_MULTIPLIER,
+                encoderTicksToInches(frontPos) * Y_MULTIPLIER
         );
+
     }
+
+//    @NonNull
+//    @Override
+//    public List<Double> getWheelPositions() {
+//        long leftEncoderPos = leftEncoder.getCurrentPosition();
+//        long rightEncoderPos = rightEncoder.getCurrentPosition();
+//        long frontEncoderPos = frontEncoder.getCurrentPosition();
+//        System.out.println("Encoder Pos:" + leftEncoderPos + "," + rightEncoderPos + "," + frontEncoderPos);
+//
+//
+//
+//        return Arrays.asList(
+//                encoderTicksToInches(leftEncoderPos)*X_MULTIPLIER,
+//                encoderTicksToInches(rightEncoderPos)*X_MULTIPLIER,
+//                encoderTicksToInches(frontEncoderPos)*Y_MULTIPLIER
+//        );
+//    }
 
     @NonNull
     @Override

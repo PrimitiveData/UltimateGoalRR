@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.TimedAction;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.PID.ShooterPID;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 
 @Config
 @Autonomous(name = "RedMTINoStack", group = "Autonomous")
@@ -167,6 +168,8 @@ public class RMTINoStack extends LinearOpMode {
 
             hardware.shooter.updateShooterPIDF();
 
+            TrajectorySequenceRunner.turretHeading = Math.toDegrees(hardware.turret.localTurretAngleRadians());
+
             double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
             double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
             telemetry.addData("Requested shooter velo: ", velo);
@@ -216,7 +219,7 @@ public class RMTINoStack extends LinearOpMode {
                     break;
                 case STOP:
                     hardware.turret.updatePID = false;
-                    hardware.drive.recordPose = false;
+//                    hardware.drive.recordPose = false;
                     hardware.turret.turretAngleOffsetAdjustmentConstant = 0;
                     hardware.shooter.rampAngleAdjustmentConstant = 0;
                     break;

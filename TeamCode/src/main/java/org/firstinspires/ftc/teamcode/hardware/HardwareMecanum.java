@@ -62,7 +62,7 @@ public class HardwareMecanum {
     public List<LynxModule> allHubs;
     public SampleMecanumDrive drive;
     public Pose2d currentPose;
-    //public static Pose2d poseStorage;
+    public static volatile Pose2d poseStorage = new Pose2d(-63,-47,Math.PI);
     public static volatile double PoseStorageX;
     public static volatile double PoseStorageY;
     public static volatile double PoseStorageHeading;
@@ -81,10 +81,15 @@ public class HardwareMecanum {
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        if (PoseStorageX == 0.0)
-            currentPose = new Pose2d(-63, -47, Math.PI);
-        else
-            currentPose = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
+        if(poseStorage == null){
+            currentPose = new Pose2d(-63,-47, Math.PI);
+        }else{
+            currentPose = poseStorage;
+        }
+//        if (PoseStorageX == 0.0)
+//            currentPose = new Pose2d(-63, -47, Math.PI);
+//        else
+//            currentPose = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
 
 //        if (autoRan)
 //            currentPose = new Pose2d(PoseStorageX, PoseStorageY, PoseStorageHeading);
@@ -129,6 +134,7 @@ public class HardwareMecanum {
         else{
             drive = new SampleMecanumDrive(hardwareMap);
         }
+
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         packet = new TelemetryPacket();
     }
@@ -137,7 +143,13 @@ public class HardwareMecanum {
     }
 
     public void loop(){
-        System.out.println(timer.milliseconds());
+//        System.out.println(timer.milliseconds());
+        try {
+            System.out.println("Pose Storage:" + poseStorage.getX() + poseStorage.getY() + poseStorage.getHeading());
+        }
+        catch (Exception e){
+            System.out.println("exception caught");
+        }
         timer.reset();
         loops++;
         boolean hub1ReadNeeded = false;
@@ -224,12 +236,13 @@ public class HardwareMecanum {
         Canvas fieldOverlay = packet.fieldOverlay();
         //FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
-        PoseStorageX = currentPose.getX();
-        PoseStorageY = currentPose.getY();
-        PoseStorageHeading = currentPose.getHeading();
-        PoseStorage.PoseStorageX = currentPose.getX();
-        PoseStorage.PoseStorageY = currentPose.getY();
-        PoseStorage.PoseStorageHeading = cumulativeAngle;
+//        PoseStorageX = currentPose.getX();
+//        PoseStorageY = currentPose.getY();
+//        PoseStorageHeading = currentPose.getHeading();
+//        PoseStorage.PoseStorageX = PoseStorageX;
+//        PoseStorage.PoseStorageY = PoseStorageY;
+//        PoseStorage.PoseStorageHeading = PoseStorageHeading;
+        poseStorage = currentPose;
 
         for(RegServo servo: servos){
             if(servo!=null&&servo.writeRequested){

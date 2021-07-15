@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -97,8 +98,9 @@ public class UltimateGoalTeleop extends OpMode {
         startAngle = Hardware.angleClassVariable;
         telemetry.addData("startAngle",startAngle);
         hardware = new HardwareMecanum(hardwareMap,telemetry,false);
-        Pose2d poseStorage = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
-        hardware.drive.setPoseEstimate(poseStorage);
+//        Pose2d poseStorage = new Pose2d(PoseStorage.PoseStorageX, PoseStorage.PoseStorageY, PoseStorage.PoseStorageHeading);
+//        hardware.drive.setPoseEstimate(poseStorage);
+        hardware.drive.setPoseEstimate(HardwareMecanum.poseStorage);
         hardware.cumulativeAngle = HardwareMecanum.cumulativeAngleStorage;
         hardware.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterVelo = 1350;
@@ -110,6 +112,9 @@ public class UltimateGoalTeleop extends OpMode {
         currentlyIncrementingMagDuringShooting = false;
         driveMode = Mode.DRIVER_CONTROL;
         headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
+        hardware.turret.turretMotor.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hardware.turret.turretMotor.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hardware.turret.turretMotor.motor.setDirection(DcMotorEx.Direction.REVERSE);
         hardware.turret.turretMotor.readRequested = true;
         bumperDown = false;
         hardware.loop();
@@ -259,7 +264,10 @@ public class UltimateGoalTeleop extends OpMode {
             hardware.shooter.setRampPosition(hardware.shooter.rampPostion - gamepad2.right_stick_y*0.001);
         }
         else{
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,bussinAngle);
+            double x = hardware.drive.getPoseEstimate().getX();
+            double y = hardware.drive.getPoseEstimate().getY();
+            double angle = hardware.drive.getPoseEstimate().getHeading();
+            double[] turretPosition = MathFunctions.transposeCoordinate(x,y,-4.22,angle);
             packet.put("turret pose x", turretPosition[0]);
             packet.put("turret pose y", turretPosition[1]);
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
@@ -602,6 +610,9 @@ public class UltimateGoalTeleop extends OpMode {
         telemetry.addData("Current Shooter Velocity: ",hardware.shooter.shooterMotor1.getVelocity());
         telemetry.addData("Local Turret Angle: ", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
         telemetry.addData("Shooter On: ",shooterOn);
+
+        TrajectorySequenceRunner.turretHeading = Math.toDegrees(hardware.turret.localTurretAngleRadians());
+
         /*
         telemetry.addLine("Robot Angle: " + Math.toDegrees(hardware.getAngle()));
         telemetry.addLine("XCenter: " + hardware.getXAbsoluteCenter()  + ", YCenter: "+hardware.getYAbsoluteCenter());
