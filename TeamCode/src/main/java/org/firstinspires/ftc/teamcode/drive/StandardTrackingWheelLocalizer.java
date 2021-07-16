@@ -65,16 +65,17 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         double rightPos = rightEncoder.getCurrentPosition();
         double frontPos = frontEncoder.getCurrentPosition();
 
+        double jumpDisplacement = 1000;
 
-        if (leftPos == 0 && Math.abs(lastLeft) > 4000) {
+        if (leftPos == 0 && Math.abs(lastLeft) > jumpDisplacement) {
             leftPos = lastLeft;
         }
 
-        if (rightPos == 0 && Math.abs(lastRight) > 4000) {
+        if (rightPos == 0 && Math.abs(lastRight) > jumpDisplacement) {
             rightPos = lastRight;
         }
 
-        if (frontPos == 0 && Math.abs(lastFront) > 4000) {
+        if (frontPos == 0 && Math.abs(lastFront) > jumpDisplacement) {
             frontPos = lastFront;
         }
 

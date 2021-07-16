@@ -82,11 +82,13 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
         double parallelPos = parallelEncoder.getCurrentPosition();
         double perpPos = perpendicularEncoder.getCurrentPosition();
 
-        if (parallelPos == 0 && Math.abs(lastParallel) > 4000) {
+        double jumpDisplacement = 1000;
+
+        if (parallelPos == 0 && Math.abs(lastParallel) > jumpDisplacement) {
             parallelPos = lastParallel;
         }
 
-        if (perpPos == 0 && Math.abs(lastPerp) > 4000) {
+        if (perpPos == 0 && Math.abs(lastPerp) > jumpDisplacement) {
             perpPos = lastPerp;
         }
 

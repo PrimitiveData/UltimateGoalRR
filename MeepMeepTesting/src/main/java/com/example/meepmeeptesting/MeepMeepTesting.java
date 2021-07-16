@@ -114,23 +114,27 @@ public class MeepMeepTesting{
                 .setConstraints(55, 60, Math.toRadians(211.05948602103072), Math.toRadians(211.05948602103072), 15.7471307087)
                 .followTrajectorySequence(drive ->     drive.trajectorySequenceBuilder(new Pose2d(-63, -47, Math.PI))
                         .setReversed(true)
+                        .setReversed(true)
                         .addTemporalMarker(0.1, () -> {})
-                        .addTemporalMarker(28, ()->{}) //time to wait before dropping intake
-                        .addTemporalMarker(29, ()->{})
-                        .waitSeconds(15)
-                        .splineToConstantHeading(new Vector2d(-6, -37), 0) //shooting
+                        .addTemporalMarker(1, ()->{}) //time to wait before dropping intake
+                        .splineTo(shooterVector, 0) //shooting
                         .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
                         .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> {})
                         .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> {})
                         .waitSeconds(5) //total time for shooting sequence
-                        .splineToConstantHeading(new Vector2d(8, -37), 0) //wobble
+                        .lineToLinearHeading(new Pose2d(-14, -48, Math.toRadians(135)))
+                        .forward(12)
+                        .forward(8)
+                        .splineToLinearHeading(new Pose2d(0, -59, Math.PI), 0) //wobble
+                        .splineToLinearHeading(new Pose2d(34, -59, Math.PI), 0) //wobble
                         .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
                         .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> {})
                         .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> {})
                         .waitSeconds(2.5) //total time for wobble sequence
-                        .lineToLinearHeading(new Pose2d(10,-58, Math.toRadians(90))) //park
+                        .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
                         .addTemporalMarker(29.9, ()->{})
                         .build()
+
                 )
                 .start();
     }

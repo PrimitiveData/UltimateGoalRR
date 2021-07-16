@@ -200,7 +200,7 @@ public class TrajectorySequenceRunner {
 
         packet.put("turret heading", turretHeading);
 
-//        packet.put("recordPose", recordPose);
+        packet.put("recordPose", recordPose);
 
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 
