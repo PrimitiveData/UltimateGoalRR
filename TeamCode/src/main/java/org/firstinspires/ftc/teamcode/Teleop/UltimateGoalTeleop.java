@@ -35,7 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 @Config
-@TeleOp(name = "aUltimateGoalTeleop",group="TeleOp")
+@TeleOp(name = "Teleop",group="ActualTeleOp")
 public class UltimateGoalTeleop extends OpMode {
     HardwareMecanum hardware;
     //toggles
@@ -88,6 +88,8 @@ public class UltimateGoalTeleop extends OpMode {
     boolean slowMode;
     boolean slowModeToggledPrevLoop;
 
+    boolean red;
+
     BussinKalman bussinKalman = new BussinKalman(hardware.PoseStorageHeading);
 
     public void init(){
@@ -117,6 +119,12 @@ public class UltimateGoalTeleop extends OpMode {
         hardware.turret.turretMotor.motor.setDirection(DcMotorEx.Direction.REVERSE);
         hardware.turret.turretMotor.readRequested = true;
         bumperDown = false;
+
+        if(HardwareMecanum.poseStorage.getY() < 0)
+            red = true;
+        else
+            red = false;
+
         hardware.loop();
     }
     public double logistic(double input, double constantB, double constantC){
@@ -271,13 +279,20 @@ public class UltimateGoalTeleop extends OpMode {
             packet.put("turret pose x", turretPosition[0]);
             packet.put("turret pose y", turretPosition[1]);
             telemetry.addLine("Turret XY Position On Field: "+turretPosition[0]+", "+turretPosition[1]);
-            double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
-            packet.put("distance to goal", distanceToGoal);
-            double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]);
-            packet.put("angle to goal", Math.toDegrees(angleToGoal));
-            if(!currentlyIncrementingMagDuringShooting) {
-                hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
+            double distanceToGoal, angleToGoal;
+            if(red){
+                distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.highGoalPosition[1], turretPosition[0] - FieldConstants.highGoalPosition[0]);
+                angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1] - turretPosition[1], FieldConstants.highGoalPosition[0] - turretPosition[0]);
             }
+            else{
+                distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.blueHighGoalPosition[1], turretPosition[0] - FieldConstants.blueHighGoalPosition[0]);
+                angleToGoal = Math.atan2(FieldConstants.blueHighGoalPosition[1] - turretPosition[1], FieldConstants.blueHighGoalPosition[0] - turretPosition[0]);
+            }
+            packet.put("distance to goal", distanceToGoal);
+            packet.put("angle to goal", Math.toDegrees(angleToGoal));
+//            if(!currentlyIncrementingMagDuringShooting) {
+//                hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
+//            }
             hardware.turret.updatePID = true;
             hardware.turret.setTurretAngle(angleToGoal + hardware.turret.getTurretOffset(distanceToGoal));
             shooterVelo = hardware.shooter.autoaimShooterSpeed(distanceToGoal);
@@ -572,19 +587,14 @@ public class UltimateGoalTeleop extends OpMode {
          */
 
         if(gamepad1.dpad_up){
-            hardware.turret.setLocalTurretAngle(0);
-            hardware.turret.updatePID = true;
             hardware.shooter.setRampPosition(0.6);
         }
         if(gamepad1.dpad_left){
-            hardware.turret.setLocalTurretAngle(0);
-            hardware.turret.updatePID = true;
             hardware.shooter.setRampPosition(0.2);
         }
         if(gamepad1.dpad_down){
-            hardware.turret.setLocalTurretAngle(0);
             hardware.turret.updatePID = true;
-            hardware.shooter.setRampPosition(0.4);
+            hardware.turret.setLocalTurretAngle(0);
         }
 
         /*if(gamepad1.dpad_right){

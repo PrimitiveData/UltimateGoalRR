@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.arcrobotics.ftclib.vision.UGContourRingDetector;
 import com.arcrobotics.ftclib.vision.UGContourRingPipeline;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,27 +12,27 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.internal.ftdi.eeprom.FT_EEPROM_232H;
-import org.firstinspires.ftc.teamcode.FieldConstants;
-import org.firstinspires.ftc.teamcode.MathFunctions;
+
+import org.firstinspires.ftc.teamcode.Ramsete.Pose;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.hardware.Hardware;
 import org.firstinspires.ftc.teamcode.hardware.HardwareComponents.TimedAction;
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
+import org.firstinspires.ftc.teamcode.hardware.HardwareThreadInterface;
 import org.firstinspires.ftc.teamcode.hardware.PID.ShooterPID;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
-
 @Config
-@Autonomous(name = "RedMTIStack", group = "Autonomous")
-public class RMTI extends LinearOpMode {
+@Autonomous(name = "BlueMTIStack", group = "Autonomous")
+public class BMTI extends LinearOpMode {
     public static double velo = 0;
-    public static boolean updateTurret = true;
+    public static boolean updateTurret = false;
     TimedAction flicker;
 
     //state machine
     public enum State{
-        STARTED, //shooter off, turns on turret tracking
+        STARTED, //shooter off
+        TURRETON, //turns turret tracking on
         ARMDOWN, //moves wobble arm to drop wobble
         ARMDOWN2, //moves wobble arm to final drop pos
         OPENCLAW, //opens wobble claw to drop wobble
@@ -48,7 +47,7 @@ public class RMTI extends LinearOpMode {
     }
     public State state = State.STARTED;
 
-    Pose2d startPose = new Pose2d(-63, -47, Math.PI); //starting pose
+    Pose2d startPose = new Pose2d(-63, 47, Math.PI); //starting pose
 
     @Override
     public void runOpMode() {
@@ -88,66 +87,78 @@ public class RMTI extends LinearOpMode {
         TrajectorySequence zeroStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
                 .addTemporalMarker(0.1, () -> state = State.STARTED)
-                .addTemporalMarker(18, ()->hardware.intake.dropIntake()) //time to wait before dropping intake
-                .addTemporalMarker(20, ()->hardware.intake.raiseBumper()) //bring bumper back up
-                .waitSeconds(11)
-                .splineTo(new Vector2d(-11,-58), 0) //wobble
+                .waitSeconds(17)
+                .splineTo(new Vector2d(-11,60), 0) //wobble and shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
                 .UNSTABLE_addTemporalMarkerOffset(1, ()-> state = State.ARMDOWN2)
                 .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
                 .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
                 .waitSeconds(2.5) //total time for wobble sequence
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, ()-> hardware.intake.dropIntake())
+                .UNSTABLE_addTemporalMarkerOffset(0.5, ()-> state = State.TURRETON)
+                .UNSTABLE_addTemporalMarkerOffset(1.0, ()-> hardware.intake.raiseBumper())
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(4.95, ()-> state = State.RESET)
                 .waitSeconds(5) //total time for shooting sequence
-                .lineTo(new Vector2d(-14, -42)) //park
-                .addDisplacementMarker(()->state = State.RESET)
-                .lineToLinearHeading(new Pose2d(10, -42, 0)) //park
+                .splineToLinearHeading(new Pose2d(14, 36, Math.toRadians(-1)), 0) //park
                 .addTemporalMarker(29.9, ()->state = State.STOP)
                 .build();
         //one stack path
         TrajectorySequence oneStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addTemporalMarker(0.1, () -> state = State.STARTED)
-                .waitSeconds(4)
-                .lineToConstantHeading(new Vector2d(-6, -58)) //shooting
+                .waitSeconds(9)
+                .splineToSplineHeading(new Pose2d(-11,58, Math.toRadians(160)), 0) //shooting
                 .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, ()-> hardware.intake.dropIntake())
+                .UNSTABLE_addTemporalMarkerOffset(0.5, ()-> state = State.TURRETON)
+                .UNSTABLE_addTemporalMarkerOffset(2.0, ()-> hardware.intake.raiseBumper())
                 .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> state = State.SHOOTERSHOOT)
-                .UNSTABLE_addTemporalMarkerOffset(4.85, ()-> state = State.SHOOTEROFF)
-                .waitSeconds(5) //total time for shooting sequence
-                .splineToConstantHeading(new Vector2d(10, -36), 0) //wobble
-                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> hardware.intake.dropIntake())
-                .UNSTABLE_addTemporalMarkerOffset(0.5, ()-> hardware.intake.raiseBumper())
-                .UNSTABLE_addTemporalMarkerOffset(0.6, ()-> state = State.ARMDOWN)
-                .UNSTABLE_addTemporalMarkerOffset(1.75, ()-> state = State.OPENCLAW)
-                .UNSTABLE_addTemporalMarkerOffset(2.9, ()-> state = State.ARMUP)
-                .UNSTABLE_addTemporalMarkerOffset(2.99, ()-> state = State.INTAKEON)
-                .waitSeconds(3) //total time for wobble sequence
-                .lineToConstantHeading(new Vector2d(-20, -39)) //stack pickup
-                .UNSTABLE_addTemporalMarkerOffset(2, () -> state = State.INTAKEOFF)
-                .UNSTABLE_addTemporalMarkerOffset(2.1, ()-> state = State.SHOOTERON)
-                .UNSTABLE_addTemporalMarkerOffset(5.25, ()-> state = State.SHOOTERSHOOT)
-                .UNSTABLE_addTemporalMarkerOffset(6.85, ()-> state = State.SHOOTEROFF)
-                .UNSTABLE_addTemporalMarkerOffset(6.9, ()-> state = State.RESET)
-                .waitSeconds(7) //total time for shooting sequence
-                .lineToLinearHeading(new Pose2d(10, -58, Math.PI/2))
-                .addTemporalMarker(29.9, ()->state = State.STOP)
+                .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(4.95, ()-> state = State.RESET)
+                .UNSTABLE_addTemporalMarkerOffset(4.99, ()-> state = State.INTAKEON)
+                .waitSeconds(5)
+                .lineToLinearHeading(new Pose2d(-18, 38, Math.toRadians(240))) //stack
+                .splineTo(new Vector2d(10, 48), 0) //wobble
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.INTAKEOFF)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1, ()-> state = State.ARMDOWN2)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
+                .waitSeconds(2.5)
+                .lineToLinearHeading(new Pose2d(0,58, Math.toRadians(-90))) //shoot
+                .UNSTABLE_addTemporalMarkerOffset(0.2, ()-> state = State.TURRETON)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(3.0, ()-> state = State.SHOOTERSHOOT)
+                .UNSTABLE_addTemporalMarkerOffset(3.8, ()-> state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(3.95, ()-> state = State.RESET)
+                .waitSeconds(4)
+                .lineTo(new Vector2d(10, 58))
+                .addDisplacementMarker(()-> state = State.STOP)
                 .build();
         //four stack path
         TrajectorySequence fourStack = drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
-                .addTemporalMarker(0.1, () -> state = State.STARTED)
-                .splineTo(new Vector2d(-8,-58), 0) //shooting
-                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> hardware.intake.dropIntake())
-                .UNSTABLE_addTemporalMarkerOffset(0.15, ()-> state = State.SHOOTERON)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, ()-> hardware.intake.raiseBumper())
-                .UNSTABLE_addTemporalMarkerOffset(1.0, ()-> hardware.intake.dropIntake())
-                .UNSTABLE_addTemporalMarkerOffset(2.15, ()-> state = State.SHOOTERSHOOT)
-                .UNSTABLE_addTemporalMarkerOffset(3.45, ()-> state = State.SHOOTEROFF)
-                .waitSeconds(3.5) //total time for shooting sequence
+                .splineToSplineHeading(new Pose2d(-11,58, Math.toRadians(160)), 0) //shooting
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, ()-> hardware.intake.dropIntake())
+                .UNSTABLE_addTemporalMarkerOffset(0.5, ()-> state = State.TURRETON)
+                .UNSTABLE_addTemporalMarkerOffset(1.0, ()-> hardware.intake.raiseBumper())
+                .UNSTABLE_addTemporalMarkerOffset(2.0, ()-> hardware.intake.dropIntake())
+                .UNSTABLE_addTemporalMarkerOffset(2.0, ()-> state = State.SHOOTERSHOOT)
+                .UNSTABLE_addTemporalMarkerOffset(3.4, ()-> state = State.SHOOTEROFF)
+                .UNSTABLE_addTemporalMarkerOffset(3.45, ()-> state = State.RESET)
+                .waitSeconds(3.5)
+                .splineToSplineHeading(new Pose2d(34, 56, Math.toRadians(225)), 0) //wobble
+                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
+                .UNSTABLE_addTemporalMarkerOffset(1, ()-> state = State.ARMDOWN2)
+                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
+                .UNSTABLE_addTemporalMarkerOffset(1.7, ()-> state = State.ARMUP)
+                .waitSeconds(1.75)
                 .setReversed(false)
-                .lineToLinearHeading(new Pose2d(-15, -47, Math.toRadians(135)))
+                .splineTo(new Vector2d(10, 40), Math.PI) //spline to stack
+                .splineTo(new Vector2d(-12, 34), Math.PI) //spline to stack
                 .addDisplacementMarker(()-> state = State.INTAKEON)
                 .forward(16,
                         SampleMecanumDrive.getVelocityConstraint(5, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
@@ -155,6 +166,7 @@ public class RMTI extends LinearOpMode {
                 )
                 .UNSTABLE_addTemporalMarkerOffset(1.0, ()-> state = State.INTAKEOFF)
                 .UNSTABLE_addTemporalMarkerOffset(1.1, ()-> state = State.SHOOTERON)
+                .UNSTABLE_addTemporalMarkerOffset(1.2, ()-> state = State.TURRETON)
                 .UNSTABLE_addTemporalMarkerOffset(3, ()-> state = State.SHOOTERSHOOT)
                 .UNSTABLE_addTemporalMarkerOffset(4.4, ()-> state = State.SHOOTEROFF)
                 .UNSTABLE_addTemporalMarkerOffset(4.49, ()-> state = State.INTAKEON)
@@ -169,21 +181,9 @@ public class RMTI extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(4.4, ()-> state = State.SHOOTEROFF)
                 .UNSTABLE_addTemporalMarkerOffset(4.49, ()-> state = State.RESET)
                 .waitSeconds(4.5) //total time for shooting sequence
-                .setReversed(true)
-                .splineTo(new Vector2d(0, -59), 0) //wobble
-                .splineTo(new Vector2d(34, -59), 0) //wobble
-                .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> state = State.ARMDOWN)
-                .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> state = State.OPENCLAW)
-                .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> state = State.ARMUP)
-                .waitSeconds(2.5) //total time for wobble sequence
-                .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
+                .lineToLinearHeading(new Pose2d(10, 58, -Math.PI/2)) //park
                 .addTemporalMarker(29.9, ()->state = State.STOP)
                 .build();
-
-        /*
-            SampleMecanumDrive.getVelocityConstraint(15, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-    SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
-         */
 
         //camera control
         UGContourRingDetector detector;
@@ -207,7 +207,6 @@ public class RMTI extends LinearOpMode {
                 drive.followTrajectorySequenceAsync(oneStack);
                 break;
             case FOUR:
-                hardware.shooter.rampAngleAdjustmentConstant = -0.025;
                 drive.followTrajectorySequenceAsync(fourStack);
                 break;
         }
@@ -224,22 +223,13 @@ public class RMTI extends LinearOpMode {
             telemetry.addData("State", state);
             telemetry.update();
 
-            double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,hardware.getAngle());
-            double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
-            telemetry.addData("Requested shooter velo: ", velo);
-            telemetry.addData("State", state);
-            telemetry.addData("Turret heading:", Math.toDegrees(hardware.turret.localTurretAngleRadians()));
-            telemetry.addData("Angle to goal:", Math.toDegrees(Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]) + hardware.turret.getTurretOffset(distanceToGoal)));
-            telemetry.addData("Distance to goal:", distanceToGoal);
-            telemetry.addData("Record pose:", hardware.drive.recordPose);
-            telemetry.update();
-
             //states for auto
             switch (state) {
                 case STARTED:
+                    hardware.turret.maxPositive = Math.toRadians(0);
+                    hardware.turret.maxNegative = Math.toRadians(-200);
                     hardware.turret.updatePID = true;
                     velo = 0;
-                    hardware.turret.maxPositive = Math.toRadians(0);
                     break;
                 case ARMDOWN:
                     hardware.wobbler.goToWobblerDropPosition();
@@ -251,13 +241,12 @@ public class RMTI extends LinearOpMode {
                     hardware.wobbler.releaseWobble();
                     break;
                 case ARMUP:
+                    hardware.turret.maxPositive = Math.toRadians(315);
+                    hardware.turret.maxNegative = Math.toRadians(-225);
                     hardware.wobbler.goToClawRestingPos();
                     hardware.wobbler.goToArmRestingPos();
-                    hardware.turret.maxPositive = Math.toRadians(315);
                     break;
                 case SHOOTERON:
-//                    hardware.turret.turretAngleOffsetAdjustmentConstant = Math.toRadians(1);
-//                    hardware.shooter.rampAngleAdjustmentConstant = -0.025;
                     hardware.mag.dropRings();
                     velo = 1350;
                     break;
@@ -274,6 +263,9 @@ public class RMTI extends LinearOpMode {
                     break;
                 case INTAKEOFF:
                     hardware.intake.turnIntake(0);
+                    break;
+                case TURRETON:
+                    updateTurret = true;
                     break;
                 case RESET:
                     hardware.turret.setLocalTurretAngle(0);

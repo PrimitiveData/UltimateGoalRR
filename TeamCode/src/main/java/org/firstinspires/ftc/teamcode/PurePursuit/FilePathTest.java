@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.PurePursuit;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-@TeleOp(name="FilePathTest", group="TeleOp")
+@Disabled
 public class FilePathTest extends LinearOpMode {
     public void runOpMode(){
         File file = new File("//sdcard//FIRST//points.txt.txt");

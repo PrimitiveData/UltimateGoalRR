@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision.BlobDetection;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,7 +9,7 @@ import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCamera;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraFactory;
 import org.firstinspires.ftc.teamcode.easyopencv.OpenCvCameraRotation;
 
-@TeleOp(name="BlobDetector", group="TeleOp")
+@Disabled
 public class BlobDetectionOpMode extends LinearOpMode {
     OpenCvCamera webcam;
     public void runOpMode() {

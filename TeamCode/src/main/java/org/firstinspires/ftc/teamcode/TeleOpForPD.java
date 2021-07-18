@@ -2,14 +2,17 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
+import kotlin.DslMarker;
+
 
 @Config
-@TeleOp
+@Disabled
 public class TeleOpForPD extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

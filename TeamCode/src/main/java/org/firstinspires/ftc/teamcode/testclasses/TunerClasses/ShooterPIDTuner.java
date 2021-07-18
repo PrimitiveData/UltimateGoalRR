@@ -2,12 +2,13 @@ package org.firstinspires.ftc.teamcode.testclasses.TunerClasses;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 
-@TeleOp(group = "TeleOp", name = "ShooterPIDTuner")
+@Disabled
 public class ShooterPIDTuner extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

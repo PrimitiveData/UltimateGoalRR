@@ -150,8 +150,15 @@ public class Turret {
     public void update(double shooterVelo, Pose2d poseEstimate, boolean red, boolean update) {
         double bussinAngle = bussinKalman.updateKalmanEstimate(hardware.getAngle(), hardware.drive.getRawExternalHeading());
         double[] turretPosition = MathFunctions.transposeCoordinate(hardware.getXAbsoluteCenter(),hardware.getYAbsoluteCenter(),-4.22,bussinAngle);
-        double distanceToGoal = Math.hypot(turretPosition[1]- FieldConstants.highGoalPosition[1],turretPosition[0] - FieldConstants.highGoalPosition[0]);
-        double angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1]-turretPosition[1], FieldConstants.highGoalPosition[0]-turretPosition[0]);
+        double distanceToGoal, angleToGoal;
+        if(red) {
+            distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.highGoalPosition[1], turretPosition[0] - FieldConstants.highGoalPosition[0]);
+            angleToGoal = Math.atan2(FieldConstants.highGoalPosition[1] - turretPosition[1], FieldConstants.highGoalPosition[0] - turretPosition[0]);
+        }
+        else{
+            distanceToGoal = Math.hypot(turretPosition[1] - FieldConstants.blueHighGoalPosition[1], turretPosition[0] - FieldConstants.blueHighGoalPosition[0]);
+            angleToGoal = Math.atan2(FieldConstants.blueHighGoalPosition[1] - turretPosition[1], FieldConstants.blueHighGoalPosition[0] - turretPosition[0]);
+        }
         if (update){
             hardware.shooter.autoRampPositionForHighGoal(distanceToGoal);
             hardware.turret.updatePID = true;

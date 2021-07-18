@@ -112,27 +112,20 @@ public class MeepMeepTesting{
                 .setBackgroundAlpha(1f)
                 // Set constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(55, 60, Math.toRadians(211.05948602103072), Math.toRadians(211.05948602103072), 15.7471307087)
-                .followTrajectorySequence(drive ->     drive.trajectorySequenceBuilder(new Pose2d(-63, -47, Math.PI))
+                .followTrajectorySequence(drive ->     drive.trajectorySequenceBuilder(new Pose2d(-63, 47, Math.PI))
                         .setReversed(true)
-                        .setReversed(true)
-                        .addTemporalMarker(0.1, () -> {})
-                        .addTemporalMarker(1, ()->{}) //time to wait before dropping intake
-                        .splineTo(shooterVector, 0) //shooting
-                        .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
-                        .UNSTABLE_addTemporalMarkerOffset(3.25, ()-> {})
-                        .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> {})
-                        .waitSeconds(5) //total time for shooting sequence
-                        .lineToLinearHeading(new Pose2d(-14, -48, Math.toRadians(135)))
+                        .splineToSplineHeading(new Pose2d(-11,58, Math.toRadians(160)), 0) //shooting
+                        .waitSeconds(5)
+                        .splineToSplineHeading(new Pose2d(40, 56, Math.toRadians(225)), 0)
+                        .waitSeconds(2.5)
+                        .setReversed(false)
+                        .splineTo(new Vector2d(10, 50), Math.PI)
+                        .splineTo(new Vector2d(-12, 36), Math.PI) //spline to stack
+                        .forward(16)
+                        .waitSeconds(7)
                         .forward(12)
-                        .forward(8)
-                        .splineToLinearHeading(new Pose2d(0, -59, Math.PI), 0) //wobble
-                        .splineToLinearHeading(new Pose2d(34, -59, Math.PI), 0) //wobble
-                        .UNSTABLE_addTemporalMarkerOffset(0.1, ()-> {})
-                        .UNSTABLE_addTemporalMarkerOffset(1.25, ()-> {})
-                        .UNSTABLE_addTemporalMarkerOffset(2.49, ()-> {})
-                        .waitSeconds(2.5) //total time for wobble sequence
-                        .lineToSplineHeading(new Pose2d(10,-56, Math.toRadians(90))) //park
-                        .addTemporalMarker(29.9, ()->{})
+                        .waitSeconds(6)
+                        .lineToLinearHeading(new Pose2d(10, 58, -Math.PI/2))
                         .build()
 
                 )

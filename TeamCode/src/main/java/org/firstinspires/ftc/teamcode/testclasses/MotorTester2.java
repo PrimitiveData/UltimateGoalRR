@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.testclasses;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name = "motorTesterTwoMotors",group = "TeleOp")
+@Disabled
 public class MotorTester2 extends LinearOpMode {
     public void runOpMode(){
         DcMotorEx motorToTest = hardwareMap.get(DcMotorEx.class,"motorToTest");

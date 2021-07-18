@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.testclasses.WithMecanumHardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.HardwareMecanum;
 import org.firstinspires.ftc.teamcode.hardware.PID.PIDwithBasePower;
 
-@TeleOp(group = "TeleOp", name = "PrintTurretPosition")
+@Disabled
 public class PrintTurretPosition extends LinearOpMode {
     public void runOpMode(){
         HardwareMecanum hardware = new HardwareMecanum(hardwareMap, telemetry);

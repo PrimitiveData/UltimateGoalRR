@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.testclasses.TunerClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.FileWriter;
 import java.io.IOException;
-@Autonomous(name = "FFtunerGeneric", group = "Autonomous")
+@Disabled
 public class FeedForwardTunerGeneric extends LinearOpMode {
     final double ZERO_TO_MAX_TIME = 180000;//milliseconds
     public void runOpMode(){
