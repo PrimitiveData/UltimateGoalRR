@@ -216,7 +216,7 @@ public class RMTI extends LinearOpMode {
             //hardware and drive updating
             hardware.loop();
             //turret autoaim update
-            hardware.turret.update(velo, drive.getPoseEstimate(), false, updateTurret);
+            hardware.turret.update(velo, drive.getPoseEstimate(), true, updateTurret);
 
             hardware.shooter.updateShooterPIDF();
 

@@ -114,18 +114,9 @@ public class MeepMeepTesting{
                 .setConstraints(55, 60, Math.toRadians(211.05948602103072), Math.toRadians(211.05948602103072), 15.7471307087)
                 .followTrajectorySequence(drive ->     drive.trajectorySequenceBuilder(new Pose2d(-63, 47, Math.PI))
                         .setReversed(true)
-                        .splineToSplineHeading(new Pose2d(-11,58, Math.toRadians(160)), 0) //shooting
-                        .waitSeconds(5)
-                        .splineToSplineHeading(new Pose2d(40, 56, Math.toRadians(225)), 0)
-                        .waitSeconds(2.5)
+                        .splineTo(new Vector2d(-11,60), 0) //wobble and shooting
                         .setReversed(false)
-                        .splineTo(new Vector2d(10, 50), Math.PI)
-                        .splineTo(new Vector2d(-12, 36), Math.PI) //spline to stack
-                        .forward(16)
-                        .waitSeconds(7)
-                        .forward(12)
-                        .waitSeconds(6)
-                        .lineToLinearHeading(new Pose2d(10, 58, -Math.PI/2))
+                        .splineToLinearHeading(new Pose2d(14, 36, -Math.PI/2), 0) //park
                         .build()
 
                 )

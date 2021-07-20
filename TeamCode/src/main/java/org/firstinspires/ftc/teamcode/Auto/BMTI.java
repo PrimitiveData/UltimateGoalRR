@@ -102,7 +102,7 @@ public class BMTI extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(4.9, ()-> state = State.SHOOTEROFF)
                 .UNSTABLE_addTemporalMarkerOffset(4.95, ()-> state = State.RESET)
                 .waitSeconds(5) //total time for shooting sequence
-                .splineToLinearHeading(new Pose2d(14, 36, Math.toRadians(-1)), 0) //park
+                .splineToLinearHeading(new Pose2d(14, 36, -Math.PI/2), 0) //park
                 .addTemporalMarker(29.9, ()->state = State.STOP)
                 .build();
         //one stack path
